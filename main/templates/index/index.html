@@ -9,6 +9,10 @@ The Vertex-Index!
 
 {% block main_content %}
 <h2>Index page</h2>
-    <a href="/test/test_page">Testing page</a>
+    <a href="/account/login">Login (with any account type)</a><br>
+    <a href="/account/register">Customer Register</a><br>
+    {%  if User %}
+    <a href="/account/your_account">View account</a><br>
+    {% endif %}
 {% endblock %}
 
