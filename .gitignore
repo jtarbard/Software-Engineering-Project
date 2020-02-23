@@ -1,8 +1,8 @@
 #pycharm files
-/.idea
+.idea/
 
 # python bytecode
 *.py[cod]
 
 #virtual environment
-/venv
+venv/
