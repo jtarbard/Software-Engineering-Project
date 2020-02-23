@@ -12,7 +12,7 @@ as the basic body -->
     <title>{%  block title %} {% endblock %}</title> <!-- Lets each page have its own title-->
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="../../static/css/main.css">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="icon" href="../../static" type="image/ico">
     {% block additional_css %}{% endblock %} <!--Allows extra css to be added-->
 </head>
