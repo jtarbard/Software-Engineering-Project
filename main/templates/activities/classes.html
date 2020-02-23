@@ -11,7 +11,7 @@ The Vertex classes!
     <ul>
     {% for activity in list %}
     <li>
-        {{ activity.activity_type.name[0] }}, {{ activity.start_time[0] }}, {{ activity.end_time[0] }}, <form action="/transaction/view_receipt" method="post"><input name="activity" type="hidden" value="{{ activity.activity_id[0] }}"><input type="submit" value="Book Now"></form>
+        {{ activity.activity_type[0].name }}, {{ activity.start_time }}, {{ activity.end_time }}, <form action="/transaction/view_receipt" method="post"><input name="activity" type="hidden" value="{{ activity.activity_id }}"><input type="submit" value="Book Now"></form>
     </li>
     {% endfor %}
     </ul>

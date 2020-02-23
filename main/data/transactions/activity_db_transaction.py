@@ -175,4 +175,9 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
 def return_activities_between_dates(start_date: datetime.datetime, end_time: datetime.datetime):
     session = db.create_session()
     print()
-    return session.query(Activity).filter(Activity.start_time > start_date, Activity.end_time < end_time)
+    return session.query(Activity).filter(Activity.start_time > start_date, Activity.end_time < end_time).all()
+
+
+def return_activity_with_id(activity_id: int):
+    session = db.create_session()
+    return session.query(Activity).filter(Activity.activity_id == activity_id).first()

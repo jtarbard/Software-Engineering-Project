@@ -119,3 +119,10 @@
 2020-02-23 20:48:06,094:main.data.transactions.user_db_transaction:Attempting to return user: Dante
 2020-02-23 20:48:12,912:main.data.transactions.user_db_transaction:Attempting to return user: Dante
 2020-02-23 20:48:15,836:main.data.transactions.user_db_transaction:Attempting to return user: Dante
+2020-02-23 20:59:53,672:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 20:59:54,033:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 20:59:58,837:main.data.transactions.user_db_transaction:Attempting to return user: Dante
+2020-02-23 21:00:01,094:main.data.transactions.user_db_transaction:Attempting to return user: Dante
+2020-02-23 21:00:13,929:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 21:00:14,260:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 21:00:17,379:main.data.transactions.user_db_transaction:Attempting to return user: Dante

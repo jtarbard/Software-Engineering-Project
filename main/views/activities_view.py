@@ -36,5 +36,5 @@ def view_receipt():
         # login page
 
     data_form = flask.request.form
-    activity_id = data_form.get('activity')
-    return flask.render_template("/activities/receipt.html", ID=activity_id, User=user) #ID=activity_id)
+    activity = adf.return_activity_with_id(data_form.get('activity'))
+    return flask.render_template("/activities/receipt.html", adctivity=activity, User=user) #ID=activity_id)
