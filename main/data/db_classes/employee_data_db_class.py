@@ -1,17 +1,22 @@
 import sqlalchemy as sa
+from sqlalchemy import orm
+
 from main.data.model_base import SqlAlchemyBase
 
 
 class Employee_Router(SqlAlchemyBase):
     __tablename__ = 'Employee_Router'
 
-    Employee_id = sa.Column(sa.Integer, sa.ForeignKey("Employees.employee_id"), nullable=False)
-    Activity_id = sa.Column(sa.Integer, sa.ForeignKey("Activities.activity_id"), nullable=False)
-    Role = sa.Column(sa.String, sa.ForeignKey("Roles.role_id"), nullable=False)
+    employee_id = sa.Column(sa.Integer, sa.ForeignKey("Employees.employee_id"), nullable=False)
+    activity_id = sa.Column(sa.Integer, sa.ForeignKey("Activities.activity_id"), nullable=False)
+    role_id = sa.Column(sa.String, sa.ForeignKey("Roles.role_id"), nullable=False)
 
     __table_args__ = (
-        sa.PrimaryKeyConstraint("Employee_id","Activity_id"),
+        sa.PrimaryKeyConstraint("employee_id","activity_id"),
     )
+
+    activity = orm.relationship("Activity", back_populates="employees", uselist=False)
+    role = orm.relationship("Role")
 
 
 class Facility(SqlAlchemyBase):
@@ -21,6 +26,8 @@ class Facility(SqlAlchemyBase):
     name = sa.Column(sa.String, nullable=False)
     definition = sa.Column(sa.String, nullable=False)
     max_space = sa.Column(sa.Integer, nullable=False)
+
+    activities = orm.relationship("Activity", back_populates="facility")
 
 
 class Role(SqlAlchemyBase):

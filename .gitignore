@@ -1,9 +1,2 @@
-# pycharm files
-.idea/**/*.xml
-
-# python bytecode
-__pychache__/
-.py[cod]
-
-# virtual environment
-venv/
+/venv/
+/.idea/

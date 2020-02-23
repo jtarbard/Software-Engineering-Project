@@ -3,17 +3,8 @@ from sqlalchemy import orm
 from datetime import datetime
 from main.data.model_base import SqlAlchemyBase
 
-#Customer_Connection = sa.Table(
-#    "Customer_Connection",
-#    SqlAlchemyBase.metadata,
-#    sa.Column("connection_id", sa.Integer, primary_key=True, autoincrement=True),
-#    sa.Column("customer_primary_id", sa.Integer, sa.ForeignKey("Customer.customer_id")),
-#    sa.Column("customer_secondary_id",sa.Integer, sa.ForeignKey("Customer.customer_id")),
-#    sa.Column("pending", sa.Boolean, default=True),
-#    sa.Column("date_created", sa.Date, default=datetime.now()),
-#)
-
-
+# Class mapped to the user table in the database, this is the parent class to the: customer, employee and
+# manager classes; this is defined by the __mapper_args__ field
 class User(SqlAlchemyBase):
     __tablename__ = 'Users'
 
@@ -29,26 +20,28 @@ class User(SqlAlchemyBase):
     postal_code = sa.Column(sa.String)
     address = sa.Column(sa.String)
     creation_date = sa.Column(sa.DateTime, default=datetime.now)
-    user_type = sa.Column(sa.Integer, sa.CheckConstraint("user_type >= 0 and user_type <= 2"), default=0)
 
-    discriminator = sa.Column('type', sa.String(50))
+    discriminator = sa.Column('type', sa.String(50)) #Type of user
     __mapper_args__ = {
         'polymorphic_on': discriminator
     }
 
 
+# Employee class that maps to the user table, data is automatically added to the user table when referencing the
+# employee, manager and customer tables
 class Employee(User):
     __tablename__ = 'Employees'
 
     employee_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
     user_id = sa.Column(sa.Integer, sa.ForeignKey("Users.user_id"), nullable=False)
-    composite_roles = sa.Column(sa.String, nullable=False)
+    composite_roles = sa.Column(sa.String, nullable=False) # Integer related to the roles that a user is allowed
+                                                           # To partake in for certain activities
 
     __mapper_args__ = {
         'polymorphic_identity': 'Employee'
     }
 
-    activities = orm.relation("Employee_Router", backref="employees")
+    router_activities = orm.relation("Employee_Router", backref="employee")
 
 
 class Customer(User):
@@ -62,9 +55,6 @@ class Customer(User):
     }
 
     purchases = orm.relation("Receipt", backref="customer")
-    #friends = orm.relation("Customer", secondary="Customer_Connection",
-    #                       primaryjoin=(id == Customer_Connection.c.customer_primary_id),
-    #                       secondaryjoin=id == Customer_Connection.c.customer_secondary_id)
 
 
 class Manager(User):

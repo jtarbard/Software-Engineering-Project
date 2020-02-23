@@ -19,9 +19,8 @@ class ActivityType(SqlAlchemyBase):
     valid_composite_roles = sa.Column(sa.String, nullable=False)
     max_staff = sa.Column(sa.Integer, nullable=False)
     min_staff = sa.Column(sa.Integer, nullable=False)
-    leisure_center_run = sa.Column(sa.Boolean, nullable=False)
 
-    memberships = orm.relationship("Membership", back_populates="activity")
+    activities = orm.relationship("Activity", back_populates="activity_type")
 
 
 class Activity(SqlAlchemyBase):
@@ -33,5 +32,6 @@ class Activity(SqlAlchemyBase):
     start_time = sa.Column(sa.DateTime, default=datetime.now, nullable=False)
     end_time = sa.Column(sa.DateTime, nullable=False)
 
-    facility = orm.relationship("Facility", back_populates="activities")
     activity_type = orm.relationship("ActivityType", back_populates="activities")
+    employees = orm.relationship("Employee_Router", back_populates="activity")
+    facility = orm.relationship("Facility", back_populates="activities", uselist=False)

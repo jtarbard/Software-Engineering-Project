@@ -1,9 +1,5 @@
-# pycharm files
-.idea/**/*.xml
-
-# python bytecode
-__pychache__/
-.py[cod]
-
-# virtual environment
-venv/
+# Default ignored files
+/workspace.xml
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
