@@ -82,3 +82,5 @@
 2020-02-23 19:48:20,877:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
 2020-02-23 19:48:50,596:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
 2020-02-23 19:48:50,922:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 20:18:44,572:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 20:18:44,750:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password

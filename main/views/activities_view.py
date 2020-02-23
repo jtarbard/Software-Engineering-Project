@@ -21,8 +21,8 @@ def view_classes():
     return flask.render_template("/activities/classes.html", User=user, list=activity_list)
 
 
-@blueprint.route("/transaction/view_receipt", methods=["POST, GET"])
+@blueprint.route("/transaction/view_receipt", methods=["POST"])
 def view_receipt():
     form = flask.request
     activity_id = form.get('activity')
-    return flask.render_template("/activities/receipt.html", User=user)
+    return flask.render_template("/activities/receipt.html", ID=activity_id)

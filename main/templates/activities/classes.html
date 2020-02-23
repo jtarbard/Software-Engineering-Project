@@ -8,7 +8,7 @@ The Vertex classes!
 {% endblock %}
 
 {% block main_content %}
-
+<form action="/transaction/view_receipt" method="post"><input name="activity" type="hidden" value="hello"><input type="submit" value="Book Now"></form>
     <ul>
     {% for activity in list %}
     <li>
