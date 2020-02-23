@@ -23,6 +23,18 @@ def view_classes():
 
 @blueprint.route("/transaction/view_receipt", methods=["POST"])
 def view_receipt():
-    form = flask.request
-    activity_id = form.get('activity')
-    return flask.render_template("/activities/receipt.html", ID=activity_id)
+    account_id = udf.check_valid_account_cookie(flask.request)  # Returns user ID from cookie
+    if account_id:
+        user = udf.return_user(account_id)  # Checks that the customer is in the database
+        if not user:  # If the customer is not in the database, then that customer has been deleted, but the user
+            # still has an account cookie, therefore the cookie must be destroyed as it is no longer valid
+            response = flask.redirect('/account/login')
+            udf.destroy_cookie(response)
+            return response
+    else:
+        return flask.redirect('/account/login')  # If the use does not have an account cookie then they are taken to the
+        # login page
+
+    data_form = flask.request.form
+    activity_id = data_form.get('activity')
+    return flask.render_template("/activities/receipt.html", ID=activity_id, User=user) #ID=activity_id)
