@@ -1,47 +1,6 @@
-import flask, os, sys, logging
-import main.data.db_session as db
-import main.data.transactions.reset_transaction as rt
+import flask
 
-folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.insert(0, folder)
-
-app = flask.Flask(__name__)
-
-
-# App is configured and ran
-def main():
-    configure()
-    app.run(debug=True)
-
-
-# App is configured
-def configure():
-    print("Configuring Flask app:")
-
-    register_blueprints()
-    print("Registered blueprints")
-
-    setup_db()
-    print("DB setup completed")
-
-    if rt.populate_db(create_activity_instances=True):
-        print("Populated database")
-    else:
-        print("Database already populated")
-
-    create_logging()
-    print("Logging created")
-
-    print("Starting application:")
-
-
-# Database is setup
-def setup_db():
-    db_file = os.path.join(
-        os.path.dirname(__file__),
-        'db',
-        'TheVertex.sqlite')
-    db.global_init(db_file)
+flask_app = flask.Flask(__name__)
 
 
 # All app blueprints are added
@@ -53,43 +12,51 @@ def register_blueprints():
     from main.views import transaction_view
     from main.views import activities_view
 
-    app.register_blueprint(index_view.blueprint)
-    app.register_blueprint(misc_view.blueprint)
-    app.register_blueprint(info_view.blueprint)
-    app.register_blueprint(account_view.blueprint)
-    app.register_blueprint(transaction_view.blueprint)
-    app.register_blueprint(activities_view.blueprint)
+    flask_app.register_blueprint(index_view.blueprint)
+    flask_app.register_blueprint(misc_view.blueprint)
+    flask_app.register_blueprint(info_view.blueprint)
+    flask_app.register_blueprint(account_view.blueprint)
+    flask_app.register_blueprint(transaction_view.blueprint)
+    flask_app.register_blueprint(activities_view.blueprint)
+
+
+# Database is setup
+def setup_db():
+    import main.data.db_session as db_session
+    db_session.global_init(flask_app)
 
 
 # Error logging is created so all errors are recorded
 def create_logging():
-    file_error_handler = logging.FileHandler("logs/server_error.log")
-    file_error_handler.setFormatter(logging.Formatter("%(asctime)s:%(module)s:%(message)s"))
-    file_error_handler.setLevel(logging.WARNING)
-
-    app.logger.addHandler(file_error_handler)
+    import main.logger as logger
+    logger.create_transaction_logger()
+    logger.create_flask_logger(flask_app)
 
 
-# Returns a 'not found' page if the route cannot be established
-@app.errorhandler(404)
-def page_not_found(Error):
-    return flask.render_template('/misc/not_found.html', has_cookie=True, nav=False, footer=False), 404
+# App is configured
+def configure():
+    print("Configuring Flask app:")
 
+    setup_db()
+    print("DB setup completed")
 
-@app.errorhandler(405)
-def page_not_found(Error):
-    return flask.render_template('/misc/not_found.html', has_cookie=True, nav=False, footer=False), 405
+    register_blueprints()
+    print("Registered blueprints")
 
+    import main.data.transactions.reset_transaction as rt
+    if rt.populate_db(create_activity_instances=True):
+        print("Populated database")
+    else:
+        print("Database already populated")
 
-# Returns a 'server error' page if an error occurs
-@app.errorhandler(500)
-def page_not_found(Error):
-    return flask.render_template('/misc/server_error.html', has_cookie=True, nav=False, footer=False), 500
+    create_logging()
+    print("Logging created")
+
+    print("Starting application:")
 
 
 if __name__ == '__main__':
-    main()
+    configure()
+    flask_app.run(debug=True)
 else:
     configure()
-
-

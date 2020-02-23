@@ -1,39 +1,36 @@
-import sqlalchemy as sa
-from sqlalchemy import orm
-
-from main.data.model_base import SqlAlchemyBase
+from main.data.db_session import database
 
 
-class Employee_Router(SqlAlchemyBase):
+class Employee_Router(database.Model):
     __tablename__ = 'Employee_Router'
 
-    employee_id = sa.Column(sa.Integer, sa.ForeignKey("Employees.employee_id"), nullable=False)
-    activity_id = sa.Column(sa.Integer, sa.ForeignKey("Activities.activity_id"), nullable=False)
-    role_id = sa.Column(sa.String, sa.ForeignKey("Roles.role_id"), nullable=False)
+    employee_id = database.Column(database.Integer, database.ForeignKey("Employees.employee_id"), nullable=False)
+    activity_id = database.Column(database.Integer, database.ForeignKey("Activities.activity_id"), nullable=False)
+    role_id = database.Column(database.String, database.ForeignKey("Roles.role_id"), nullable=False)
 
     __table_args__ = (
-        sa.PrimaryKeyConstraint("employee_id","activity_id"),
+        database.PrimaryKeyConstraint("employee_id","activity_id"),
     )
 
-    activity = orm.relationship("Activity", back_populates="employees", uselist=False)
-    role = orm.relationship("Role")
+    activity = database.relationship("Activity", back_populates="employees", uselist=False)
+    role = database.relationship("Role")
 
 
-class Facility(SqlAlchemyBase):
+class Facility(database.Model):
     __tablename__ = 'Facilities'
 
-    facility_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    name = sa.Column(sa.String, nullable=False)
-    definition = sa.Column(sa.String, nullable=False)
-    max_space = sa.Column(sa.Integer, nullable=False)
+    facility_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    name = database.Column(database.String, nullable=False)
+    definition = database.Column(database.String, nullable=False)
+    max_space = database.Column(database.Integer, nullable=False)
 
-    activities = orm.relationship("Activity", back_populates="facility")
+    activities = database.relationship("Activity", back_populates="facility")
 
 
-class Role(SqlAlchemyBase):
+class Role(database.Model):
     __tablename__ = 'Roles'
 
-    role_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    role_name = sa.Column(sa.String, nullable=False)
-    description = sa.Column(sa.String)
-    hourly_pay = sa.Column(sa.Integer, nullable=False)
+    role_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    role_name = database.Column(database.String, nullable=False)
+    description = database.Column(database.String)
+    hourly_pay = database.Column(database.Integer, nullable=False)

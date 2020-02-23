@@ -8,17 +8,7 @@ import main.data.db_session as db
 from flask import Response
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
 from main.data.db_classes.user_db_class import Customer, User, Employee, Manager
-
-# Logging has been individually set for this file, as transactions in the database
-# are important and must be recorded
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler("logs/transactions.log")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
-
-logger.addHandler(file_handler)
+from main.logger import log_transaction
 
 
 # Hashes data passed to the function, this used for hashing user passwords
@@ -61,21 +51,21 @@ def check_valid_account_cookie(request: flask.request):
     val = request.cookies["vertex_account_cookie"]
     split_list = val.split(":")
     if len(split_list) != 2:
-        logger.info(f"IP:{request.access_route} contains invalid cookie")
+        log_transaction(f"IP:{request.access_route} contains invalid cookie")
         return None
 
     user_id = split_list[0]  # User Id is returned
     hash_val = split_list[1]  # Hash is returned
     hash_val_check = __hash_text(user_id)  # Hashed is checked to make sure the cookie is valid (ensures someone cannot
     if hash_val != hash_val_check:  # access the user account unless they have logged in successfully)
-        logger.info(f"IP:{request.access_route} has invalid cookie hash")
+        log_transaction(f"IP:{request.access_route} has invalid cookie hash")
         return None
 
     try:
         user_id = int(user_id)  # Attempts to convert ID to int
     except ValueError:
         response: Response = flask.redirect("/login")  # If there is an error, then the cookie is invalid and is destroyed
-        logger.info(f"IP:{request.access_route} contains invalid cookie")
+        log_transaction(f"IP:{request.access_route} contains invalid cookie")
         destroy_cookie(response)
     else:
         return user_id # User_id is returned and the customer can successful access their account data
@@ -87,7 +77,6 @@ def check_valid_account_cookie(request: flask.request):
 #   - 1 : employee account
 #   - 2 : manager account
 def create_new_user_account(title, password, first_name, last_name, email, tel_number, dob, postcode, address, country, usertype):
-    session = db.create_session()
     if usertype == 0:
         new_user: Customer = Customer()
     elif usertype == 1:
@@ -106,24 +95,21 @@ def create_new_user_account(title, password, first_name, last_name, email, tel_n
     new_user.postal_code = postcode
     new_user.address = address.lower()
     new_user.country = country.lower()
-    session.add(new_user)
 
-    logger.info(f"New User {new_user.user_id} of type {type(new_user)} added")
-
-    session.commit()
-
-    return new_user
+    if db.add_to_database(new_user):
+        log_transaction(f"New User {new_user.user_id} of type {type(new_user)} added")
+        return new_user
+    else:
+        return None
 
 
 # Simply returns the user with matching ID. Mainly used when a user has a verified cookie and needs access to
 # customer details
 def return_user(account_id):
-    session = db.create_session()
-    returned_user: User = session.query(User).filter(User.user_id == account_id).first()
-    if returned_user:
-        logger.info(f"Attempting to return user: {returned_user.first_name}")
-    else:
-        logger.info(f"Failed to return user with ID: {account_id}")
+    returned_user: User = db.session.query(User).filter(User.user_id == account_id).first()
+    if returned_user is None:
+        log_transaction(f"Failed to return user with ID: {account_id}")
+
     return returned_user
 
 
@@ -133,21 +119,16 @@ def check_user_is_in_database_and_password_valid(email: str, password: str):
     if not email or not password:
         return None
 
-    session = db.create_session()
-    returned_user = session.query(User).filter(User.email == email).first()
-
-    logger.info(f"Checking if:{email} has correct password")
+    returned_user = db.session.query(User).filter(User.email == email).first()
 
     if not returned_user:
-        logger.info(f"False: {email} does not exist")
+        log_transaction(f"{email} does not exist")
         return False
 
     if not verify_hash(returned_user.password, password):  # Password does not match encrypted password
-        logger.info(f"False: {email} did not enter correct password")
+        log_transaction(f"{email} did not enter correct password")
         return False
 
-    session.close()
-    logger.info(f"True: {email} did enter correct password")
     return returned_user
 
 
@@ -157,13 +138,10 @@ def check_user_is_in_database_and_password_valid(email: str, password: str):
 def check_if_email_exists(email: str) -> bool:
     if not email:
         return False
-    session = db.create_session()
-    logger.info(f"Checking if user:{email} exists in database")
-    returned_user = session.query(User).filter(User.email == email).first()  # User of that email is searched
-    session.close()
+
+    returned_user = db.session.query(User).filter(User.email == email).first()  # User of that email is searched
     if returned_user is None:
-        logger.info(f"True: {email} does not exist in database")
+        log_transaction(f"{email} does not exist in database")
         return False
     else:
-        logger.info(f"False: {email} does exist in database")
         return True

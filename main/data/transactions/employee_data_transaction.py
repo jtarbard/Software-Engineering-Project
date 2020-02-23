@@ -1,19 +1,8 @@
 # Holds all functions related to the employees/managers of the website and the transactions with the database
 import logging
 import main.data.db_session as db
-
 from main.data.db_classes.employee_data_db_class import Facility, Role, Employee_Router
-
-# Logging has been individually set for this file, as transactions in the database
-# are important and must be recorded
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler("logs/transactions.log")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
-
-logger.addHandler(file_handler)
+from main.logger import log_transaction
 
 
 # Returns all the roles from the composition value passed to the function parameter. EG: 1 = Lifeguard
@@ -53,19 +42,19 @@ def return_list_of_roles():
 #   - Hourly pay must be between £0 and £50
 def create_new_role(role_name: str, description: str, hourly_pay: float):
     if len(role_name) < 4 or len(role_name) > 20 or not role_name.replace(" ", "").isalpha():
-        logger.info(f"Failed to add new role {role_name}: role_name not correct length or type")
+        log_transaction(f"Failed to add new role {role_name}: role_name not correct length or type")
         return False
     if len(description) < 10 or len(description) > 200:
-        logger.info(f"Failed to add new role {role_name}: description not correct length or type")
+        log_transaction(f"Failed to add new role {role_name}: description not correct length or type")
         return False
     if hourly_pay < 0 or hourly_pay > 50:
-        logger.info(f"Failed to add new role {role_name}: invalid discount value")
+        log_transaction(f"Failed to add new role {role_name}: invalid discount value")
         return False
 
     current_roles = return_list_of_roles()
     for role in current_roles:
         if role.role_name == role_name.lower():
-            logger.info(f"Failed to add new role {role_name}: role name already exists")
+            log_transaction(f"Failed to add new role {role_name}: role name already exists")
             return False
 
     new_role = Role()
@@ -75,7 +64,7 @@ def create_new_role(role_name: str, description: str, hourly_pay: float):
 
     session = db.create_session()
     session.add(new_role)
-    logger.info(f"Added new role {role_name}")
+    log_transaction(f"Added new role {role_name}")
     session.commit()
     session.close()
     return True
