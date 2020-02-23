@@ -152,7 +152,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
             return False
 
     new_activity_type = ActivityType()
-    new_activity_type.name = name
+    new_activity_type.name = name.lower()
     new_activity_type.description = description
     new_activity_type.category = category
     new_activity_type.tags = tags
