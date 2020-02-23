@@ -1,0 +1,40 @@
+2020-02-23 15:10:41,601:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 15:10:41,601:main.data.transactions.user_db_transaction:False: team_10@leeds.ac.uk does not exist
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Creating database facilities:
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Main Swimming Pool
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Gym
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Sports Hall 1
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Sports Hall 2
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Climbing Wall
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Tennis Courts
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Outside Playing Field
+2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Studio Room
+2020-02-23 15:10:41,748:main.data.transactions.reset_transaction:Creating database job roles:
+2020-02-23 15:10:41,802:main.data.transactions.employee_data_transaction:Added new role Lifeguard
+2020-02-23 15:10:41,930:main.data.transactions.employee_data_transaction:Added new role Sports Coach
+2020-02-23 15:10:42,112:main.data.transactions.employee_data_transaction:Added new role Instructor
+2020-02-23 15:10:42,452:main.data.transactions.employee_data_transaction:Added new role Swim Teacher
+2020-02-23 15:10:42,617:main.data.transactions.employee_data_transaction:Added new role Activity Leader
+2020-02-23 15:10:42,751:main.data.transactions.employee_data_transaction:Added new role Activity Assistant
+2020-02-23 15:10:42,917:main.data.transactions.employee_data_transaction:Added new role Climbing Expert
+2020-02-23 15:10:43,050:main.data.transactions.employee_data_transaction:Added new role Trampoline Expert
+2020-02-23 15:10:43,166:main.data.transactions.employee_data_transaction:Added new role Martial Arts Expert
+2020-02-23 15:10:43,334:main.data.transactions.employee_data_transaction:Added new role Direct Manager
+2020-02-23 15:10:43,487:main.data.transactions.reset_transaction:Creating database membership types:
+2020-02-23 15:10:43,517:main.data.transactions.transaction_db_transaction:Adding new membership standard
+2020-02-23 15:10:43,669:main.data.transactions.transaction_db_transaction:Adding new membership premium
+2020-02-23 15:10:43,760:main.data.transactions.reset_transaction:Creating database activity types:
+2020-02-23 15:10:43,817:main.data.transactions.activity_db_transaction:Added new activity Football
+2020-02-23 15:10:44,016:main.data.transactions.activity_db_transaction:Added new activity Basketball
+2020-02-23 15:10:44,133:main.data.transactions.activity_db_transaction:Added new activity Badminton
+2020-02-23 15:10:44,267:main.data.transactions.activity_db_transaction:Added new activity Gym
+2020-02-23 15:10:44,383:main.data.transactions.activity_db_transaction:Added new activity Boxing
+2020-02-23 15:10:44,533:main.data.transactions.activity_db_transaction:Added new activity Climbing
+2020-02-23 15:10:44,667:main.data.transactions.activity_db_transaction:Added new activity Cricket
+2020-02-23 15:10:44,852:main.data.transactions.activity_db_transaction:Added new activity Tennis
+2020-02-23 15:10:45,070:main.data.transactions.activity_db_transaction:Added new activity General Swim
+2020-02-23 15:10:45,257:main.data.transactions.activity_db_transaction:Added new activity Swimming classes
+2020-02-23 15:10:45,383:main.data.transactions.activity_db_transaction:Added new activity Aqua
+2020-02-23 15:10:45,533:main.data.transactions.activity_db_transaction:Added new activity Yoga
+2020-02-23 15:10:45,621:main.data.transactions.reset_transaction:Creating database manager
+2020-02-23 15:10:46,176:main.data.transactions.reset_transaction:Creating timetable between dates: 2020-02-23 15:10:46.176801 and 2020-03-22 15:10:46.176801

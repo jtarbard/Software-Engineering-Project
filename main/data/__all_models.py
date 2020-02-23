@@ -5,6 +5,6 @@
 # Methodology
 
 from main.data.db_classes.activity_db_class import ActivityType, Activity
-from main.data.db_classes.transaction_db_class import Booking, Membership, Receipt, Subscription, MembershipType
+from main.data.db_classes.transaction_db_class import Booking, Membership, Receipt, MembershipType
 from main.data.db_classes.user_db_class import User, Customer, Manager, Employee
 from main.data.db_classes.employee_data_db_class import Employee_Router, Facility, Role

@@ -1,6 +1,6 @@
 import flask, os, sys, logging
 import main.data.db_session as db
-
+import main.data.transactions.reset_transaction as rt
 
 folder = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, folder)
@@ -22,7 +22,12 @@ def configure():
     print("Registered blueprints")
 
     setup_db()
-    print("DB setup completed.")
+    print("DB setup completed")
+
+    if rt.populate_db(create_activity_instances=True):
+        print("Populated database")
+    else:
+        print("Database already populated")
 
     create_logging()
     print("Logging created")
