@@ -38,3 +38,47 @@
 2020-02-23 15:10:45,533:main.data.transactions.activity_db_transaction:Added new activity Yoga
 2020-02-23 15:10:45,621:main.data.transactions.reset_transaction:Creating database manager
 2020-02-23 15:10:46,176:main.data.transactions.reset_transaction:Creating timetable between dates: 2020-02-23 15:10:46.176801 and 2020-03-22 15:10:46.176801
+2020-02-23 16:05:35,042:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 16:05:35,386:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 18:57:33,179:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 18:57:33,507:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 18:59:08,471:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 18:59:08,815:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:04:56,524:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:04:56,852:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:06:02,583:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:06:02,895:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:06:40,239:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:06:40,582:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:07:48,627:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:07:48,955:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:08:07,191:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:08:07,518:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:08:34,812:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:08:35,157:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:09:48,970:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:09:49,314:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:10:05,608:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:10:05,945:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:11:04,912:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:11:05,259:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:11:44,867:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:11:45,193:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:11:59,180:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:11:59,512:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:18:14,000:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:18:14,341:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:22:22,504:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:22:22,834:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:22:53,188:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:22:53,512:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:27:19,419:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:27:19,744:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:30:21,349:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:30:21,679:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:37:00,139:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:37:00,480:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:48:20,550:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:48:20,877:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password
+2020-02-23 19:48:50,596:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
+2020-02-23 19:48:50,922:main.data.transactions.user_db_transaction:True: team_10@leeds.ac.uk did enter correct password

@@ -8,5 +8,12 @@ The Vertex classes!
 {% endblock %}
 
 {% block main_content %}
-<h2>About page</h2>
+
+    <ul>
+    {% for activity in list %}
+    <li>
+        {{ activity.activity_type.name[0] }}, {{ activity.start_time[0] }}, {{ activity.end_time[0] }}, <form action="/transaction/view_receipt" method="post"><input name="activity" type="hidden" value="{{ activity.activity_id[0] }}"><input type="submit" value="Book Now"></form>
+    </li>
+    {% endfor %}
+    </ul>
 {% endblock %}
