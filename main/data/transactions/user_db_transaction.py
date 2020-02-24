@@ -123,11 +123,11 @@ def check_user_is_in_database_and_password_valid(email: str, password: str):
 
     if not returned_user:
         log_transaction(f"{email} does not exist")
-        return False
+        return None
 
     if not verify_hash(returned_user.password, password):  # Password does not match encrypted password
         log_transaction(f"{email} did not enter correct password")
-        return False
+        return None
 
     return returned_user
 

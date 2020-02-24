@@ -44,7 +44,7 @@ def configure():
     print("Registered blueprints")
 
     import main.data.transactions.reset_transaction as rt
-    if rt.populate_db(create_activity_instances=True):
+    if rt.populate_db(create_timetable=True):
         print("Populated database")
     else:
         print("Database already populated")

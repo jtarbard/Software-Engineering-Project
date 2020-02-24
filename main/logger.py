@@ -1,13 +1,14 @@
 import logging
 
 LOG_FORMAT = "%(asctime)s:%(name)s:%(message)s"
+LOGS_DIRECTORY = "../logs/"
 
 transaction_logger = None
 server_logger = None
 
 
 def create_transaction_logger():
-    transaction_handler = logging.FileHandler("logs/transactions.log")
+    transaction_handler = logging.FileHandler(LOGS_DIRECTORY+"transactions.log")
     transaction_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
     global transaction_logger
@@ -17,7 +18,7 @@ def create_transaction_logger():
 
 
 def create_flask_logger(flask_app):
-    server_error_handler = logging.FileHandler("logs/server_error.log")
+    server_error_handler = logging.FileHandler(LOGS_DIRECTORY+"server_error.log")
     server_error_handler.setFormatter(logging.Formatter(LOG_FORMAT))
     server_error_handler.setLevel(logging.WARNING)
 
