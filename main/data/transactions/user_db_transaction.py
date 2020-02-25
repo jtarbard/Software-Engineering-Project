@@ -106,7 +106,7 @@ def create_new_user_account(title, password, first_name, last_name, email, tel_n
 # Simply returns the user with matching ID. Mainly used when a user has a verified cookie and needs access to
 # customer details
 def return_user(account_id):
-    returned_user: User = db.session.query(User).filter(User.user_id == account_id).first()
+    returned_user: User = User.query.filter(User.user_id == account_id).first()
     if returned_user is None:
         log_transaction(f"Failed to return user with ID: {account_id}")
 
@@ -119,7 +119,7 @@ def check_user_is_in_database_and_password_valid(email: str, password: str):
     if not email or not password:
         return None
 
-    returned_user = db.session.query(User).filter(User.email == email).first()
+    returned_user = User.query.filter(User.email == email).first()
 
     if not returned_user:
         log_transaction(f"{email} does not exist")
@@ -139,7 +139,7 @@ def check_if_email_exists(email: str) -> bool:
     if not email:
         return False
 
-    returned_user = db.session.query(User).filter(User.email == email).first()  # User of that email is searched
+    returned_user = User.query.filter(User.email == email).first()  # User of that email is searched
     if returned_user is None:
         log_transaction(f"{email} does not exist in database")
         return False

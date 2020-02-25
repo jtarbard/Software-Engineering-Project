@@ -1,42 +1,36 @@
-2020-02-23 15:10:41,601:main.data.transactions.user_db_transaction:Checking if:team_10@leeds.ac.uk has correct password
-2020-02-23 15:10:41,601:main.data.transactions.user_db_transaction:False: team_10@leeds.ac.uk does not exist
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Creating database facilities:
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Main Swimming Pool
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Gym
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Sports Hall 1
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Sports Hall 2
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Climbing Wall
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Tennis Courts
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Outside Playing Field
-2020-02-23 15:10:41,601:main.data.transactions.reset_transaction:Added facility: Studio Room
-2020-02-23 15:10:41,748:main.data.transactions.reset_transaction:Creating database job roles:
-2020-02-23 15:10:41,802:main.data.transactions.employee_data_transaction:Added new role Lifeguard
-2020-02-23 15:10:41,930:main.data.transactions.employee_data_transaction:Added new role Sports Coach
-2020-02-23 15:10:42,112:main.data.transactions.employee_data_transaction:Added new role Instructor
-2020-02-23 15:10:42,452:main.data.transactions.employee_data_transaction:Added new role Swim Teacher
-2020-02-23 15:10:42,617:main.data.transactions.employee_data_transaction:Added new role Activity Leader
-2020-02-23 15:10:42,751:main.data.transactions.employee_data_transaction:Added new role Activity Assistant
-2020-02-23 15:10:42,917:main.data.transactions.employee_data_transaction:Added new role Climbing Expert
-2020-02-23 15:10:43,050:main.data.transactions.employee_data_transaction:Added new role Trampoline Expert
-2020-02-23 15:10:43,166:main.data.transactions.employee_data_transaction:Added new role Martial Arts Expert
-2020-02-23 15:10:43,334:main.data.transactions.employee_data_transaction:Added new role Direct Manager
-2020-02-23 15:10:43,487:main.data.transactions.reset_transaction:Creating database membership types:
-2020-02-23 15:10:43,517:main.data.transactions.transaction_db_transaction:Adding new membership standard
-2020-02-23 15:10:43,669:main.data.transactions.transaction_db_transaction:Adding new membership premium
-2020-02-23 15:10:43,760:main.data.transactions.reset_transaction:Creating database activity types:
-2020-02-23 15:10:43,817:main.data.transactions.activity_db_transaction:Added new activity Football
-2020-02-23 15:10:44,016:main.data.transactions.activity_db_transaction:Added new activity Basketball
-2020-02-23 15:10:44,133:main.data.transactions.activity_db_transaction:Added new activity Badminton
-2020-02-23 15:10:44,267:main.data.transactions.activity_db_transaction:Added new activity Gym
-2020-02-23 15:10:44,383:main.data.transactions.activity_db_transaction:Added new activity Boxing
-2020-02-23 15:10:44,533:main.data.transactions.activity_db_transaction:Added new activity Climbing
-2020-02-23 15:10:44,667:main.data.transactions.activity_db_transaction:Added new activity Cricket
-2020-02-23 15:10:44,852:main.data.transactions.activity_db_transaction:Added new activity Tennis
-2020-02-23 15:10:45,070:main.data.transactions.activity_db_transaction:Added new activity General Swim
-2020-02-23 15:10:45,257:main.data.transactions.activity_db_transaction:Added new activity Swimming classes
-2020-02-23 15:10:45,383:main.data.transactions.activity_db_transaction:Added new activity Aqua
-2020-02-23 15:10:45,533:main.data.transactions.activity_db_transaction:Added new activity Yoga
-2020-02-23 15:10:45,621:main.data.transactions.reset_transaction:Creating database manager
-2020-02-23 15:10:46,176:main.data.transactions.reset_transaction:Creating timetable between dates: 2020-02-23 15:10:46.176801 and 2020-03-22 15:10:46.176801
-2020-02-23 19:50:22,138:main.logger:Jake@gmail.com does not exist in database
-2020-02-23 19:50:22,245:main.logger:New User 2 of type <class 'main.data.db_classes.user_db_class.Customer'> added
+2020-02-25 16:29:42,215:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 16:29:42,351:main.logger:Added new role Lifeguard
+2020-02-25 16:29:42,368:main.logger:Added new role Sports Coach
+2020-02-25 16:29:42,387:main.logger:Added new role Instructor
+2020-02-25 16:29:42,401:main.logger:Added new role Swim Teacher
+2020-02-25 16:29:42,417:main.logger:Added new role Activity Leader
+2020-02-25 16:29:42,433:main.logger:Added new role Activity Assistant
+2020-02-25 16:29:42,450:main.logger:Added new role Climbing Expert
+2020-02-25 16:29:42,466:main.logger:Added new role Trampoline Expert
+2020-02-25 16:29:42,481:main.logger:Added new role Martial Arts Expert
+2020-02-25 16:29:42,495:main.logger:Added new role Direct Manager
+2020-02-25 16:29:42,495:main.logger:Creating database membership types:
+2020-02-25 16:29:42,528:main.logger:Creating database activity types:
+2020-02-25 16:29:42,730:main.logger:Creating database manager
+2020-02-25 16:29:42,831:main.logger:Creating timetable between dates: 2020-02-25 16:29:42.831516 and 2020-03-24 16:29:42.831538
+2020-02-25 16:29:53,551:main.logger:Failed to add new activity with id 9 starting on 2020-03-15 12:00:00 and ending 2020-03-15 19:00:00: date times invalid
+2020-02-25 16:29:58,786:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 16:29:58,912:main.logger:Failed to add new role Lifeguard: role name already exists
+2020-02-25 16:35:02,934:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 16:35:03,073:main.logger:Failed to add new role Lifeguard: role name already exists
+2020-02-25 16:35:56,888:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 16:35:57,024:main.logger:Added new role Lifeguard
+2020-02-25 16:35:57,040:main.logger:Added new role Sports Coach
+2020-02-25 16:35:57,056:main.logger:Added new role Instructor
+2020-02-25 16:35:57,073:main.logger:Added new role Swim Teacher
+2020-02-25 16:35:57,087:main.logger:Added new role Activity Leader
+2020-02-25 16:35:57,100:main.logger:Added new role Activity Assistant
+2020-02-25 16:35:57,117:main.logger:Added new role Climbing Expert
+2020-02-25 16:35:57,133:main.logger:Added new role Trampoline Expert
+2020-02-25 16:35:57,149:main.logger:Added new role Martial Arts Expert
+2020-02-25 16:35:57,164:main.logger:Added new role Direct Manager
+2020-02-25 16:35:57,164:main.logger:Creating database membership types:
+2020-02-25 16:35:57,194:main.logger:Creating database activity types:
+2020-02-25 16:35:57,401:main.logger:Creating database manager
+2020-02-25 16:35:57,501:main.logger:Creating timetable between dates: 2020-02-25 16:35:57.501622 and 2020-03-24 16:35:57.501642
+2020-02-25 16:36:24,155:main.logger:Failed to return user with ID: 3
