@@ -49,6 +49,12 @@ as the basic body -->
 
 <div class="main_content"> <!--Defines the main content for the webpages, this is where all
                                 the content is situated-->
+{% if page_title is defined %} <!-- Page title is not empty -->
+  <div class="jumbotron">
+    <h1>{{ page_title }}</h1>
+  </div>
+{% endif %}
+
 {% block main_content %} {% endblock %}
 </div>
 
