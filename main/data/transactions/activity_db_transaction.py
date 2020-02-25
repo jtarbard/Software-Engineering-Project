@@ -49,7 +49,7 @@ def remove_tag(tag: str):
 # Returns all the tags from the valid_tags.csv file
 def return_valid_tags_from_file():
     all_tags = []
-    with open("data/transactions/valid_tags.csv", newline="") as tag_file:
+    with open("main/data/transactions/valid_tags.csv", newline="") as tag_file:
         tag_reader = csv.reader(tag_file)
         for line in tag_reader:
             all_tags += line
@@ -141,7 +141,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     new_activity_type.valid_composite_roles = valid_composite_roles
     new_activity_type.max_staff = max_staff
     new_activity_type.min_staff = min_staff
-
+    
     add_to_database(new_activity_type)
     return True
 
@@ -151,13 +151,13 @@ def return_activity_instances_between_dates(activity_type_id: int, start_time: d
     end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute // 30)
 
     if type(activity_type_id) is not int:
-        logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
+        log_transaction(f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
         return False
     if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
-        logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: date times invalid")
+        log_transaction(f"Failed to return activity with id {activity_type_id} starting on {start_time}: date times invalid")
         return False
     if not return_activity_type_with_id(activity_type_id):
-        logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+        log_transaction(f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
         return False
 
     return Activity.query.filter(Activity.activity_type_id == activity_type_id,
@@ -193,3 +193,12 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
     new_activity.end_time = end_time
 
     add_to_database(new_activity)
+    return True
+
+
+def return_activities_between_dates(start_date: datetime.datetime, end_time: datetime.datetime):
+    return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time).all()
+
+
+def return_activity_with_id(activity_id: int):
+    return Activity.query.filter(Activity.activity_id == activity_id).first()

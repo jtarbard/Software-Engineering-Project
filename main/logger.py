@@ -1,7 +1,7 @@
 import logging
 
 LOG_FORMAT = "%(asctime)s:%(name)s:%(message)s"
-LOGS_DIRECTORY = "../logs/"
+LOGS_DIRECTORY = "logs/"
 
 transaction_logger = None
 server_logger = None

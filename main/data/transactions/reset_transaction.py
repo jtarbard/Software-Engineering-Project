@@ -200,7 +200,12 @@ def create_root_manager_account():
     manager_account.title = "Dr".lower()
     manager_account.password = udf.hash_text(MANAGER_PASSWORD)
 
-    return add_to_database(manager_account)
+    if add_to_database(manager_account) == False:
+        print("MANAGER NOT ADDED")
+        return False
+    else:
+        print("Manager added fine")
+        return True
 
 
 # Populates the activity table with semi-random activities, creates a timetable for the website
@@ -311,7 +316,7 @@ def populate_db(create_timetable):
             and create_activity_types() and create_root_manager_account():
 
         if create_timetable:
-            create_pseudorandom_activity_instances(end_date=timedelta(weeks=4))
+            create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
         return True
 
     else:
