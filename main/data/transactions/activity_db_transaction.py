@@ -4,21 +4,11 @@ import hashlib
 import logging
 import datetime
 import csv
-import main.data.db_session as db
+from main.data.db_session import database
+from main.logger import log_transaction
 
 from main.data.db_classes.activity_db_class import ActivityType, Activity
 import main.data.transactions.employee_data_transaction as edf
-
-# Logging has been individually set for this file, as transactions in the database
-# are important and must be recorded
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler("logs/transactions.log")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
-
-logger.addHandler(file_handler)
 
 
 # Returns the activity with the same id as the parameter
@@ -111,44 +101,44 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
                              valid_composite_roles: int, max_staff: int, min_staff: int):
 
     if len(name) < 3 or len(name) > 20 or not name.replace(" ", "").isalpha():
-        logger.info(f"Failed to add new activity type {name}: name not correct length or type")
+        log_transaction(f"Failed to add new activity type {name}: name not correct length or type")
         return False
     if len(category) < 4 or len(category) > 20 or not category.replace(" ", "").isalpha():
-        logger.info(f"Failed to add new activity type {name}: category not correct length or type")
+        log_transaction(f"Failed to add new activity type {name}: category not correct length or type")
         return False
     if len(description) < 10 or len(description) > 200:
-        logger.info(f"Failed to add new activity type {name}: description not correct length or type")
+        log_transaction(f"Failed to add new activity type {name}: description not correct length or type")
         return False
     if miniumum_age < 0 or miniumum_age > 100:
-        logger.info(f"Failed to add new activity type {name}: maximum_age or miniumum_age not correct size")
+        log_transaction(f"Failed to add new activity type {name}: maximum_age or miniumum_age not correct size")
         return False
     if maximum_activity_capacity > 150:
-        logger.info(f"Failed to add new activity type {name}: maximum_activity_capacity not correct size")
+        log_transaction(f"Failed to add new activity type {name}: maximum_activity_capacity not correct size")
         return False
     if hourly_activity_cost < 0 or hourly_activity_price < 0 or hourly_activity_price > 50 or hourly_activity_cost > 200:
-        logger.info(f"Failed to add new activity type {name}: hourly cost or price not correct size")
+        log_transaction(f"Failed to add new activity type {name}: hourly cost or price not correct size")
         return False
     if max_staff > 15 or max_staff < 0 or min_staff < 0 or min_staff > 10:
-        logger.info(f"Failed to add new activity type {name}: max_staff or min_staff not correct size")
+        log_transaction(f"Failed to add new activity type {name}: max_staff or min_staff not correct size")
         return False
 
     if not check_tags_are_valid(tags_list):
-        logger.info(f"Failed to add new activity type {name}: invalid tag instance")
+        log_transaction(f"Failed to add new activity type {name}: invalid tag instance")
         return False
 
     tags = ":".join(tags_list)
     if len(tags) > 200:
-        logger.info(f"Failed to add new activity type {name}: tag length too long")
+        log_transaction(f"Failed to add new activity type {name}: tag length too long")
         return False
 
     if not edf.return_roles_from_composition_value(valid_composite_roles):
-        logger.info(f"Failed to add new activity type {name}: composite roles are not valid")
+        log_transaction(f"Failed to add new activity type {name}: composite roles are not valid")
         return False
 
     activity_types = return_all_activity_types()
     for activity in activity_types:
         if activity.name == name.lower():
-            logger.info(f"Failed to add new activity type {name}: activity name already exists")
+            log_transaction(f"Failed to add new activity type {name}: activity name already exists")
             return False
 
     new_activity_type = ActivityType()
@@ -166,7 +156,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
 
     session = db.create_session()
     session.add(new_activity_type)
-    logger.info(f"Added new activity {name}")
+    log_transaction(f"Added new activity {name}")
     session.commit()
     session.close()
     return True
