@@ -37,6 +37,9 @@ def create_logging():
 def configure():
     print("Configuring Flask app:")
 
+    create_logging()
+    print("Logging created")
+
     setup_db()
     print("DB setup completed")
 
@@ -48,9 +51,6 @@ def configure():
         print("Populated database")
     else:
         print("Database already populated")
-
-    create_logging()
-    print("Logging created")
 
     print("Starting application:")
 

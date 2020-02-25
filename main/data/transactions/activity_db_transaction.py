@@ -1,10 +1,7 @@
 # Holds all functions related to the activities of the website and the transactions with the database
-import flask
-import hashlib
-import logging
 import datetime
 import csv
-from main.data.db_session import database
+from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
 from main.data.db_classes.activity_db_class import ActivityType, Activity
@@ -13,14 +10,12 @@ import main.data.transactions.employee_data_transaction as edf
 
 # Returns the activity with the same id as the parameter
 def return_activity_type_with_id(activity_type_id: int):
-    session = db.create_session()
-    return session.query(ActivityType).filter(ActivityType.activity_type_id == activity_type_id).first()
+    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
 
 # Returns an activity with the same name as the parameter
 def return_activity_type_with_name(activity_type_name: str):
-    session = db.create_session()
-    return session.query(ActivityType).filter(ActivityType.name == activity_type_name.lower()).first()
+    return ActivityType.query.filter(ActivityType.name == activity_type_name.lower()).first()
 
 
 # Attempts to add a tag to the list of tags in the csv file, if the tag exists in the csv file then the new tag is
@@ -54,7 +49,7 @@ def remove_tag(tag: str):
 # Returns all the tags from the valid_tags.csv file
 def return_valid_tags_from_file():
     all_tags = []
-    with open("main/data/transactions/valid_tags.csv", newline="") as tag_file:
+    with open("data/transactions/valid_tags.csv", newline="") as tag_file:
         tag_reader = csv.reader(tag_file)
         for line in tag_reader:
             all_tags += line
@@ -72,8 +67,7 @@ def check_tags_are_valid(tag_list: list):
 
 # Returns all the activity types stored in the database
 def return_all_activity_types():
-    session = db.create_session()
-    return session.query(ActivityType).all()
+    return ActivityType.query.all()
 
 
 # Used for creating a new activity type, each of the following parameters are checked as follows:
@@ -148,11 +142,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     new_activity_type.max_staff = max_staff
     new_activity_type.min_staff = min_staff
 
-    session = db.create_session()
-    session.add(new_activity_type)
-    log_transaction(f"Added new activity {name}")
-    session.commit()
-    session.close()
+    add_to_database(new_activity_type)
     return True
 
 
@@ -170,10 +160,9 @@ def return_activity_instances_between_dates(activity_type_id: int, start_time: d
         logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
         return False
 
-    session = db.create_session()
-    return session.query(Activity).filter(Activity.activity_type_id == activity_type_id,
-                                   Activity.start_time <= start_time,
-                                   Activity.end_time >= end_time).all()
+    return Activity.query.filter(Activity.activity_type_id == activity_type_id,
+                                 Activity.start_time <= start_time,
+                                 Activity.end_time >= end_time).all()
 
 
 def create_new_activity(activity_type_id: int, facility_name: str, start_time: datetime.datetime, end_time: datetime.datetime):
@@ -182,19 +171,19 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
     end_time= end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute//30)
 
     if type(activity_type_id) is not int:
-        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type id invalid")
+        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type id invalid")
         return False
     if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
-        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
+        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
         return False
     if not facility:
-        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: facility does not exist")
+        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: facility does not exist")
         return False
     if not return_activity_type_with_id(activity_type_id):
-        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
         return False
     if return_activity_instances_between_dates(activity_type_id, start_time, end_time):
-        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity already exists")
+        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity already exists")
         return False
 
     new_activity = Activity()
@@ -203,8 +192,4 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
     new_activity.start_time = start_time
     new_activity.end_time = end_time
 
-    session = db.create_session()
-    session.add(new_activity)
-    session.commit()
-    session.close()
-    logger.info(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
+    add_to_database(new_activity)
