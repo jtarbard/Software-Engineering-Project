@@ -1,6 +1,6 @@
 # Holds all functions related to the employees/managers of the website and the transactions with the database
 import logging
-import main.data.db_session as db
+from main.data.db_session import add_to_database
 from main.data.db_classes.employee_data_db_class import Facility, Role, Employee_Router
 from main.logger import log_transaction
 
@@ -31,8 +31,7 @@ def return_composition_value_from_roles(input_roles: list):
 
 # Returns list of all roles in the database
 def return_list_of_roles():
-    session = db.create_session()
-    return session.query(Role).all()
+    return Role.query.all()
 
 
 # Creates a new role if the conditions are met:
@@ -62,19 +61,14 @@ def create_new_role(role_name: str, description: str, hourly_pay: float):
     new_role.description = description
     new_role.hourly_pay = hourly_pay
 
-    session = db.create_session()
-    session.add(new_role)
+    add_to_database(new_role)
     log_transaction(f"Added new role {role_name}")
-    session.commit()
-    session.close()
     return True
 
 
 def return_facility_with_id(facility_id: int):
-    session = db.create_session()
-    return session.query(Facility).filter(Facility.facility_id == facility_id).first()
+    return Facility.query.filter(Facility.facility_id == facility_id).first()
 
 
 def return_facility_with_name(facility_name: str):
-    session = db.create_session()
-    return session.query(Facility).filter(Facility.name == facility_name).first()
+    return Facility.query.filter(Facility.name == facility_name).first()

@@ -9,22 +9,11 @@ import main.data.transactions.transaction_db_transaction as tdf
 from main.data.db_classes.activity_db_class import *
 from main.data.db_classes.employee_data_db_class import *
 from main.data.db_classes.user_db_class import Manager
-from main.data.db_session import session, add_to_database
+from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
-from flask import Response
-from passlib.handlers.sha2_crypt import sha512_crypt as crypto
-
-# Logging has been individually set for this file, as transactions in the database
-# are important and must be recorded
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler("logs/transactions.log")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
-
-logger.addHandler(file_handler)
+MANAGER_EMAIL = "team_10@leeds.ac.uk"
+MANAGER_PASSWORD = "WeAreTeam10"
 
 
 # Populates the database with all the facilities in out leisure center
@@ -193,7 +182,7 @@ def create_activity_types():
 def create_membership_types():
     log_transaction("Creating database membership types:")
     return tdf.create_new_membership_type("standard", "DescToBeAdded", 30, 15.00) \
-           and tdf.create_new_membership_type("premium", "DescToBeAdded", 100, 30.00)
+        and tdf.create_new_membership_type("premium", "DescToBeAdded", 100, 30.00)
 
 
 # Creates a manager account that has access to everything on the website
@@ -206,28 +195,23 @@ def create_root_manager_account():
     manager_account.postal_code = "LS2 9JT".upper()
     manager_account.dob = datetime.today() - timedelta(weeks=52 * 20)
     manager_account.tel_number = "0113 243 1751"
-    manager_account.email = "team10@leeds.ac.uk".lower()
+    manager_account.email = MANAGER_EMAIL.lower()
     manager_account.first_name = "team_10".lower()
     manager_account.last_name = "manager".lower()
     manager_account.title = "Dr".lower()
-    manager_account.password = udf.hash_text("WeAreTeam10")
+    manager_account.password = udf.hash_text(MANAGER_PASSWORD)
 
     return add_to_database(manager_account)
 
 
 # Populates the activity table with semi-random activities, creates a timetable for the website
 def create_pseudorandom_activity_instances(end_date: timedelta):
-    logger.info(f"Creating timetable between dates: {datetime.today()} and {datetime.today()+end_date}")
+    log_transaction(f"Creating timetable between dates: {datetime.today()} and {datetime.today() + end_date}")
     days_between_dates = end_date.days
 
     current_date = datetime.today()
 
-    session = db.create_session()
-
-    activity_types = session.query(ActivityType).all()
-    # TODO not implemented yet
-
-    session.close()
+    activity_types = ActivityType.query.all()
 
     activity_to_facility_converter = dict.fromkeys([activity_type.name for activity_type in activity_types])
 
@@ -301,7 +285,8 @@ def return_random_times(amount_today: int):
 
 
 # Traverses the times an activity takes place and adds it to the database
-def add_activities_with_times(returned_times: list, day_amount: int, activity_type, activity_to_facility_converter: dict):
+def add_activities_with_times(returned_times: list, day_amount: int, activity_type,
+                              activity_to_facility_converter: dict):
     for time in returned_times:
         end_time = time + 1
         if time - 1 in returned_times:
@@ -309,7 +294,7 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
         while end_time in returned_times:
             end_time += 1
         midnight_today = datetime.combine(datetime.today(), datetime.min.time())
-        facility_to_use = random.randint(0, len(activity_to_facility_converter[activity_type.name])-1)
+        facility_to_use = random.randint(0, len(activity_to_facility_converter[activity_type.name]) - 1)
         adf.create_new_activity(activity_type.activity_type_id,
                                 activity_to_facility_converter[activity_type.name][facility_to_use],
                                 midnight_today + timedelta(days=day_amount) + timedelta(hours=time),
@@ -319,7 +304,7 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
 # Executes all the functions for populating the database
 def populate_db(create_timetable):
     # if the manager account exists
-    if udf.check_user_is_in_database_and_password_valid("team_10@leeds.ac.uk", "Team10"):
+    if udf.check_user_is_in_database_and_password_valid(MANAGER_EMAIL, MANAGER_PASSWORD):
         # assume the database has already been populated
         return False
 
@@ -328,7 +313,6 @@ def populate_db(create_timetable):
 
         if create_timetable:
             create_pseudorandom_activity_instances(end_date=timedelta(weeks=4))
-
         return True
 
     else:
