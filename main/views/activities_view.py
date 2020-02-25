@@ -2,12 +2,14 @@ import flask
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import datetime
+from main.data.db_classes.activity_db_class import Activity
 
 blueprint = flask.Blueprint("activities", __name__)
 
 
-@blueprint.route("/activities/view_classes", methods=["GET"])
+@blueprint.route("/activities/timetable", methods=["GET"])
 def view_classes():
+    '''
     account_id = udf.check_valid_account_cookie(flask.request)  # Returns user ID from cookie
     user = None
     if account_id:
@@ -16,9 +18,30 @@ def view_classes():
             # still has an account cookie, therefore the cookie must be destroyed as it is no longer valid
             response = flask.redirect('/account/login')
             udf.destroy_cookie(response)
+    '''
 
     activity_list = adf.return_activities_between_dates(datetime.datetime.now(), datetime.datetime.now()+datetime.timedelta(days=14))
-    return flask.render_template("/activities/classes.html", User=user, list=activity_list)
+    return flask.render_template("/activities/classes.html", list=activity_list)
+
+
+@blueprint.route("/activities/book", methods=["POST"])
+def book_class():
+    user_id = udf.check_valid_account_cookie(flask.request)
+    if user_id is not None:
+        # user is logged in
+
+        activity_id = request.form['activity']
+        activity = Activity.query.get(activity_id)
+        if activity is None:
+            # don't book anything
+            print("Tried booking non-existing activity!")
+            return flask.redirect("/activities")
+        else:
+            # now the user pays for the booking
+            return flask.render_template("transactions/payments.html",activity=activity)
+    else:
+        # user is NOT logged in
+        return flask.redirect("/account/login")
 
 
 @blueprint.route("/transaction/view_receipt", methods=["POST"])

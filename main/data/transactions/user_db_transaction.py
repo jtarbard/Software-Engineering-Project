@@ -77,6 +77,7 @@ def check_valid_account_cookie(request: flask.request):
         response: Response = flask.redirect("/login")  # If there is an error, then the cookie is invalid and is destroyed
         logger.info(f"IP:{request.access_route} contains invalid cookie")
         destroy_cookie(response)
+        return None
     else:
         return user_id # User_id is returned and the customer can successful access their account data
 

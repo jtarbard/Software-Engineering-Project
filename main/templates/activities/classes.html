@@ -4,15 +4,32 @@
 {% endblock %}
 
 {% block title %}
-The Vertex classes!
+The Vertex - Classes Timetable!
 {% endblock %}
 
 {% block main_content %}
-    <ul>
+<h1>Classes Timetable</h1><br>
+<table style="width:60%">
+    <tr>
+        <th>Activity</th>
+        <th>Start</th>
+        <th>End</th>
+        <th>Location</th>
+        <th></th>
+    </tr>
     {% for activity in list %}
-    <li>
-        {{ activity.activity_type[0].name }}, {{ activity.start_time }}, {{ activity.end_time }}, <form action="/transaction/view_receipt" method="post"><input name="activity" type="hidden" value="{{ activity.activity_id }}"><input type="submit" value="Book Now"></form>
-    </li>
+    <tr>
+        <td>{{ activity.activity_type[0].name }}</td>
+        <td>{{ activity.start_time }}</td>
+        <td>{{ activity.end_time }}</td>
+        <td>{{ activity.facility.name }}</td>
+        <td>
+            <form action="/activities/book" method="post">
+                <input name="activity" type="hidden" value="{{ activity.activity_id }}">
+                <input type="submit" value="Book Now">
+            </form>
+        </td>
+    </tr>
     {% endfor %}
-    </ul>
+</table>
 {% endblock %}
