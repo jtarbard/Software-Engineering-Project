@@ -22,7 +22,7 @@ as the basic body -->
 {% if nav != False %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
     <nav class="navbar bg-dark navbar-dark">
       <!-- brand text -->
-      <a class="navbar-brand" href="#">The Vertex</a>
+      <a class="navbar-brand" href="../">The Vertex</a>
       <!-- dropdown button-->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
@@ -30,17 +30,17 @@ as the basic body -->
       <!-- navbar links -->
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav">
-          <li class="nav-item"><a class="nav-link" href="info/facilities">Facilities</a></li>
-          <li class="nav-item"><a class="nav-link" href="info/classes">Classes</a></li>
+          <li class="nav-item"><a class="nav-link" href="../info/facilities">Facilities</a></li>
+          <li class="nav-item"><a class="nav-link" href="../info/classes">Classes</a></li>
             {%  if User %}
-            <li class="nav-item"><a class="nav-link" href="info/about">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="account/your_account">My Account</a></li>
+            <li class="nav-item"><a class="nav-link" href="../info/about">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="../account/your_account">My Account</a></li>
             <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
             {% else %}
-            <li class="nav-item"><a class="nav-link" href="info/memberships">Membership</a></li>
-            <li class="nav-item"><a class="nav-link" href="info/about">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="account/register">Register</a></li>
-            <li class="nav-item"><a class="nav-link" href="account/login">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="../info/memberships">Membership</a></li>
+            <li class="nav-item"><a class="nav-link" href="../info/about">About</a></li>
+            <li class="nav-item"><a class="nav-link" href="../account/register">Register</a></li>
+            <li class="nav-item"><a class="nav-link" href="../account/login">Login</a></li>
             {% endif %}
         </ul>
       </div>
