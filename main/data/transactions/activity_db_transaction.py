@@ -33,12 +33,6 @@ def return_activity_type_with_name(activity_type_name: str):
     return session.query(ActivityType).filter(ActivityType.name == activity_type_name.lower()).first()
 
 
-def add_new_activity(activity_type_id: int, start_datetime: datetime.datetime, end_datetime: datetime.datetime, facility_id: int):
-    activity_type = return_activity_type_with_id(activity_type_id)
-    if not activity_type:
-        return False
-
-
 # Attempts to add a tag to the list of tags in the csv file, if the tag exists in the csv file then the new tag is
 # not added, otherwise the tag is appended to the end of the file
 def add_tag(tag: str):
@@ -170,3 +164,57 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     session.commit()
     session.close()
     return True
+
+
+def return_activity_instances_between_dates(activity_type_id: int, start_time: datetime.datetime, end_time: datetime.datetime):
+    start_time = start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute // 30)
+    end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute // 30)
+
+    if type(activity_type_id) is not int:
+        logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
+        return False
+    if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
+        logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: date times invalid")
+        return False
+    if not return_activity_type_with_id(activity_type_id):
+        logger.info(f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+        return False
+
+    session = db.create_session()
+    return session.query(Activity).filter(Activity.activity_type_id == activity_type_id,
+                                   Activity.start_time <= start_time,
+                                   Activity.end_time >= end_time).all()
+
+
+def create_new_activity(activity_type_id: int, facility_name: str, start_time: datetime.datetime, end_time: datetime.datetime):
+    facility = edf.return_facility_with_name(facility_name)
+    start_time= start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute//30)
+    end_time= end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute//30)
+
+    if type(activity_type_id) is not int:
+        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type id invalid")
+        return False
+    if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
+        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
+        return False
+    if not facility:
+        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: facility does not exist")
+        return False
+    if not return_activity_type_with_id(activity_type_id):
+        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+        return False
+    if return_activity_instances_between_dates(activity_type_id, start_time, end_time):
+        logger.info(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity already exists")
+        return False
+
+    new_activity = Activity()
+    new_activity.facility_id = facility.facility_id
+    new_activity.activity_type_id = activity_type_id
+    new_activity.start_time = start_time
+    new_activity.end_time = end_time
+
+    session = db.create_session()
+    session.add(new_activity)
+    session.commit()
+    session.close()
+    logger.info(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")

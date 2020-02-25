@@ -79,3 +79,13 @@ def create_new_role(role_name: str, description: str, hourly_pay: float):
     session.commit()
     session.close()
     return True
+
+
+def return_facility_with_id(facility_id: int):
+    session = db.create_session()
+    return session.query(Facility).filter(Facility.facility_id == facility_id).first()
+
+
+def return_facility_with_name(facility_name: str):
+    session = db.create_session()
+    return session.query(Facility).filter(Facility.name == facility_name).first()
