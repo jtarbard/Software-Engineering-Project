@@ -2,9 +2,12 @@ html {
   scroll-behavior: smooth;
 }
 
-body {
-  height: 100%;
-  max-width: 100%;
+#page-title {
+  height: 15vh;
+}
+
+#page-title h1 {
+  line-height: 15vh;
 }
 
 .navbar-brand {

@@ -35,7 +35,7 @@ as the basic body -->
             {%  if User %}
             <li class="nav-item"><a class="nav-link" href="../info/about">About</a></li>
             <li class="nav-item"><a class="nav-link" href="../account/your_account">My Account</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+            <li class="nav-item"><a class="nav-link" href="../account/log_out">Logout</a></li>
             {% else %}
             <li class="nav-item"><a class="nav-link" href="../info/memberships">Membership</a></li>
             <li class="nav-item"><a class="nav-link" href="../info/about">About</a></li>
@@ -50,7 +50,7 @@ as the basic body -->
 <div class="main_content"> <!--Defines the main content for the webpages, this is where all
                                 the content is situated-->
 {% if page_title is defined %} <!-- Page title is not empty -->
-  <div class="jumbotron">
+  <div class="container" id="page-title">
     <h1>{{ page_title }}</h1>
   </div>
 {% endif %}
@@ -60,7 +60,6 @@ as the basic body -->
 
 {% if footer != False %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->
 <footer>
-<h3>Footer Section</h3>
 </footer>
 {% endif %}
 
