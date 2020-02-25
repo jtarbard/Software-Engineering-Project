@@ -154,8 +154,6 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     session.commit()
     session.close()
     return True
-<<<<<<< HEAD
-=======
 
 
 def return_activity_instances_between_dates(activity_type_id: int, start_time: datetime.datetime, end_time: datetime.datetime):
@@ -210,4 +208,3 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
     session.commit()
     session.close()
     logger.info(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
->>>>>>> db_populate_script

@@ -8,29 +8,12 @@ import main.data.transactions.employee_data_transaction as edf
 import main.data.transactions.transaction_db_transaction as tdf
 from main.data.db_classes.activity_db_class import *
 from main.data.db_classes.employee_data_db_class import *
-from main.data.db_classes.user_db_class import *
+from main.data.db_classes.user_db_class import Manager
 from main.data.db_session import session, add_to_database
 from main.logger import log_transaction
 
-<<<<<<< HEAD
-from main.data.db_classes.user_db_class import Manager
-=======
-
 from flask import Response
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
-
-# Logging has been individually set for this file, as transactions in the database
-# are important and must be recorded
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler("logs/transactions.log")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
-
-logger.addHandler(file_handler)
->>>>>>> db_populate_script
-
 
 # Populates the database with all the facilities in out leisure center
 def create_facilities():
@@ -220,12 +203,6 @@ def create_root_manager_account():
     return add_to_database(manager_account)
 
 
-<<<<<<< HEAD
-# Populates the activity table with activities, creates a timetable for the website
-def create_pseudorandom_activity_instances(end_date):
-    log_transaction(f"Creating timetable between dates: {datetime.today()} and {datetime.today() + end_date}")
-    facilities = session.query(Facility).all()
-=======
 # Populates the activity table with semi-random activities, creates a timetable for the website
 def create_pseudorandom_activity_instances(end_date: timedelta):
     logger.info(f"Creating timetable between dates: {datetime.today()} and {datetime.today()+end_date}")
@@ -235,30 +212,11 @@ def create_pseudorandom_activity_instances(end_date: timedelta):
 
     session = db.create_session()
 
->>>>>>> db_populate_script
     activity_types = session.query(ActivityType).all()
     # TODO not implemented yet
 
     session.close()
 
-<<<<<<< HEAD
-def populate_db(create_timetable):
-    # if the manager account exists
-    if udf.check_user_is_in_database_and_password_valid("team_10@leeds.ac.uk", "Team10"):
-        # assume the database has already been populated
-        return False
-
-    if create_facilities() and create_roles() and create_membership_types() \
-            and create_activity_types() and create_root_manager_account():
-
-        if create_timetable:
-            create_pseudorandom_activity_instances(end_date=timedelta(weeks=4))
-
-        return True
-
-    else:
-        raise RuntimeError("Could not populate table")
-=======
     activity_to_facility_converter = dict.fromkeys([activity_type.name for activity_type in activity_types])
 
     activity_to_facility_converter["swimming classes"] = ["main swimming pool"]
@@ -347,15 +305,19 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
 
 
 # Executes all the functions for populating the database
-def populate_db(create_activity_instances):
-    if udf.check_user_is_in_database_and_password_valid("team10@leeds.ac.uk", "WeAreTeam10"):
+def populate_db(create_timetable):
+    # if the manager account exists
+    if udf.check_user_is_in_database_and_password_valid("team_10@leeds.ac.uk", "Team10"):
+        # assume the database has already been populated
         return False
-    create_facilities()
-    create_roles()
-    create_membership_types()
-    create_activity_types()
-    create_root_manager_account()
-    if create_activity_instances:
-        create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
-    return True
->>>>>>> db_populate_script
+
+    if create_facilities() and create_roles() and create_membership_types() \
+            and create_activity_types() and create_root_manager_account():
+
+        if create_timetable:
+            create_pseudorandom_activity_instances(end_date=timedelta(weeks=4))
+
+        return True
+
+    else:
+        raise RuntimeError("Could not populate table")
