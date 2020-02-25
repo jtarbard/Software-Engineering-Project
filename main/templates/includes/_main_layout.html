@@ -11,6 +11,7 @@ as the basic body -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{%  block title %} {% endblock %}</title> <!-- Lets each page have its own title-->
     <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/reset.css') }}">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="icon" href="../../static" type="image/ico">
@@ -21,7 +22,7 @@ as the basic body -->
 {% if nav != False %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
     <nav class="navbar bg-dark navbar-dark">
       <!-- brand text -->
-      <a class="navbar-brand" href="#">Navbar</a>
+      <a class="navbar-brand" href="#">The Vertex</a>
       <!-- dropdown button-->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>

@@ -1,7 +1,21 @@
-#carousel-container {
-    height: 800px;
+.carousel {
+    height: 90vh;
 }
 
-body {
-    background-color: red;
+.carousel-inner {
+    height: 100%;
+}
+
+.carousel-item img {
+    width: 100%;
+}
+
+#carousel-btn-container {
+    position: absolute;
+    margin-top: -15vh;
+    align-items: center;
+}
+
+#carousel-btn {
+    color: white;
 }

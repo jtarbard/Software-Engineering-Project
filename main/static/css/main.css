@@ -3,5 +3,12 @@ html {
 }
 
 body {
-  background-color: aqua;
+  height: 100%;
+  max-width: 100%;
+}
+
+.navbar-brand {
+  height: 8vh;
+  padding: 1vh 0 1vh;
+  line-height: 6vh;
 }

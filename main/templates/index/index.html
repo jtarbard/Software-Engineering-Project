@@ -8,18 +8,21 @@ The Vertex-Index!
 {% endblock %}
 
 {% block main_content %}
-<div class="carousel slide" id="carousel-container" data-ride="carousel">
-{#    <div class="carousel-inner">#}
-{#        <div class="carousel-item active"><img src="/static/imgs/woman_dumbbells.jpg" alt="Woman using dumbbells."></div>#}
-{#        <div class="carousel-item"><img src="/static/imgs/barbell.jpg" alt="Man using barbell."></div>#}
-{#        <div class="carousel-item"><img src="/static/imgs/treadmill.jpg" alt="Man using treadmill."></div>#}
-{#    </div>#}
-{#    <a class="carousel-control-prev" href="#demo" data-slide="prev">#}
-{#    <span class="carousel-control-prev-icon"></span>#}
-{#    </a>#}
-{#    <a class="carousel-control-next" href="#demo" data-slide="next">#}
-{#    <span class="carousel-control-next-icon"></span>#}
-{#    </a>#}
+<div id="carousel"class="carousel slide" data-ride="carousel">
+    <div class="carousel-inner">
+        <div class="carousel-item active"><img src="/static/imgs/woman_dumbbells.jpg" alt="Woman using dumbbells."></div>
+        <div class="carousel-item"><img src="/static/imgs/barbell.jpg" alt="Man using barbell."></div>
+        <div class="carousel-item"><img src="/static/imgs/treadmill.jpg" alt="Man using treadmill."></div>
+    </div>
+    <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
+    <span class="carousel-control-next-icon"></span>
+    </a>
+    <div class="container col text-center" id="carousel-btn-container">
+        <button class="btn btn-lg btn-dark" id="carousel-btn">Join Now</button>
+    </div>
 </div>
 <!--<h2>Index page</h2>-->
 <!--    <a href="/account/login">Login (with any account type)</a><br>-->
