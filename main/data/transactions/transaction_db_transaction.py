@@ -1,14 +1,7 @@
 # Holds all functions related to the users of the website and the transactions with the database
-import flask
-import hashlib
-import logging
-import datetime
 from main.data.db_session import session, add_to_database
 from main.logger import log_transaction
-
-from flask import Response
-from passlib.handlers.sha2_crypt import sha512_crypt as crypto
-from main.data.db_classes.transaction_db_class import Booking, Receipt, MembershipType, Membership
+from main.data.db_classes.transaction_db_class import MembershipType
 
 
 #  A simple function that returns a list of all the membership types currently in the gym

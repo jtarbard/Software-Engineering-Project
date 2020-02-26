@@ -1,7 +1,8 @@
 # Holds all functions related to the employees/managers of the website and the transactions with the database
 import logging
 from main.data.db_session import add_to_database
-from main.data.db_classes.employee_data_db_class import Facility, Role, Employee_Router
+from main.data.db_classes.employee_data_db_class import Role, Employee_Router
+from main.data.db_classes.activity_db_class import Facility
 from main.logger import log_transaction
 
 

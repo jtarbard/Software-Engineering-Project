@@ -1,5 +1,5 @@
 import flask
-from main.data.db_classes.employee_data_db_class import Facility
+from main.data.db_classes.activity_db_class import Facility
 blueprint = flask.Blueprint("info", __name__)
 
 

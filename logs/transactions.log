@@ -1,0 +1,189 @@
+2020-02-25 18:22:31,009:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 18:22:31,155:main.logger:Added new role Lifeguard
+2020-02-25 18:22:31,171:main.logger:Added new role Sports Coach
+2020-02-25 18:22:31,187:main.logger:Added new role Instructor
+2020-02-25 18:22:31,201:main.logger:Added new role Swim Teacher
+2020-02-25 18:22:31,218:main.logger:Added new role Activity Leader
+2020-02-25 18:22:31,236:main.logger:Added new role Activity Assistant
+2020-02-25 18:22:31,253:main.logger:Added new role Climbing Expert
+2020-02-25 18:22:31,269:main.logger:Added new role Trampoline Expert
+2020-02-25 18:22:31,283:main.logger:Added new role Martial Arts Expert
+2020-02-25 18:22:31,300:main.logger:Added new role Direct Manager
+2020-02-25 18:22:31,300:main.logger:Creating database membership types:
+2020-02-25 18:22:31,333:main.logger:Creating database activity types:
+2020-02-25 18:23:27,487:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 18:23:27,613:main.logger:Failed to add new role Lifeguard: role name already exists
+2020-02-25 18:23:54,634:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 18:23:54,764:main.logger:Added new role Lifeguard
+2020-02-25 18:23:54,775:main.logger:Added new role Sports Coach
+2020-02-25 18:23:54,792:main.logger:Added new role Instructor
+2020-02-25 18:23:54,808:main.logger:Added new role Swim Teacher
+2020-02-25 18:23:54,824:main.logger:Added new role Activity Leader
+2020-02-25 18:23:54,841:main.logger:Added new role Activity Assistant
+2020-02-25 18:23:54,858:main.logger:Added new role Climbing Expert
+2020-02-25 18:23:54,876:main.logger:Added new role Trampoline Expert
+2020-02-25 18:23:54,897:main.logger:Added new role Martial Arts Expert
+2020-02-25 18:23:54,911:main.logger:Added new role Direct Manager
+2020-02-25 18:23:54,911:main.logger:Creating database membership types:
+2020-02-25 18:23:54,942:main.logger:Creating database activity types:
+2020-02-25 18:23:55,148:main.logger:Creating database manager
+2020-02-25 18:23:55,250:main.logger:Creating timetable between dates: 2020-02-25 18:23:55.250320 and 2020-03-03 18:23:55.250340
+2020-02-25 20:24:05,058:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 20:24:05,203:main.logger:Added new role Lifeguard
+2020-02-25 20:24:05,221:main.logger:Added new role Sports Coach
+2020-02-25 20:24:05,243:main.logger:Added new role Instructor
+2020-02-25 20:24:05,257:main.logger:Added new role Swim Teacher
+2020-02-25 20:24:05,274:main.logger:Added new role Activity Leader
+2020-02-25 20:24:05,289:main.logger:Added new role Activity Assistant
+2020-02-25 20:24:05,309:main.logger:Added new role Climbing Expert
+2020-02-25 20:24:05,325:main.logger:Added new role Trampoline Expert
+2020-02-25 20:24:05,339:main.logger:Added new role Martial Arts Expert
+2020-02-25 20:24:05,356:main.logger:Added new role Direct Manager
+2020-02-25 20:24:05,356:main.logger:Creating database membership types:
+2020-02-25 20:24:05,388:main.logger:Creating database activity types:
+2020-02-25 20:24:05,594:main.logger:Creating database manager
+2020-02-25 20:24:05,698:main.logger:Creating timetable between dates: 2020-02-25 20:24:05.698082 and 2020-03-03 20:24:05.698102
+2020-02-25 21:22:20,942:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 21:22:21,088:main.logger:Added new role Lifeguard
+2020-02-25 21:22:21,105:main.logger:Added new role Sports Coach
+2020-02-25 21:22:21,122:main.logger:Added new role Instructor
+2020-02-25 21:22:21,139:main.logger:Added new role Swim Teacher
+2020-02-25 21:22:21,153:main.logger:Added new role Activity Leader
+2020-02-25 21:22:21,169:main.logger:Added new role Activity Assistant
+2020-02-25 21:22:21,183:main.logger:Added new role Climbing Expert
+2020-02-25 21:22:21,200:main.logger:Added new role Trampoline Expert
+2020-02-25 21:22:21,217:main.logger:Added new role Martial Arts Expert
+2020-02-25 21:22:21,233:main.logger:Added new role Direct Manager
+2020-02-25 21:22:21,234:main.logger:Creating database membership types:
+2020-02-25 21:22:21,270:main.logger:Creating database activity types:
+2020-02-25 21:22:34,890:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 21:22:35,013:main.logger:Failed to add new role Lifeguard: role name already exists
+2020-02-25 21:22:46,734:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 21:22:46,877:main.logger:Added new role Lifeguard
+2020-02-25 21:22:46,893:main.logger:Added new role Sports Coach
+2020-02-25 21:22:46,910:main.logger:Added new role Instructor
+2020-02-25 21:22:46,927:main.logger:Added new role Swim Teacher
+2020-02-25 21:22:46,943:main.logger:Added new role Activity Leader
+2020-02-25 21:22:46,960:main.logger:Added new role Activity Assistant
+2020-02-25 21:22:46,977:main.logger:Added new role Climbing Expert
+2020-02-25 21:22:46,993:main.logger:Added new role Trampoline Expert
+2020-02-25 21:22:47,010:main.logger:Added new role Martial Arts Expert
+2020-02-25 21:22:47,027:main.logger:Added new role Direct Manager
+2020-02-25 21:22:47,027:main.logger:Creating database membership types:
+2020-02-25 21:22:47,064:main.logger:Creating database activity types:
+2020-02-25 21:22:47,266:main.logger:Creating database manager
+2020-02-25 21:22:47,365:main.logger:Creating timetable between dates: 2020-02-25 21:22:47.365288 and 2020-03-03 21:22:47.365308
+2020-02-25 23:35:18,831:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 23:35:18,980:main.logger:Added new role Lifeguard
+2020-02-25 23:35:18,996:main.logger:Added new role Sports Coach
+2020-02-25 23:35:19,015:main.logger:Added new role Instructor
+2020-02-25 23:35:19,026:main.logger:Added new role Swim Teacher
+2020-02-25 23:35:19,039:main.logger:Added new role Activity Leader
+2020-02-25 23:35:19,057:main.logger:Added new role Activity Assistant
+2020-02-25 23:35:19,075:main.logger:Added new role Climbing Expert
+2020-02-25 23:35:19,092:main.logger:Added new role Trampoline Expert
+2020-02-25 23:35:19,105:main.logger:Added new role Martial Arts Expert
+2020-02-25 23:35:19,122:main.logger:Added new role Direct Manager
+2020-02-25 23:35:19,122:main.logger:Creating database membership types:
+2020-02-25 23:35:19,157:main.logger:Creating database activity types:
+2020-02-25 23:35:58,294:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 23:35:58,438:main.logger:Added new role Lifeguard
+2020-02-25 23:35:58,455:main.logger:Added new role Sports Coach
+2020-02-25 23:35:58,470:main.logger:Added new role Instructor
+2020-02-25 23:35:58,486:main.logger:Added new role Swim Teacher
+2020-02-25 23:35:58,502:main.logger:Added new role Activity Leader
+2020-02-25 23:35:58,516:main.logger:Added new role Activity Assistant
+2020-02-25 23:35:58,533:main.logger:Added new role Climbing Expert
+2020-02-25 23:35:58,550:main.logger:Added new role Trampoline Expert
+2020-02-25 23:35:58,565:main.logger:Added new role Martial Arts Expert
+2020-02-25 23:35:58,581:main.logger:Added new role Direct Manager
+2020-02-25 23:35:58,581:main.logger:Creating database membership types:
+2020-02-25 23:35:58,612:main.logger:Creating database activity types:
+2020-02-25 23:37:15,650:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 23:37:15,783:main.logger:Failed to add new role Lifeguard: role name already exists
+2020-02-25 23:37:29,934:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 23:37:30,075:main.logger:Added new role Lifeguard
+2020-02-25 23:37:30,091:main.logger:Added new role Sports Coach
+2020-02-25 23:37:30,107:main.logger:Added new role Instructor
+2020-02-25 23:37:30,127:main.logger:Added new role Swim Teacher
+2020-02-25 23:37:30,148:main.logger:Added new role Activity Leader
+2020-02-25 23:37:30,168:main.logger:Added new role Activity Assistant
+2020-02-25 23:37:30,186:main.logger:Added new role Climbing Expert
+2020-02-25 23:37:30,209:main.logger:Added new role Trampoline Expert
+2020-02-25 23:37:30,227:main.logger:Added new role Martial Arts Expert
+2020-02-25 23:37:30,252:main.logger:Added new role Direct Manager
+2020-02-25 23:37:30,253:main.logger:Creating database membership types:
+2020-02-25 23:37:30,287:main.logger:Creating database activity types:
+2020-02-25 23:40:25,784:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 23:40:25,959:main.logger:Added new role Lifeguard
+2020-02-25 23:40:25,977:main.logger:Added new role Sports Coach
+2020-02-25 23:40:25,995:main.logger:Added new role Instructor
+2020-02-25 23:40:26,011:main.logger:Added new role Swim Teacher
+2020-02-25 23:40:26,029:main.logger:Added new role Activity Leader
+2020-02-25 23:40:26,047:main.logger:Added new role Activity Assistant
+2020-02-25 23:40:26,065:main.logger:Added new role Climbing Expert
+2020-02-25 23:40:26,082:main.logger:Added new role Trampoline Expert
+2020-02-25 23:40:26,099:main.logger:Added new role Martial Arts Expert
+2020-02-25 23:40:26,119:main.logger:Added new role Direct Manager
+2020-02-25 23:40:26,119:main.logger:Creating database membership types:
+2020-02-25 23:40:26,158:main.logger:Creating database activity types:
+2020-02-25 23:42:58,913:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-25 23:42:59,046:main.logger:Added new role Lifeguard
+2020-02-25 23:42:59,065:main.logger:Added new role Sports Coach
+2020-02-25 23:42:59,081:main.logger:Added new role Instructor
+2020-02-25 23:42:59,095:main.logger:Added new role Swim Teacher
+2020-02-25 23:42:59,111:main.logger:Added new role Activity Leader
+2020-02-25 23:42:59,128:main.logger:Added new role Activity Assistant
+2020-02-25 23:42:59,144:main.logger:Added new role Climbing Expert
+2020-02-25 23:42:59,162:main.logger:Added new role Trampoline Expert
+2020-02-25 23:42:59,181:main.logger:Added new role Martial Arts Expert
+2020-02-25 23:42:59,195:main.logger:Added new role Direct Manager
+2020-02-25 23:42:59,195:main.logger:Creating database membership types:
+2020-02-25 23:42:59,231:main.logger:Creating database activity types:
+2020-02-25 23:42:59,795:main.logger:Creating database manager
+2020-02-25 23:42:59,907:main.logger:Creating timetable between dates: 2020-02-25 23:42:59.907265 and 2020-03-03 23:42:59.907294
+2020-02-26 00:01:00,190:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-26 00:01:00,338:main.logger:Added new role Lifeguard
+2020-02-26 00:01:00,353:main.logger:Added new role Sports Coach
+2020-02-26 00:01:00,368:main.logger:Added new role Instructor
+2020-02-26 00:01:00,385:main.logger:Added new role Swim Teacher
+2020-02-26 00:01:00,401:main.logger:Added new role Activity Leader
+2020-02-26 00:01:00,418:main.logger:Added new role Activity Assistant
+2020-02-26 00:01:00,434:main.logger:Added new role Climbing Expert
+2020-02-26 00:01:00,451:main.logger:Added new role Trampoline Expert
+2020-02-26 00:01:00,468:main.logger:Added new role Martial Arts Expert
+2020-02-26 00:01:00,485:main.logger:Added new role Direct Manager
+2020-02-26 00:01:00,485:main.logger:Creating database membership types:
+2020-02-26 00:01:00,520:main.logger:Creating database activity types:
+2020-02-26 00:01:01,071:main.logger:Creating database manager
+2020-02-26 00:01:01,175:main.logger:Creating timetable between dates: 2020-02-26 00:01:01.174995 and 2020-03-04 00:01:01.175015
+2020-02-26 00:02:34,000:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-26 00:02:34,148:main.logger:Added new role Lifeguard
+2020-02-26 00:02:34,165:main.logger:Added new role Sports Coach
+2020-02-26 00:02:34,182:main.logger:Added new role Instructor
+2020-02-26 00:02:34,199:main.logger:Added new role Swim Teacher
+2020-02-26 00:02:34,215:main.logger:Added new role Activity Leader
+2020-02-26 00:02:34,233:main.logger:Added new role Activity Assistant
+2020-02-26 00:02:34,250:main.logger:Added new role Climbing Expert
+2020-02-26 00:02:34,264:main.logger:Added new role Trampoline Expert
+2020-02-26 00:02:34,281:main.logger:Added new role Martial Arts Expert
+2020-02-26 00:02:34,297:main.logger:Added new role Direct Manager
+2020-02-26 00:02:34,297:main.logger:Creating database membership types:
+2020-02-26 00:02:34,331:main.logger:Creating database activity types:
+2020-02-26 00:02:34,878:main.logger:Creating database manager
+2020-02-26 00:02:34,980:main.logger:Creating timetable between dates: 2020-02-26 00:02:34.980278 and 2020-03-04 00:02:34.980299
+2020-02-26 00:05:04,338:main.logger:team_10@leeds.ac.uk does not exist
+2020-02-26 00:05:04,489:main.logger:Added new role Lifeguard
+2020-02-26 00:05:04,503:main.logger:Added new role Sports Coach
+2020-02-26 00:05:04,519:main.logger:Added new role Instructor
+2020-02-26 00:05:04,533:main.logger:Added new role Swim Teacher
+2020-02-26 00:05:04,551:main.logger:Added new role Activity Leader
+2020-02-26 00:05:04,568:main.logger:Added new role Activity Assistant
+2020-02-26 00:05:04,585:main.logger:Added new role Climbing Expert
+2020-02-26 00:05:04,602:main.logger:Added new role Trampoline Expert
+2020-02-26 00:05:04,621:main.logger:Added new role Martial Arts Expert
+2020-02-26 00:05:04,638:main.logger:Added new role Direct Manager
+2020-02-26 00:05:04,638:main.logger:Creating database membership types:
+2020-02-26 00:05:04,668:main.logger:Creating database activity types:
+2020-02-26 00:05:05,227:main.logger:Creating database manager
+2020-02-26 00:05:05,330:main.logger:Creating timetable between dates: 2020-02-26 00:05:05.330625 and 2020-03-04 00:05:05.330651

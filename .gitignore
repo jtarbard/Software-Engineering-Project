@@ -1,16 +1,9 @@
 #pycharm files
-<<<<<<< HEAD
 /.idea/
 .idea
-=======
-.idea/
->>>>>>> more_views
 
 # python bytecode
 *.py[cod]
 
 #virtual environment
 venv/
-
-#logs
-logs/

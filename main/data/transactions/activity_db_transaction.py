@@ -7,6 +7,8 @@ from main.logger import log_transaction
 from main.data.db_classes.activity_db_class import ActivityType, Activity
 import main.data.transactions.employee_data_transaction as edf
 
+TAGS_CSV = "main/data/transactions/valid_tags.csv"
+
 
 # Returns the activity with the same id as the parameter
 def return_activity_type_with_id(activity_type_id: int):
@@ -24,7 +26,7 @@ def add_tag(tag: str):
     all_tags = return_valid_tags_from_file()
     if tag.lower() in all_tags:
         return False
-    with open("main/data/transactions/valid_tags.csv", "a", newline="") as tag_file:
+    with open(TAGS_CSV, "a", newline="") as tag_file:
         tag_writer = csv.writer(tag_file, delimiter=",")
         tag_writer.write(tag)
     return True
@@ -38,7 +40,7 @@ def remove_tag(tag: str):
         all_tags.remove(tag.lower())
     except ValueError:
         return False
-    with open("main/data/transactions/valid_tags.csv", "w+", newline="") as tag_file:
+    with open(TAGS_CSV, "w+", newline="") as tag_file:
         tag_write = csv.writer(tag_file, delimiter=",")
         tag_write.seek(0)
         tag_write.truncate()
@@ -49,7 +51,7 @@ def remove_tag(tag: str):
 # Returns all the tags from the valid_tags.csv file
 def return_valid_tags_from_file():
     all_tags = []
-    with open("main/data/transactions/valid_tags.csv", newline="") as tag_file:
+    with open(TAGS_CSV, newline="") as tag_file:
         tag_reader = csv.reader(tag_file)
         for line in tag_reader:
             all_tags += line

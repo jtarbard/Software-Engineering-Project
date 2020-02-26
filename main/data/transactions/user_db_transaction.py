@@ -1,7 +1,6 @@
 # Holds all functions related to the users of the website and the transactions with the database
 import flask
 import hashlib
-import logging
 import datetime
 import main.data.db_session as db
 
