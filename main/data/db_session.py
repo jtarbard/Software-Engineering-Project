@@ -2,37 +2,31 @@
 # database by providing a setup for the database as well
 # as a connection string and factory return function
 
-import sqlalchemy as sa
-import sqlalchemy.orm as orm
-from main.data.model_base import SqlAlchemyBase
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.exc import SQLAlchemyError
+from main.logger import log_server_error
 
-__factory = None
+database = None
+session = None
 
 
 # Takes a connection string and sets up a SQLite connection
 def global_init(db_file: str):
-    global __factory
+    global database, session
 
-    if __factory:
-        return
-
-    if not db_file or not db_file.strip():
-        raise Exception("Db file must be specified")
-
-    connection_string = "sqlite:///" + db_file.strip()
-
-    print(f"connecting to DB with {connection_string}")
-
-    engine = sa.create_engine(connection_string, echo=False)
-
-    __factory = orm.sessionmaker(bind=engine) #Creates a session
+    flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/TheVertex.sqlite'
+    database = SQLAlchemy(flask_app)
+    session = database.session
 
     import main.data.__all_models
+    database.create_all()
 
-    SqlAlchemyBase.metadata.create_all(engine) #Creates the database
 
-
-# Returns the session
-def create_session() -> orm.Session:
-    global __factory
-    return __factory()
+def add_to_database(database_class):
+    try:
+        session.add(database_class)
+        session.commit()
+        return True
+    except SQLAlchemyError as e:
+        log_server_error(str(e))
+        return False

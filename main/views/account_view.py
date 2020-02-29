@@ -167,7 +167,6 @@ def view_account():
         return flask.redirect('/account/login') # If the use does not have an account cookie then they are taken to the
                                                 # login page
 
-
     return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user)
 
 

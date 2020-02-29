@@ -1,40 +1,35 @@
-import sqlalchemy as sa
-from main.data.model_base import SqlAlchemyBase
-from sqlalchemy import orm
 from datetime import datetime
+from main.data.db_session import database
 
 
-class ActivityType(SqlAlchemyBase):
+class ActivityType(database.Model):
     __tablename__ = 'ActivityTypes'
 
-    activity_type_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    name = sa.Column(sa.String, nullable=False)
-    description = sa.Column(sa.String, nullable=False)
-    tags = sa.Column(sa.String)
-    category = sa.Column(sa.String, nullable=False)
-    minimum_age = sa.Column(sa.Integer, nullable=False)
-    maximum_activity_capacity = sa.Column(sa.Integer, nullable=False)
-    hourly_activity_cost = sa.Column(sa.Integer, nullable=False)
-    hourly_activity_price = sa.Column(sa.Integer, nullable=False)
-    max_staff = sa.Column(sa.Integer, nullable=False)
-    min_staff = sa.Column(sa.Integer, nullable=False)
+    activity_type_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    name = database.Column(database.String, nullable=False)
+    description = database.Column(database.String, nullable=False)
+    tags = database.Column(database.String)
+    category = database.Column(database.String, nullable=False)
+    minimum_age = database.Column(database.Integer, nullable=False)
+    maximum_activity_capacity = database.Column(database.Integer, nullable=False)
+    hourly_activity_cost = database.Column(database.Integer, nullable=False)
+    hourly_activity_price = database.Column(database.Integer, nullable=False)
+    valid_composite_roles = database.Column(database.String, nullable=False)
+    max_staff = database.Column(database.Integer, nullable=False)
+    min_staff = database.Column(database.Integer, nullable=False)
 
-    activities = orm.relationship("Activity", back_populates="activity_type")
-    allowed_facilities = orm.relationship("Facility", secondary="valid_facility_association",
-                                              back_populates="activity_types_allowed")
-    allowed_roles = orm.relationship("Role", secondary="valid_activity_roles_association",
-                                            back_populates="activities_with_role")
+    activities = database.relationship("Activity", back_populates="activity_type")
 
 
-class Activity(SqlAlchemyBase):
+class Activity(database.Model):
     __tablename__ = 'Activities'
 
-    activity_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
-    activity_type_id = sa.Column(sa.Integer, sa.ForeignKey("ActivityTypes.activity_type_id"), nullable=False)
-    facility_id = sa.Column(sa.Integer, sa.ForeignKey("Facilities.facility_id"), nullable=False)
-    start_time = sa.Column(sa.DateTime, default=datetime.now, nullable=False)
-    end_time = sa.Column(sa.DateTime, nullable=False)
+    activity_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    activity_type_id = database.Column(database.Integer, database.ForeignKey("ActivityTypes.activity_type_id"), nullable=False)
+    facility_id = database.Column(database.Integer, database.ForeignKey("Facilities.facility_id"), nullable=False)
+    start_time = database.Column(database.DateTime, default=datetime.now, nullable=False)
+    end_time = database.Column(database.DateTime, nullable=False)
 
-    activity_type = orm.relationship("ActivityType", back_populates="activities")
-    employees = orm.relationship("Employee_Router", back_populates="activity")
-    facility = orm.relationship("Facility", back_populates="activities", uselist=False)
+    activity_type = database.relationship("ActivityType", back_populates="activities")
+    employees = database.relationship("Employee_Router", back_populates="activity")
+    facility = database.relationship("Facility", back_populates="activities", uselist=False)
