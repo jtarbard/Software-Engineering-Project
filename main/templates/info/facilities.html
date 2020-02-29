@@ -4,29 +4,9 @@
 {% endblock %}
 
 {% block title %}
-The Vertex - Facilities!
+The Vertex facilities!
 {% endblock %}
 
 {% block main_content %}
-<h1>Facilities</h1><br>
-<table style="width:60%">
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Capacity</th>
-        <th>Activities Available</th>
-    </tr>
-    {% for facility in facilities %}
-    <tr>
-        <th>{{ facility.name }}</th>
-        <th>{{ facility.definition }}</th>
-        <th>{{ facility.max_space }}</th>
-        <th>
-            {% for activity in facility.activities %}
-            {{ activity.name }},
-            {% endfor %}
-        </th>
-    </tr>
-    {% endfor %}
-</table>
+<h2>Facilites page</h2>
 {% endblock %}

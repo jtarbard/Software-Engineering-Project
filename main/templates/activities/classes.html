@@ -4,32 +4,35 @@
 {% endblock %}
 
 {% block title %}
-The Vertex - Classes Timetable!
+The Vertex classes!
 {% endblock %}
 
 {% block main_content %}
-<h1>Classes Timetable</h1><br>
-<table style="width:60%">
-    <tr>
-        <th>Activity</th>
-        <th>Start</th>
-        <th>End</th>
-        <th>Location</th>
-        <th></th>
-    </tr>
-    {% for activity in list %}
-    <tr>
-        <td>{{ activity.activity_type.name }}</td>
-        <td>{{ activity.start_time }}</td>
-        <td>{{ activity.end_time }}</td>
-        <td>{{ activity.facility.name }}</td>
-        <td>
-            <form action="/activities/book" method="post">
-                <input name="activity" type="hidden" value="{{ activity.activity_id }}">
-                <input type="submit" value="Book Now">
-            </form>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="6"> Time Table </td></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Class name</td>
+                    <td>Class Start Time </td>
+                    <td>Class End Time</td>
+                    <td>Facility</td>
+                    <td>Availability left</td>
+                    <td>Book</td>
+                </tr>
+                {% for i in range(num_activites) %}
+                    <tr>
+                        <td>{{ activity_names[i] }}</td>
+                        <td>{{ activity_list[i].start_time }}</td>
+                        <td>{{ activity_list[i].end_time }}</td>
+                        <td>{{ facility_names[i] }}</td>
+                        <td>{{ avalibility[i] }}</td>
+                        <td><a class="btn-danger" href="/activities/view_class/{{ activity_list[i].activity_id }}">Book</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

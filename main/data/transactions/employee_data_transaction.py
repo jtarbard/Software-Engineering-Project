@@ -1,10 +1,22 @@
 # Holds all functions related to the employees/managers of the website and the transactions with the database
 import logging
-from main.data.db_session import add_to_database
+import main.data.db_session as db
+from main.data.db_classes.activity_db_class import ActivityType
+
 from main.data.db_classes.employee_data_db_class import Facility, Role, Employee_Router
-from main.logger import log_transaction
 
+# Logging has been individually set for this file, as transactions in the database
+# are important and must be recorded
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler("logs/transactions.log")
+file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
+
+logger.addHandler(file_handler)
+
+"""
 # Returns all the roles from the composition value passed to the function parameter. EG: 1 = Lifeguard
 def return_roles_from_composition_value(binary_rep: int):
     binary_list = [int(x) for x in bin(binary_rep)[2:]] # Retrieves the converted binary list from the composite value
@@ -27,11 +39,12 @@ def return_composition_value_from_roles(input_roles: list):
         if current_role.name in [role.lower() for role in input_roles]: # Retrieves ID of role in the database
             composite_role += 2**(current_role.role_id-1)   # Adds binary value to the composite roles
     return composite_role
-
+"""
 
 # Returns list of all roles in the database
 def return_list_of_roles():
-    return Role.query.all()
+    session = db.create_session()
+    return session.query(Role).all()
 
 
 # Creates a new role if the conditions are met:
@@ -41,19 +54,19 @@ def return_list_of_roles():
 #   - Hourly pay must be between £0 and £50
 def create_new_role(role_name: str, description: str, hourly_pay: float):
     if len(role_name) < 4 or len(role_name) > 20 or not role_name.replace(" ", "").isalpha():
-        log_transaction(f"Failed to add new role {role_name}: role_name not correct length or type")
+        logger.info(f"Failed to add new role {role_name}: role_name not correct length or type")
         return False
     if len(description) < 10 or len(description) > 200:
-        log_transaction(f"Failed to add new role {role_name}: description not correct length or type")
+        logger.info(f"Failed to add new role {role_name}: description not correct length or type")
         return False
     if hourly_pay < 0 or hourly_pay > 50:
-        log_transaction(f"Failed to add new role {role_name}: invalid discount value")
+        logger.info(f"Failed to add new role {role_name}: invalid discount value")
         return False
 
     current_roles = return_list_of_roles()
     for role in current_roles:
         if role.role_name == role_name.lower():
-            log_transaction(f"Failed to add new role {role_name}: role name already exists")
+            logger.info(f"Failed to add new role {role_name}: role name already exists")
             return False
 
     new_role = Role()
@@ -61,14 +74,43 @@ def create_new_role(role_name: str, description: str, hourly_pay: float):
     new_role.description = description
     new_role.hourly_pay = hourly_pay
 
-    add_to_database(new_role)
-    log_transaction(f"Added new role {role_name}")
+    session = db.create_session()
+    session.add(new_role)
+    logger.info(f"Added new role {role_name}")
+    session.commit()
+    session.close()
     return True
 
 
 def return_facility_with_id(facility_id: int):
-    return Facility.query.filter(Facility.facility_id == facility_id).first()
+    session = db.create_session()
+    return session.query(Facility).filter(Facility.facility_id == facility_id).first()
 
 
 def return_facility_with_name(facility_name: str):
-    return Facility.query.filter(Facility.name == facility_name).first()\
+    session = db.create_session()
+    return session.query(Facility).filter(Facility.name == facility_name).first()
+
+
+def return_facility_name_with_facility_id(facility_id):
+    session = db.create_session()
+    facility = session.query(Facility).filter(Facility.facility_id == facility_id).first()
+    return facility.name
+
+
+def return_role_id_with_name(role):
+    session = db.create_session()
+    role = session.query(Role).filter(Role.role_name == role).first()
+    if not role:
+        logger.info(f"Failed to return role {role}")
+    return role
+
+
+def add_role_to_activity_type(role_id, activity_type_id):
+    session = db.create_session()
+    role = session.query(Role).filter(Role.role_id == role_id).first()
+    activity_type = session.query(ActivityType).filter(ActivityType.activity_type_id == activity_type_id).first()
+
+    role.activities_with_role.append(activity_type)
+    session.commit()
+    session.close()

@@ -1,26 +1,27 @@
+import sqlalchemy as sa
+from sqlalchemy import orm
 from datetime import datetime
-from main.data.db_session import database
-
+from main.data.model_base import SqlAlchemyBase
 
 # Class mapped to the user table in the database, this is the parent class to the: customer, employee and
 # manager classes; this is defined by the __mapper_args__ field
-class User(database.Model):
+class User(SqlAlchemyBase):
     __tablename__ = 'Users'
 
-    user_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    first_name = database.Column(database.String, nullable=False)
-    last_name = database.Column(database.String, nullable=False)
-    title = database.Column(database.String)
-    email = database.Column(database.String, nullable=False, index=True)
-    password = database.Column(database.String, nullable=False, index=True)
-    dob = database.Column(database.Date)
-    tel_number = database.Column(database.String)
-    country = database.Column(database.String)
-    postal_code = database.Column(database.String)
-    address = database.Column(database.String)
-    creation_date = database.Column(database.DateTime, default=datetime.now)
+    user_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    first_name = sa.Column(sa.String, nullable=False)
+    last_name = sa.Column(sa.String, nullable=False)
+    title = sa.Column(sa.String)
+    email = sa.Column(sa.String, nullable=False, index=True, unique=True)
+    password = sa.Column(sa.String, nullable=False, index=True)
+    dob = sa.Column(sa.Date)
+    tel_number = sa.Column(sa.String)
+    country = sa.Column(sa.String)
+    postal_code = sa.Column(sa.String)
+    address = sa.Column(sa.String)
+    creation_date = sa.Column(sa.DateTime, default=datetime.now)
 
-    discriminator = database.Column('type', database.String(50)) #Type of user
+    discriminator = sa.Column('type', sa.String(50)) #Type of user
     __mapper_args__ = {
         'polymorphic_on': discriminator
     }
@@ -31,37 +32,37 @@ class User(database.Model):
 class Employee(User):
     __tablename__ = 'Employees'
 
-    employee_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
-    composite_roles = database.Column(database.String, nullable=False) # Integer related to the roles that a user is allowed
-                                                           # To partake in for certain activities
+    employee_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey("Users.user_id"), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'Employee'
     }
 
-    router_activities = database.relation("Employee_Router", backref="employee")
+    router_activities = orm.relation("Employee_Router", backref="employee")
+    allowed_roles = orm.relationship("Role", secondary="valid_employee_role_association", back_populates="employees_with_role")
 
 
 class Customer(User):
     __tablename__ = 'Customers'
 
-    customer_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
+    customer_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey("Users.user_id"), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'Customer'
     }
 
-    purchases = database.relation("Receipt", backref="customer")
+    purchases = orm.relation("Receipt", backref="customer")
 
 
 class Manager(User):
     __tablename__ = 'Managers'
 
-    manager_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
+    manager_id = sa.Column(sa.Integer, primary_key=True, autoincrement=True)
+    user_id = sa.Column(sa.Integer, sa.ForeignKey("Users.user_id"), nullable=False)
 
     __mapper_args__ = {
         'polymorphic_identity': 'Manager'
     }
+
