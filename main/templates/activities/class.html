@@ -8,23 +8,24 @@ Class!
 {% endblock %}
 
 {% block main_content %}
-<h2>{{activity_type.name.capitalize()}}</h2>
+<h2>{{activity.activity_type.name.capitalize()}}</h2>
     <p>Details</p>
     <ul>
         <li>Start time: {{ activity.start_time }} </li>
         <li>End time: {{ activity.end_time }} </li>
-        <li>Minimum age: {{ activity_type.minimum_age }} </li>
+        <li>Minimum age: {{ activity.activity_type.minimum_age }} </li>
         <li>Spaces left: {{ spaces_left }}</li>
-        <li>Total price: £{{ total_price }}</li>
+        <li>Total price: £{{ session_price }}</li>
         {% if membership %}
             <li>Membership discount type and discount: {{ membership.name + "+" + membership.discount }}</li>
-            <li>Final price: {{ total_price * membership.discount//100 }}</li>
+            <li>Final price: {{ final_price }}</li>
         {% endif %}
     </ul>
     {% if allow_booking %}
-    <form action="/activities/view_classes" method="post">
-        <label for="num_bookings">Amount of people:</label>
-        <input type="number" name="num_bookings" min="1" max="8" required>
+    <form action="/misc/add_booking_to_basket" method="post">
+        <label for="amount_of_people">Amount of people:</label>
+        <input type="number" name="amount_of_people" min="1" max="8" required>
+        <!--TODO: Add start and end of session times-->
         <input name="activity" type="hidden" value="{{ activity.activity_id }}">
         <input type="submit" value="Book activity">
     </form>

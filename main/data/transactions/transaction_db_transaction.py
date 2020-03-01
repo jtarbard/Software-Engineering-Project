@@ -1,35 +1,14 @@
 # Holds all functions related to the users of the website and the transactions with the database
-import urllib
-
 import flask
-import hashlib
-import logging
-import datetime
-import main.data.db_session as db
-
-from flask import Response
-from passlib.handlers.sha2_crypt import sha512_crypt as crypto
-from main.data.db_classes.transaction_db_class import Booking, Receipt, MembershipType, Membership
+from main.data.db_session import session, add_to_database
+from main.logger import log_transaction
+from main.data.db_classes.transaction_db_class import MembershipType
 from main.data.db_classes.activity_db_class import Activity
-import main.data.transactions.user_db_transaction as udf
-import main.data.transactions.activity_db_transaction as adf
-
-# Logging has been individually set for this file, as transactions in the database
-# are important and must be recorded
-
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-file_handler = logging.FileHandler("logs/transactions.log")
-file_handler.setFormatter(logging.Formatter("%(asctime)s:%(name)s:%(message)s"))
-
-logger.addHandler(file_handler)
-
+from main.data.transactions.activity_db_transaction import adf
+from main.data.db_classes.transaction_db_class import Booking
 
 #  A simple function that returns a list of all the membership types currently in the gym
-# [Lewis S]
 def return_all_membership_types():
-    session = db.create_session()
     return session.query(MembershipType).all()
 
 
@@ -42,47 +21,42 @@ def return_all_membership_types():
 # [Lewis S]
 def create_new_membership_type(name: str, description: str, discount: int, monthly_price: float):
     if len(name) < 4 or len(name) > 20 or not name.replace(" ", "").isalpha():
-        logger.info(f"Failed to add new membership {name}: name not correct length or type")
+        log_transaction(f"Failed to add new membership {name}: name not correct length or type")
         return False
     if len(description) < 10 or len(description) > 200:
-        logger.info(f"Failed to add new membership {name}: description not correct length or type")
+        log_transaction(f"Failed to add new membership {name}: description not correct length or type")
         return False
     if discount < 0 or discount > 100:
-        logger.info(f"Failed to add new membership {name}: invalid discount value")
+        log_transaction(f"Failed to add new membership {name}: invalid discount value")
         return False
     if monthly_price < 0 or monthly_price > 100:
-        logger.info(f"Failed to add new membership {name}: invalid monthly_price value")
+        log_transaction(f"Failed to add new membership {name}: invalid monthly_price value")
         return False
 
     membership_types = return_all_membership_types()
     for membership in membership_types:
         if membership.name == name.lower():
-            logger.info(f"Failed to add new membership {name}: membership name already exists")
+            log_transaction(f"Failed to add new membership {name}: membership name already exists")
             return False
 
-    session = db.create_session()
     new_membership = MembershipType()
     new_membership.name = name.lower()
     new_membership.description = description.lower()
     new_membership.discount = discount
     new_membership.monthly_price = monthly_price
 
-    logger.info(f"Adding new membership {name}")
-    session.add(new_membership)
-    session.commit()
-    session.close()
-    return True
+    log_transaction(f"Adding new membership {name}")
+    return add_to_database(new_membership)
 
 
 # Simply returns the membership with a specific ID
 # [Lewis S]
 def return_membership_type_with_id(id: int):
-    session = db.create_session()
-    membership = session.query(MembershipType).filter(MembershipType.membership_type_id == id).first()
+    membership : MembershipType = MembershipType.query(MembershipType).filter(MembershipType.membership_type_id == id).first()
     if not membership:
-        logger.info(f"Failed to return membership with ID {id}: does not exist in database")
+        log_transaction(f"Failed to return membership with ID {id}: does not exist in database")
     else:
-        logger.info(f"Successfully returned membership with ID {id}")
+        log_transaction(f"Successfully returned membership with ID {id}")
     return membership
 
 
@@ -100,8 +74,13 @@ def return_membership_type_with_id(id: int):
 #   - An activity item does not return a valid activity
 #   - A membership item does not return a valid membership
 #   - The type is not formatted to be a membership or activity
+#  Returns values:
+#   - Boolean: true if cookie decoded properly and booking returned correctly; false otherwise
+#   - List of activity objects which have ids that are stored in the cookie
+#   - List of membership objects which have ids that are stored in the cookie
 # [Lewis S]
 def return_activities_and_memberships_from_basket_cookie_if_exists(request: flask.request):
+    # TODO: Comment
     if "vertex_basket_cookie" not in request.cookies:
         return True, None, None
 
@@ -113,7 +92,6 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
     basket_instances = basket.split(";")
 
     basket_activities = []
-
     basket_membership = None
 
     for basket_instance in basket_instances:
@@ -127,6 +105,7 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
 
         if split_instance[0] == "M":
             new_membership = return_membership_type_with_id(split_instance[1])
+            # TODO: Comment (Only allow 1 membership; if multiple encountered then return false)
             if basket_membership or not new_membership:
                 return False, None, None
 
@@ -134,6 +113,7 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
 
         elif split_instance[0] == "A":
             new_activity: Activity = adf.return_activity_with_id(split_instance[1])
+            # TODO: Add more validation (e.g. date validation)
             if not new_activity:
                 return False, None, None
 
@@ -165,7 +145,6 @@ def add_items_and_membership_to_basket(request: flask.request, response: flask.R
     return True, response
 """
 
-def return_bookings_with_activity_id(activity_id):
-    session = db.create_session()
-    return session.query(Booking).filter(Booking.activity_id == activity_id).all()
 
+def return_bookings_with_activity_id(activity_id):
+    return Booking.query(Booking).filter(Booking.activity_id == activity_id).all()

@@ -41,8 +41,8 @@ class Employee(User):
     }
 
     router_activities = database.relation("Employee_Router", backref="employee")
-    #### allowed_roles = orm.relationship("Role", secondary="valid_employee_role_association", back_populates="employees_with_role")
 
+    # invisible virtual attribute "allowed_roles" for many-to-many relationship
 
 class Customer(User):
     __tablename__ = 'Customers'

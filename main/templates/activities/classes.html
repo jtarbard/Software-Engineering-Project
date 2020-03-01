@@ -22,14 +22,14 @@ The Vertex classes!
                     <td>Availability left</td>
                     <td>Book</td>
                 </tr>
-                {% for i in range(num_activites) %}
+                {% for activity, avalibility in activity_dict.items() %}
                     <tr>
-                        <td>{{ activity_names[i] }}</td>
-                        <td>{{ activity_list[i].start_time }}</td>
-                        <td>{{ activity_list[i].end_time }}</td>
-                        <td>{{ facility_names[i] }}</td>
-                        <td>{{ avalibility[i] }}</td>
-                        <td><a class="btn-danger" href="/activities/view_class/{{ activity_list[i].activity_id }}">Book</a></td>
+                        <td>{{ activity.name }}</td>
+                        <td>{{ activity.start_time }}</td>
+                        <td>{{ activity.end_time }}</td>
+                        <td>{{ activity.facility.name }}</td>
+                        <td>{{ avalibility }}</td>
+                        <td><a class="btn-danger" href="/activities/view_class/{{ activity.activity_id }}">Book</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
