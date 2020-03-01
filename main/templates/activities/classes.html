@@ -24,7 +24,7 @@ The Vertex classes!
                 </tr>
                 {% for activity, avalibility in activity_dict.items() %}
                     <tr>
-                        <td>{{ activity.name }}</td>
+                        <td>{{ activity.activity_type.name }}</td>
                         <td>{{ activity.start_time }}</td>
                         <td>{{ activity.end_time }}</td>
                         <td>{{ activity.facility.name }}</td>

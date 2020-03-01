@@ -19,7 +19,7 @@ def return_activity_type_with_id(activity_type_id: int):
 # lazy loading errors
 # [Lewis S]
 def return_activity_type_name_with_activity_type_id(activity_type_id):
-    activity_type: ActivityType = ActivityType.query(ActivityType).filter(ActivityType.activity_type_id == activity_type_id).first()
+    activity_type: ActivityType = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
     """
     if not activity_type:
         log_transaction(f"Failed to return activity type name with activity type ID: {activity_type_id} from DB")
@@ -250,5 +250,5 @@ def return_activity_with_id(activity_id: int):
 # Returns the max capacity for an activity of a specific type- this is used for combatting lazy loading
 # [Lewis S]
 def return_activity_capacity_with_activity_type_id(activity_type_id):
-    activity_type: ActivityType= ActivityType.query(ActivityType).filter(ActivityType.activity_type_id == activity_type_id).first()
+    activity_type: ActivityType= ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
     return int(activity_type.maximum_activity_capacity)

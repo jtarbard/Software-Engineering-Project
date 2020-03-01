@@ -29,7 +29,6 @@ class ActivityType(database.Model):
     maximum_activity_capacity = database.Column(database.Integer, nullable=False)
     hourly_activity_cost = database.Column(database.Integer, nullable=False)
     hourly_activity_price = database.Column(database.Integer, nullable=False)
-    valid_composite_roles = database.Column(database.String, nullable=False)
     max_staff = database.Column(database.Integer, nullable=False)
     min_staff = database.Column(database.Integer, nullable=False)
 

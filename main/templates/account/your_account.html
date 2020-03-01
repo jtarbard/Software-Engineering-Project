@@ -8,12 +8,12 @@
 {% endblock %}
 
 {% block main_content %}
-    <h2>Welcome: {{ User.first_name }} ({{ User_Type }} account)</h2>
+    <h2>Welcome: {{ User.first_name }} ({{ User.__mapper_args__ ['polymorphic_identity'] }} account)</h2>
     <a href="/account/log_out">Log out</a><br>
     <a href="/">Return to index</a><br>
-    {% if User.type == "Manager" %}
+    {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
 
-    {% elif User.type == "Employee" %}
+    {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
     <h3>Router:</h3>
     {% else %}
     <h3>Current bookings:</h3>

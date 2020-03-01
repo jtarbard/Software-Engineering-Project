@@ -11,7 +11,7 @@ session = None
 
 
 # Takes a connection string and sets up a SQLite connection
-def global_init(db_file: str):
+def global_init(flask_app):
     global database, session
 
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/TheVertex.sqlite'

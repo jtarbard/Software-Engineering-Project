@@ -6,7 +6,7 @@ from main.logger import log_transaction
 
 # Returns list of all roles in the database
 def return_list_of_roles():
-    return Role.query(Role).all()
+    return Role.query.all()
 
 
 # Creates a new role if the conditions are met:
@@ -51,19 +51,19 @@ def return_facility_with_name(facility_name: str):
 
 
 def return_facility_name_with_facility_id(facility_id):
-    facility = Facility.query(Facility).filter(Facility.facility_id == facility_id).first()
+    facility = Facility.query.filter(Facility.facility_id == facility_id).first()
     return facility.name
 
 
 def return_role_id_with_name(role):
-    role = Role.query(Role).filter(Role.role_name == role).first()
+    role = Role.query.filter(Role.role_name == role).first()
     if not role:
         log_transaction(f"Failed to return role {role}")
     return role
 
 
 def add_role_to_activity_type(role_id, activity_type_id):
-    role = Role.query(Role).filter(Role.role_id == role_id).first()
-    activity_type = ActivityType.query(ActivityType).filter(ActivityType.activity_type_id == activity_type_id).first()
+    role = Role.query.filter(Role.role_id == role_id).first()
+    activity_type = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
     role.activities_with_role.append(activity_type)

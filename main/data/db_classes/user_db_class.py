@@ -33,8 +33,6 @@ class Employee(User):
 
     employee_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
-    composite_roles = database.Column(database.String, nullable=False) # Integer related to the roles that a user is allowed
-                                                           # To partake in for certain activities
 
     __mapper_args__ = {
         'polymorphic_identity': 'Employee'

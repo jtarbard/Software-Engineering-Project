@@ -4,12 +4,12 @@ from main.data.db_session import session, add_to_database
 from main.logger import log_transaction
 from main.data.db_classes.transaction_db_class import MembershipType
 from main.data.db_classes.activity_db_class import Activity
-from main.data.transactions.activity_db_transaction import adf
+import main.data.transactions.activity_db_transaction as adf
 from main.data.db_classes.transaction_db_class import Booking
 
 #  A simple function that returns a list of all the membership types currently in the gym
 def return_all_membership_types():
-    return session.query(MembershipType).all()
+    return MembershipType.query.all()
 
 
 #  Creates a new membership type, only if the following conditions are met:
@@ -52,7 +52,7 @@ def create_new_membership_type(name: str, description: str, discount: int, month
 # Simply returns the membership with a specific ID
 # [Lewis S]
 def return_membership_type_with_id(id: int):
-    membership : MembershipType = MembershipType.query(MembershipType).filter(MembershipType.membership_type_id == id).first()
+    membership : MembershipType = MembershipType.query.filter(MembershipType.membership_type_id == id).first()
     if not membership:
         log_transaction(f"Failed to return membership with ID {id}: does not exist in database")
     else:
@@ -147,4 +147,4 @@ def add_items_and_membership_to_basket(request: flask.request, response: flask.R
 
 
 def return_bookings_with_activity_id(activity_id):
-    return Booking.query(Booking).filter(Booking.activity_id == activity_id).all()
+    return Booking.query.filter(Booking.activity_id == activity_id).all()

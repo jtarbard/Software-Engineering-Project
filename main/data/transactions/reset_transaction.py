@@ -278,7 +278,7 @@ def return_random_times(amount_today: int):
 
 
 # Traverses the times an activity takes place and adds it to the database
-def add_activities_with_times(returned_times: list, day_amount: int, activity_type, activity_to_facility_converter: dict):
+def add_activities_with_times(returned_times: list, day_amount: int, activity_type):
     for time in returned_times:
         end_time = time + 1
         if time - 1 in returned_times:
@@ -335,9 +335,29 @@ def populate_db(create_timetable):
         # assume the database has already been populated
         return False
 
-    if create_facilities() and create_roles() and create_membership_types() \
-            and create_activity_types() and create_activity_facility_relation() \
-            and create_base_account_types() and create_activity_type_and_role_validation():
+    success = create_facilities()
+    if not success:
+        print("failed to create facilities")
+    success = create_roles()
+    if not success:
+        print("failed to create_roles")
+    success = create_membership_types()
+    if not success:
+        print("failed to create create_membership_types")
+    success = create_activity_types()
+    if not success:
+        print("failed to create_activity_types")
+    success = create_activity_facility_relation()
+    if not success:
+        print("failed to create_activity_facility_relation")
+    success = create_base_account_types()
+    if not success:
+        print("failed to create_base_account_types")
+    success = create_activity_type_and_role_validation()
+    if not success:
+        print("failed to create_activity_type_and_role_validation")
+
+    if not success:
 
         if create_timetable:
             create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
