@@ -125,7 +125,7 @@ def register_post():
         server_error = "Input Error: Passwords do not match"
     elif " " in password_first: # Makes sure password doesn't contain spaces
         server_error = "Input Error: Password cannot contain spaces"
-    elif not any(num in password_first for num in ["1","2","3","4","5","6","7","8","9"]): # Checks password has a number
+    elif not any(num in password_first for num in ["0","1","2","3","4","5","6","7","8","9"]): # Checks password has a number
         server_error = "Input Error: Password must contain a number"
     elif formatted_dob > current_date - datetime.timedelta(days=365 * 16):  # Checks that user is over 16
         server_error = "Input Error: Incorrect date of birth entered (must be over 16)"
