@@ -1,11 +1,15 @@
 # Holds all functions related to the users of the website and the transactions with the database
 import flask
+import datetime
 from main.data.db_session import session, add_to_database
 from main.logger import log_transaction
-from main.data.db_classes.transaction_db_class import MembershipType
+from main.data.db_classes.transaction_db_class import MembershipType, Receipt, Membership
 from main.data.db_classes.activity_db_class import Activity
 import main.data.transactions.activity_db_transaction as adf
+import main.data.transactions.user_db_transaction as udf
 from main.data.db_classes.transaction_db_class import Booking
+from main.data.db_classes.user_db_class import User, Customer
+
 
 #  A simple function that returns a list of all the membership types currently in the gym
 def return_all_membership_types():
@@ -148,3 +152,49 @@ def add_items_and_membership_to_basket(request: flask.request, response: flask.R
 
 def return_bookings_with_activity_id(activity_id):
     return Booking.query.filter(Booking.activity_id == activity_id).all()
+
+
+def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User):
+    new_receipt = Receipt()
+    customer = Customer.query.filter(Customer.user_id == user.user_id).first()
+    new_receipt.creation_time = datetime.datetime.now()
+    new_receipt.customer_id = customer.customer_id
+    add_to_database(new_receipt)
+
+    total_price = 0
+
+    for activity in basket_activities:
+        new_booking = Booking()
+        new_booking.activity_id = activity.activity_id
+        new_booking.receipt_id = new_receipt.receipt_id
+        duration: datetime.timedelta = activity.end_time - activity.start_time
+        current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
+        total_price += current_price
+        add_to_database(new_booking)
+
+    if basket_membership:
+        new_membership = Membership()
+        new_membership.membership_type_id = basket_membership.membership_type_id
+        new_membership.receipt_id = new_receipt.receipt_id
+
+        #TODO: ADD MEMBERSHIP DURATION
+        month_duration = 1
+        total_price += basket_membership.monthly_price * month_duration
+        add_to_database(new_membership)
+
+    new_receipt.total_cost = total_price
+    add_to_database(new_receipt)
+
+    return new_receipt.receipt_id
+
+
+def check_encrypted_receipt(encrypted_receipt: str, user: User):
+    customer = Customer.query.filter(Customer.user_id == user.user_id).first()
+    receipts = Receipt.query.filter(Receipt.customer_id == customer.customer_id).all()
+
+    for receipt in receipts:
+        plain_text = str(receipt.receipt_id) + "-" + str(user.user_id)
+        if udf.verify_hash(encrypted_receipt, plain_text):
+            return receipt
+
+    return False

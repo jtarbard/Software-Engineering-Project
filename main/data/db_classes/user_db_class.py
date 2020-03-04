@@ -47,6 +47,7 @@ class Customer(User):
 
     customer_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
+    current_membership = database.Column(database.Integer, database.ForeignKey("Memberships.membership_id"))
 
     __mapper_args__ = {
         'polymorphic_identity': 'Customer'

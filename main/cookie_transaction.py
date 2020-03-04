@@ -73,4 +73,3 @@ def check_valid_account_cookie(request: flask.request):
 def __hash_text(text: str) -> str:
     text = 'salty__' + text + '__text'
     return hashlib.sha512(text.encode('utf-8')).hexdigest()
-

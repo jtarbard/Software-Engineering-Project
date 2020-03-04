@@ -38,15 +38,15 @@ def view_class(activity_id: int):
         return flask.abort(404)
 
     spaces_left = activity.activity_type.maximum_activity_capacity-len(tdf.return_bookings_with_activity_id(activity.activity_id))
-    if spaces_left <= 0:
-        return flask.abort(404)
 
     allow_booking = True
-    if type(user) is not Customer:
+    if type(user) is not Customer or spaces_left <= 0:
         allow_booking = False
         membership = None
     else:
-        membership : Membership = udf.return_membership_for_customer_id(user.user_id)
+        customer = udf.return_customer_with_user_id(user.user_id)
+        membership = customer.current_membership
+
 
     duration: datetime.timedelta = activity.end_time - activity.start_time
     session_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
@@ -57,7 +57,7 @@ def view_class(activity_id: int):
 
     return flask.render_template("/activities/class.html", activity=activity, session_price=round(session_price, 2),
                                  spaces_left=spaces_left, allow_booking=allow_booking, membership=membership,
-                                 final_price=round(final_price, 2))
+                                 final_price=round(final_price, 2), User=user)
 
 
 # TODO: Refactor heavily
@@ -71,10 +71,7 @@ def view_classes_post():
     activity = adf.return_activity_with_id(data_form.get('activity'))
     booking_amount: int = int(data_form.get("amount_of_people"))
 
-    check_out = data_form.get("checkout")
-    check_out = True
-
-    if not check_out and not activity:
+    if not activity:
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity")
 
     is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
@@ -92,17 +89,18 @@ def view_classes_post():
     if spaces_left <= 0:
         return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity")
 
-    if check_out:
-        response = flask.redirect("/transactions/payments")
-    else:
-        response = flask.redirect("/activities/view_classes")
+    response = flask.redirect("/activities/view_classes")
 
     valid = True
     if activity:
         add_instance = "A:" + str(activity.activity_id)
 
         if "vertex_basket_cookie" not in flask.request.cookies:
-            response.set_cookie("vertex_basket_cookie", add_instance, max_age=datetime.timedelta(days=1))
+            basket = add_instance
+            for i in range(booking_amount-1):
+                basket += ";" + add_instance
+
+            response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
             return response
 
         basket = flask.request.cookies["vertex_basket_cookie"]
@@ -110,7 +108,7 @@ def view_classes_post():
         for i in range(booking_amount):
             basket += ";" + add_instance
 
-        response.set_cookie("vertex_basket_cookie", basket , max_age=datetime.timedelta(days=1))
+        response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
         return response
 
     if not valid:
@@ -119,41 +117,51 @@ def view_classes_post():
     return response
 
 
-@blueprint.route("/transactions/payments", methods=["GET"])
-def payment_get():
+@blueprint.route("/account/basket", methods=["GET"])
+def basket_view():
     user, response = ct.return_user_response(flask.request, True)
     if response:
         return response
 
     is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
-    if not is_valid or (len(basket_activities) == 0 and len(basket_membership) == 0):
+    if not is_valid:
         response = flask.redirect("/")
         response.set_cookie("vertex_basket_cookie", "", max_age=0)
         return response
 
+    if not (basket_activities or basket_membership):
+        return flask.render_template("/account/basket.html")
+
+    new_activities_basket = ""
+    redirect = False
     for activity in basket_activities:
         spaces_left = activity.activity_type.maximum_activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id))
-        if spaces_left <= 0:
-            return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity")
+        number_of_activities = basket_activities.count(activity)
+        if spaces_left >= number_of_activities:
+            if len(new_activities_basket) != 0:
+                new_activities_basket += ";"
+            new_activities_basket += "A:" + str(activity.activity_id)
+        else:
+            redirect = True
 
-    facility_names = []
+    if redirect:
+        response = flask.redirect("/account/basket")
+        response.set_cookie("vertex_basket_cookie", new_activities_basket, max_age=datetime.timedelta(days=1))
+        return response
+
+    activity_and_price = dict()
     total_price = 0
-    individual_prices = []
     for activity in basket_activities:
         duration: datetime.timedelta = activity.end_time - activity.start_time
-        activity_type = adf.return_activity_type_with_id(activity.activity_type_id)
-        current_price = (duration.seconds // 3600 * activity_type.hourly_activity_price)
-        individual_prices.append(current_price)
+        current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
+        number_of_activities = basket_activities.count(activity)
+        activity_and_price[activity] = (current_price, number_of_activities)
         total_price += current_price
 
-        facility_name = edf.return_facility_name_with_facility_id(activity.facility_id)
-        if facility_name:
-            facility_names.append(facility_name.capitalize())
-
-    return flask.render_template("/transactions/payments.html", basket_activities=basket_activities,
+    return flask.render_template("/account/basket.html", basket_activities=basket_activities,
                                  basket_membership=basket_membership, user=user, total_price=total_price,
-                                 individual_prices=individual_prices)
+                                 activity_and_price=activity_and_price)
 
 
 

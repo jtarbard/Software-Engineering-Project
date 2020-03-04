@@ -7,14 +7,14 @@ class Receipt(database.Model):
 
     receipt_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     customer_id = database.Column(database.Integer, database.ForeignKey("Customers.customer_id"), nullable=False)
-    total_cost = database.Column(database.Integer, database.CheckConstraint("total_cost > 0 and total_cost < 5000"), nullable=False)
+    total_cost = database.Column(database.Integer, database.CheckConstraint("total_cost >= 0 and total_cost < 5000"), default=0)
     # Total cost must be between 0 and 5000
     creation_time = database.Column(database.DateTime, default=datetime.now, nullable=False)
     # Sets the creation time to now
 
-    # Relationships between the different trandatabasection types
+    # Relationships between the different transaction types
     bookings = database.relationship("Booking", back_populates="receipt")
-    memberships = database.relationship("Membership", back_populates="receipt")
+    membership = database.relationship("Membership", back_populates="receipt", uselist=False)
 
 
 class Booking(database.Model):
@@ -24,6 +24,7 @@ class Booking(database.Model):
     activity_id = database.Column(database.Integer, database.ForeignKey("Activities.activity_id"), nullable=False)
     receipt_id = database.Column(database.Integer, database.ForeignKey("Receipts.receipt_id"), nullable=False)
 
+    activity = database.relationship("Activity", back_populates="bookings", uselist=False)
     receipt = database.relationship("Receipt", back_populates="bookings", uselist=False)
 
 
@@ -36,7 +37,7 @@ class Membership(database.Model):
     end_date = database.Column(database.Date, default=date.today, nullable=False)
     receipt_id = database.Column(database.Integer, database.ForeignKey("Receipts.receipt_id"), nullable=False)
 
-    receipt = database.relationship("Receipt", back_populates="memberships", uselist=False)
+    receipt = database.relationship("Receipt", back_populates="membership", uselist=False)
     membership_type = database.relationship("MembershipType", back_populates="memberships", uselist=False)
 
 

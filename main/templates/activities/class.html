@@ -25,11 +25,17 @@ Class!
     <form action="/misc/add_booking_to_basket" method="post">
         <label for="amount_of_people">Amount of people:</label>
         <input type="number" name="amount_of_people" min="1" max="8" required>
-        <!--TODO: Add start and end of session times-->
+            <!--TODO: Add start and end of session times-->
         <input name="activity" type="hidden" value="{{ activity.activity_id }}">
         <input type="submit" value="Book activity">
     </form>
+    {% else %}
+        {% if User.__mapper_args__ ['polymorphic_identity'] == "Customer" %}
+            <p>Sorry but this activity is full </p>
+        {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+            <a class="btn-success" href="">Assign self to activity</a>
         {% else %}
-        <p>Employees and managers cannot book a class</p>
+            <a class="btn-danger" href="">Remove activity</a>
+        {% endif %}
     {% endif %}
 {% endblock %}

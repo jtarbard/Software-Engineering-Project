@@ -3,6 +3,8 @@ import flask
 import datetime
 import main.data.transactions.user_db_transaction as udf
 import main.cookie_transaction as ct
+from main.data.db_classes.transaction_db_class import Receipt, Booking
+from main.data.db_classes.user_db_class import Customer
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -153,7 +155,19 @@ def view_account():
     if response:
         return response
 
-    return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user)
+    returned_bookings = []
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            if receipt.membership:
+                continue
+            for booking in receipt.bookings:
+                if booking.activity.start_time < datetime.datetime.now():
+                    continue
+                returned_bookings.append(booking.activity)
+
+    return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user,
+                                 returned_bookings=returned_bookings)
 
 
 # Route for executing if the user wants to log out

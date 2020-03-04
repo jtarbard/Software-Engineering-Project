@@ -54,6 +54,7 @@ class Activity(database.Model):
     activity_type = database.relationship("ActivityType", back_populates="activities")
     employees = database.relationship("Employee_Router", back_populates="activity")
     facility = database.relationship("Facility", back_populates="current_activities", uselist=False)
+    bookings = database.relationship("Booking", back_populates="activity")
 
 
 class Facility(database.Model):

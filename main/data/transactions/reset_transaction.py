@@ -198,6 +198,7 @@ def create_activity_type_and_role_validation():
                 return False
             edf.add_role_to_activity_type(role.role_id, activity_type.activity_type_id)
 
+    return True
 
 # Defines all of the membership types currently available
 def create_membership_types():
@@ -213,6 +214,7 @@ def create_base_account_types():
                                     "0113 243 1751", datetime.today()-timedelta(weeks=52*20), "LS2 9JT",
                                     "Woodhouse, Leeds", "uk", i)
         i += 1
+    return True
 
 
 # Populates the activity table with semi-random activities, creates a timetable for the website
@@ -335,33 +337,20 @@ def populate_db(create_timetable):
         # assume the database has already been populated
         return False
 
-    success = create_facilities()
-    if not success:
-        print("failed to create facilities")
-    success = create_roles()
-    if not success:
-        print("failed to create_roles")
-    success = create_membership_types()
-    if not success:
-        print("failed to create create_membership_types")
-    success = create_activity_types()
-    if not success:
-        print("failed to create_activity_types")
-    success = create_activity_facility_relation()
-    if not success:
-        print("failed to create_activity_facility_relation")
-    success = create_base_account_types()
-    if not success:
-        print("failed to create_base_account_types")
-    success = create_activity_type_and_role_validation()
-    if not success:
-        print("failed to create_activity_type_and_role_validation")
+    population_functions = [
+        [create_facilities, "failed to create facilities"],
+        [create_roles, "failed to create_roles"],
+        [create_membership_types, "failed to create create_membership_types"],
+        [create_activity_types, "failed to create_activity_types"],
+        [create_activity_facility_relation, "failed to create_activity_facility_relation"],
+        [create_base_account_types, "failed to create_base_account_types"],
+        [create_activity_type_and_role_validation, "failed to create_activity_type_and_role_validation"],
+    ]
 
-    if not success:
+    for function_list in population_functions:
+        if not function_list[0]():
+            raise Exception(function_list[1])
 
-        if create_timetable:
-            create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
-        return True
-
-    else:
-        raise RuntimeError("Could not populate table")
+    if create_timetable:
+        create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
+    return True

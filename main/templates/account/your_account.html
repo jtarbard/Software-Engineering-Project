@@ -16,9 +16,31 @@
     {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
     <h3>Router:</h3>
     {% else %}
-    <h3>Current bookings:</h3>
-
-    <h3>Current membership:</h3>
+    {% if returned_bookings %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr><td colspan="4"> Current bookings </td></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Class Name</td>
+                            <td>Class Start Time </td>
+                            <td>Class End Time</td>
+                            <td>Facility</td>
+                        </tr>
+                        {% for activity in returned_bookings %}
+                            <tr>
+                                <td>{{ activity.activity_type.name }}</td>
+                                <td>{{ activity.start_time }}</td>
+                                <td>{{ activity.end_time }}</td>
+                                <td>{{ activity.facility.name }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+    {% endif %}
     {% endif %}
 {% endblock %}
 

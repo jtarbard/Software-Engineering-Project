@@ -97,12 +97,5 @@ def check_if_email_exists(email: str) -> bool:
         return True
 
 
-def return_membership_for_customer_id(customer_id: int):
-    receipts = Receipt.query.filter(Receipt.customer_id == customer_id).all()
-
-    for receipt in receipts:
-        if receipt.memberships != 0:
-            membership = receipt.memberships[0]
-            return membership.membership_type_id
-
-    return False
+def return_customer_with_user_id(user_id: int):
+    return Customer.query.filter(Customer.user_id == user_id).first()

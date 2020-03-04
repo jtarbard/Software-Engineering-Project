@@ -1,0 +1,18 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+
+{% endblock %}
+
+{% block title %}
+The Vertex card pay!
+{% endblock %}
+
+{% block main_content %}
+<h2>Pay page</h2>
+<p>Card details to be added</p>
+<p>Total cost: {{total_price}}</p>
+<form method="post">
+    <input type="submit">
+    <input type="hidden" name="pay" value="user_has_paid">
+</form>
+{% endblock %}
