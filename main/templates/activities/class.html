@@ -24,7 +24,7 @@ Class!
     {% if allow_booking %}
     <form action="/misc/add_booking_to_basket" method="post">
         <label for="amount_of_people">Amount of people:</label>
-        <input type="number" name="amount_of_people" min="1" max="8" required>
+        <input type="number" name="amount_of_people" min="1" max="{{ spaces_left }}" required>
             <!--TODO: Add start and end of session times-->
         <input name="activity" type="hidden" value="{{ activity.activity_id }}">
         <input type="submit" value="Book activity">
