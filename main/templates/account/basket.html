@@ -1,0 +1,68 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+
+{% endblock %}
+
+{% block title %}
+The Vertex payments!
+{% endblock %}
+
+{% block main_content %}
+<h2>Payments page</h2>
+
+    {% if not (basket_activities or basket_membership) %}
+        <p>Basket empty</p>
+    {% else %}
+        {% if basket_activities %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr><td colspan="5"> Current bookings </td></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Class Name</td>
+                            <td>Class Start Time </td>
+                            <td>Class End Time</td>
+                            <td>Facility</td>
+                            <td>Number of Bookings</td>
+                            <td>Price</td>
+                        </tr>
+                        {% for activity, tuple in activity_and_price.items() %}
+                            <tr>
+                                <td>{{ activity.activity_type.name }}</td>
+                                <td>{{ activity.start_time }}</td>
+                                <td>{{ activity.end_time }}</td>
+                                <td>{{ activity.facility.name }}</td>
+                                <td>{{ tuple[1] }}</td>
+                                <td>{{ tuple[0] }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="4"></td>
+                            <td>Total Price:</td>
+                            <td>{{ total_price }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+
+        {% if basket_membership %}
+            <p>New membership:</p>
+            <ul>
+                <li>
+                    Type: {{ membership.name }}
+                    Discount: {{ membership.discount }}
+                    Price per month: {{ membership.monthly_price }}
+                </li>
+            </ul>
+        {% endif %}
+
+         <form method="post" action="/transactions/pay-card">
+            <input type="submit" name="submit">
+             <input type="hidden" name="checkout" value="user_has_checkout">
+             <input type="hidden" name="total_price" value="{{total_price}}">
+        </form>
+    {% endif %}
+{% endblock %}

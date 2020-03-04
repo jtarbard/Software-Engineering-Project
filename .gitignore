@@ -1,8 +1,17 @@
 #pycharm files
+<<<<<<< HEAD
 .idea/
+=======
+/.idea/
+.idea
+>>>>>>> origin/fix-database-relationships
 
 # python bytecode
 *.py[cod]
 
 #virtual environment
+<<<<<<< HEAD
 venv/
+=======
+venv/
+>>>>>>> origin/fix-database-relationships

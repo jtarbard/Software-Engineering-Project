@@ -1,3 +1,7 @@
+# This file is the main driving force for connecting to the
+# database by providing a setup for the database as well
+# as a connection string and factory return function
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from main.logger import log_server_error

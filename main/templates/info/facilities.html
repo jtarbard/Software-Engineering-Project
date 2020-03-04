@@ -22,9 +22,11 @@ The Vertex - Facilities!
         <th>{{ facility.definition }}</th>
         <th>{{ facility.max_space }}</th>
         <th>
-            {% for activity in facility.activities %}
-            {{ activity.name }},
+            <ul style="list-style-type:disc;">
+            {% for activity in facility.activities_available %}
+                <li>{{ activity.name }}</li>
             {% endfor %}
+            </ul>
         </th>
     </tr>
     {% endfor %}

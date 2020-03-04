@@ -1,4 +1,12 @@
+from main.data.db_classes.activity_db_class import activity_roles
 from main.data.db_session import database
+
+# intermediate table that enables many-to-many relationship between ActivityType and Facility
+employee_role = \
+    database.Table("valid_employee_role_association",
+        database.Column("employee_id", database.Integer, database.ForeignKey("Employees.employee_id")),
+        database.Column("role_id", database.Integer, database.ForeignKey("Roles.role_id"))
+)
 
 
 class Employee_Router(database.Model):
@@ -9,22 +17,11 @@ class Employee_Router(database.Model):
     role_id = database.Column(database.String, database.ForeignKey("Roles.role_id"), nullable=False)
 
     __table_args__ = (
-        database.PrimaryKeyConstraint("employee_id","activity_id"),
+        database.PrimaryKeyConstraint("employee_id", "activity_id"),
     )
 
     activity = database.relationship("Activity", back_populates="employees", uselist=False)
     role = database.relationship("Role")
-
-
-class Facility(database.Model):
-    __tablename__ = 'Facilities'
-
-    facility_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    name = database.Column(database.String, nullable=False)
-    definition = database.Column(database.String, nullable=False)
-    max_space = database.Column(database.Integer, nullable=False)
-
-    activities = database.relationship("Activity", back_populates="facility")
 
 
 class Role(database.Model):
@@ -34,3 +31,11 @@ class Role(database.Model):
     role_name = database.Column(database.String, nullable=False)
     description = database.Column(database.String)
     hourly_pay = database.Column(database.Integer, nullable=False)
+
+    employees_with_role = database.relationship("Employee",
+                                                secondary=employee_role,
+                                                backref=database.backref("allowed_roles", lazy="dynamic"))
+
+    activities_with_role = database.relationship("ActivityType",
+                                                secondary=activity_roles,
+                                                backref=database.backref("allowed_roles", lazy="dynamic"))

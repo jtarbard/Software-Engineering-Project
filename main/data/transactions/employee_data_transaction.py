@@ -1,33 +1,8 @@
 # Holds all functions related to the employees/managers of the website and the transactions with the database
-import logging
 from main.data.db_session import add_to_database
-from main.data.db_classes.employee_data_db_class import Facility, Role, Employee_Router
+from main.data.db_classes.employee_data_db_class import Role, Employee_Router
+from main.data.db_classes.activity_db_class import Facility, ActivityType
 from main.logger import log_transaction
-
-
-# Returns all the roles from the composition value passed to the function parameter. EG: 1 = Lifeguard
-def return_roles_from_composition_value(binary_rep: int):
-    binary_list = [int(x) for x in bin(binary_rep)[2:]] # Retrieves the converted binary list from the composite value
-    roles = return_list_of_roles()
-    valid_roles = []
-    for i in range(len(binary_list)):
-        if binary_list[i] == 1: # If the binary value is 1, meaning that the role is valid for that value, then
-            try:                # the role is added to the total roles
-                valid_roles.append(roles[i])
-            except IndexError:
-                return False
-    return valid_roles # Total roles are returned
-
-
-# Deduces a composition value that represents the allowed roles for that user
-def return_composition_value_from_roles(input_roles: list):
-    all_roles = return_list_of_roles().all()
-    composite_role = 0
-    for current_role in all_roles:
-        if current_role.name in [role.lower() for role in input_roles]: # Retrieves ID of role in the database
-            composite_role += 2**(current_role.role_id-1)   # Adds binary value to the composite roles
-    return composite_role
-
 
 # Returns list of all roles in the database
 def return_list_of_roles():
@@ -39,6 +14,7 @@ def return_list_of_roles():
 #     in the database
 #   - Description must be between 10 and 200
 #   - Hourly pay must be between £0 and £50
+#   [Lewis.s]
 def create_new_role(role_name: str, description: str, hourly_pay: float):
     if len(role_name) < 4 or len(role_name) > 20 or not role_name.replace(" ", "").isalpha():
         log_transaction(f"Failed to add new role {role_name}: role_name not correct length or type")
@@ -71,4 +47,23 @@ def return_facility_with_id(facility_id: int):
 
 
 def return_facility_with_name(facility_name: str):
-    return Facility.query.filter(Facility.name == facility_name).first()\
+    return Facility.query.filter(Facility.name == facility_name).first()
+
+
+def return_facility_name_with_facility_id(facility_id):
+    facility = Facility.query.filter(Facility.facility_id == facility_id).first()
+    return facility.name
+
+
+def return_role_id_with_name(role):
+    role = Role.query.filter(Role.role_name == role).first()
+    if not role:
+        log_transaction(f"Failed to return role {role}")
+    return role
+
+
+def add_role_to_activity_type(role_id, activity_type_id):
+    role = Role.query.filter(Role.role_id == role_id).first()
+    activity_type = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+
+    role.activities_with_role.append(activity_type)

@@ -2,6 +2,7 @@
 import random
 import datetime
 from datetime import timedelta
+import main.data.db_session as db
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.employee_data_transaction as edf
@@ -12,8 +13,15 @@ from main.data.db_classes.user_db_class import Manager
 from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
-MANAGER_EMAIL = "team_10@leeds.ac.uk"
-MANAGER_PASSWORD = "WeAreTeam10"
+
+# For debug purpose
+EMAIL_TYPES = {
+    "customer": "team_10_c@leeds.ac.uk",
+    "employee": "team_10_e@leeds.ac.uk",
+    "manager": "team_10_m@leeds.ac.uk"
+}
+PASSWORD = "WeAreTeam10"
+
 
 # Populates the database with all the facilities in out leisure center
 def create_facilities():
@@ -56,6 +64,8 @@ def create_facilities():
 
 # Creates all of the current job roles for staff
 def create_roles():
+    log_transaction("Creating database job roles:")
+
     role_num = 10
     roles = [Role() for i in range(role_num)]
 
@@ -92,15 +102,14 @@ def create_roles():
 def create_activity_types():
     log_transaction("Creating database activity types:")
 
-    activity_num = 12
-    activities = [ActivityType() for i in range(activity_num)]
-
     names = [
         "Football", "Basketball", "Badminton", "Gym", "Boxing",
         "Climbing", "Cricket", "Tennis", "General Swim",
         "Swimming classes", "Aqua", "Yoga", "Dancing",
         "Trampolining", "Rugby"
     ]
+
+    activity_num = len(names)
 
     description = [
         "Football description", "Basketball description",
@@ -149,33 +158,47 @@ def create_activity_types():
 
     min_staff = [2, 2, 1, 1, 3, 4, 2, 1, 1, 2, 2, 1, 1, 2, 2]
 
-    composite_roles = [
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (football)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (basketball)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (badminton)
-        6,  # Sports Coach, Instructor (gym)
-        304,  # Activity Leader, Activity Assistant, Martial Arts Expert (boxing)
-        112,  # Activity Leader, Activity Assistant, Climbing Expert (climbing)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (cricket)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (tennis)
-        1,  # Lifeguard (general swim)
-        57,  # Lifeguard, Swim Teacher, Activity Leader, Activity Assistant (swim classes)
-        57,  # Lifeguard, Swim Teacher, Activity Leader, Activity Assistant (aqua)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (yoga)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (dancing)
-        176,  # Activity Leader, Activity Assistant, Trampoline Expert (trampoline)
-        54,  # Sports Coach, Instructor, Activity Leader, Activity Assistant (rugby)
-    ]
-
     activity_capacity = [50, 50, 24, 80, 40, 10, 50, 16, 70, 50, 30, 20, 20, 15, 50]
 
     for i in range(activity_num):
         if not adf.create_new_activity_type(names[i], description[i], category[i], tags[i], minimum_age[i],
                                             activity_capacity[i], hourly_activity_cost[i], hourly_activity_price[i],
-                                            composite_roles[i], max_staff[i], min_staff[i]):
+                                            max_staff[i], min_staff[i]):
             return False
     return True
 
+
+def create_activity_type_and_role_validation():
+
+    activity_names_and_roles = {
+        "Football": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Basketball": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Badminton": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Gym": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Boxing": ["Activity Leader", "Activity Assistant", "Martial Arts Expert"],
+        "Climbing": ["Activity Leader", "Activity Assistant", "Climbing Expert"],
+        "Cricket": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Tennis": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "General Swim": ["Lifeguard"],
+        "Swimming classes": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
+        "Aqua": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
+        "Yoga": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Dancing": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Trampolining": ["Activity Leader", "Activity Assistant", "Trampoline Expert"],
+        "Rugby": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"]
+    }
+
+    for activity in activity_names_and_roles.keys():
+        activity_type = adf.return_activity_type_with_name(activity.lower())
+        if not activity_type:
+            return False
+        for role in activity_names_and_roles[activity]:
+            role: Role = edf.return_role_id_with_name(role.lower())
+            if not role:
+                return False
+            edf.add_role_to_activity_type(role.role_id, activity_type.activity_type_id)
+
+    return True
 
 # Defines all of the membership types currently available
 def create_membership_types():
@@ -184,28 +207,14 @@ def create_membership_types():
         and tdf.create_new_membership_type("premium", "DescToBeAdded", 100, 30.00)
 
 
-# Creates a manager account that has access to everything on the website
-def create_root_manager_account():
-    log_transaction("Creating database manager")
-
-    manager_account = Manager()
-    manager_account.country = "uk".lower()
-    manager_account.address = "Woodhouse, Leeds".lower()
-    manager_account.postal_code = "LS2 9JT".upper()
-    manager_account.dob = datetime.today() - timedelta(weeks=52 * 20)
-    manager_account.tel_number = "0113 243 1751"
-    manager_account.email = MANAGER_EMAIL.lower()
-    manager_account.first_name = "team_10".lower()
-    manager_account.last_name = "manager".lower()
-    manager_account.title = "Dr".lower()
-    manager_account.password = udf.hash_text(MANAGER_PASSWORD)
-
-    if add_to_database(manager_account) == False:
-        print("MANAGER NOT ADDED")
-        return False
-    else:
-        print("Manager added fine")
-        return True
+def create_base_account_types():
+    i = 0
+    for user_type, email in EMAIL_TYPES.items():
+        udf.create_new_user_account("mr", PASSWORD, "team_10", user_type, email,
+                                    "0113 243 1751", datetime.today()-timedelta(weeks=52*20), "LS2 9JT",
+                                    "Woodhouse, Leeds", "uk", i)
+        i += 1
+    return True
 
 
 # Populates the activity table with semi-random activities, creates a timetable for the website
@@ -217,67 +226,49 @@ def create_pseudorandom_activity_instances(end_date: timedelta):
 
     activity_types = ActivityType.query.all()
 
-    activity_to_facility_converter = dict.fromkeys([activity_type.name for activity_type in activity_types])
-
-    activity_to_facility_converter["swimming classes"] = ["main swimming pool"]
-    activity_to_facility_converter["basketball"] = ["sports hall 1", "sports hall 2", "outside playing field"]
-    activity_to_facility_converter["football"] = ["sports hall 1", "sports hall 2", "outside playing field"]
-    activity_to_facility_converter["badminton"] = ["sports hall 1", "sports hall 2"]
-    activity_to_facility_converter["tennis"] = ["tennis courts"]
-    activity_to_facility_converter["gym"] = ["gym"]
-    activity_to_facility_converter["boxing"] = ["sports hall 1", "sports hall 2"]
-    activity_to_facility_converter["climbing"] = ["climbing wall"]
-    activity_to_facility_converter["cricket"] = ["outside playing field"]
-    activity_to_facility_converter["yoga"] = ["studio room"]
-    activity_to_facility_converter["aqua"] = ["main swimming pool"]
-    activity_to_facility_converter["general swim"] = ["main swimming pool"]
-    activity_to_facility_converter["dancing"] = ["studio room"]
-    activity_to_facility_converter["trampolining"] = ["sports hall 1", "sports hall 2"]
-    activity_to_facility_converter["rugby"] = ["outside playing field"]
-
     for day_amount in range(days_between_dates):
         for activity_type in activity_types:
             if activity_type.name == "general swim":
                 if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
                     week_day_times = [6, 7, 8, 13, 14, 15, 16, 17, 20, 21]
-                    add_activities_with_times(week_day_times, day_amount, activity_type, activity_to_facility_converter)
+                    add_activities_with_times(week_day_times, day_amount, activity_type)
                 else:
                     amount_today = random.randint(8, 16)
                     returned_times = return_random_times(amount_today)
-                    add_activities_with_times(returned_times, day_amount, activity_type, activity_to_facility_converter)
+                    add_activities_with_times(returned_times, day_amount, activity_type)
 
             elif activity_type.name == "swimming classes":
                 if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
                     week_day_times = [9, 10, 11, 19]
-                    add_activities_with_times(week_day_times, day_amount, activity_type, activity_to_facility_converter)
+                    add_activities_with_times(week_day_times, day_amount, activity_type)
 
             elif activity_type.name == "aqua":
                 if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
                     week_day_times = [18]
-                    add_activities_with_times(week_day_times, day_amount, activity_type, activity_to_facility_converter)
+                    add_activities_with_times(week_day_times, day_amount, activity_type)
                 else:
                     amount_today = random.randint(4, 6)
                     returned_times = return_random_times(amount_today)
-                    add_activities_with_times(returned_times, day_amount, activity_type, activity_to_facility_converter)
+                    add_activities_with_times(returned_times, day_amount, activity_type)
 
             elif activity_type.name == "gym":
                 week_day_times = [6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]
-                add_activities_with_times(week_day_times, day_amount, activity_type, activity_to_facility_converter)
+                add_activities_with_times(week_day_times, day_amount, activity_type)
 
             elif activity_type.name in ["badminton", "yoga"]:
                 amount_today = random.randint(3, 6)
                 returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type, activity_to_facility_converter)
+                add_activities_with_times(returned_times, day_amount, activity_type)
 
             elif activity_type.name in ["tennis", "football", "basketball", "rugby"]:
                 amount_today = random.randint(2, 4)
                 returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type, activity_to_facility_converter)
+                add_activities_with_times(returned_times, day_amount, activity_type)
 
             else:
                 amount_today = random.choices([1, 1, 1, 2, 2, 3], k=1)[0]
                 returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type, activity_to_facility_converter)
+                add_activities_with_times(returned_times, day_amount, activity_type)
 
 
 # Returns random times that activities are assigned to
@@ -289,8 +280,7 @@ def return_random_times(amount_today: int):
 
 
 # Traverses the times an activity takes place and adds it to the database
-def add_activities_with_times(returned_times: list, day_amount: int, activity_type,
-                              activity_to_facility_converter: dict):
+def add_activities_with_times(returned_times: list, day_amount: int, activity_type):
     for time in returned_times:
         end_time = time + 1
         if time - 1 in returned_times:
@@ -298,26 +288,69 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
         while end_time in returned_times:
             end_time += 1
         midnight_today = datetime.combine(datetime.today(), datetime.min.time())
-        facility_to_use = random.randint(0, len(activity_to_facility_converter[activity_type.name]) - 1)
+
+        facilities_total = len(activity_type.available_facilities)
+        random_facility = random.randint(0, facilities_total - 1)
+
         adf.create_new_activity(activity_type.activity_type_id,
-                                activity_to_facility_converter[activity_type.name][facility_to_use],
+                                activity_type.available_facilities[random_facility].name,
                                 midnight_today + timedelta(days=day_amount) + timedelta(hours=time),
                                 midnight_today + timedelta(days=day_amount) + timedelta(hours=end_time))
+
+
+def create_activity_facility_relation():
+    # which activity types are available at which facilities?
+
+    relationships = [("swimming classes", ["main swimming pool"]),
+                     ("basketball", ["sports hall 1", "sports hall 2", "outside playing field"]),
+                     ("football", ["sports hall 1", "sports hall 2", "outside playing field"]),
+                     ("badminton", ["sports hall 1", "sports hall 2"]),
+                     ("tennis", ["tennis courts"]),
+                     ("gym", ["gym"]),
+                     ("boxing", ["sports hall 1", "sports hall 2"]),
+                     ("climbing", ["climbing wall"]),
+                     ("cricket", ["outside playing field"]),
+                     ("yoga", ["studio room"]),
+                     ("aqua", ["main swimming pool"]),
+                     ("general swim", ["main swimming pool"]),
+                     ("dancing", ["studio room"]),
+                     ("trampolining", ["sports hall 1", "sports hall 2"]),
+                     ("rugby", ["outside playing field"])]
+
+    for relation in relationships:
+        activity_type = ActivityType.query.filter_by(name=relation[0]).first()
+        for facility in relation[1]:
+            facility_object = Facility.query.filter_by(name=facility).first()
+
+            # make this facility be available in this activity type
+            activity_type.available_facilities.append(facility_object)
+        # update database
+        add_to_database(activity_type)
+
+    return True
 
 
 # Executes all the functions for populating the database
 def populate_db(create_timetable):
     # if the manager account exists
-    if udf.check_user_is_in_database_and_password_valid(MANAGER_EMAIL, MANAGER_PASSWORD):
+    if udf.check_user_is_in_database_and_password_valid(EMAIL_TYPES["manager"], PASSWORD):
         # assume the database has already been populated
         return False
 
-    if create_facilities() and create_roles() and create_membership_types() \
-            and create_activity_types() and create_root_manager_account():
+    population_functions = [
+        [create_facilities, "failed to create facilities"],
+        [create_roles, "failed to create_roles"],
+        [create_membership_types, "failed to create create_membership_types"],
+        [create_activity_types, "failed to create_activity_types"],
+        [create_activity_facility_relation, "failed to create_activity_facility_relation"],
+        [create_base_account_types, "failed to create_base_account_types"],
+        [create_activity_type_and_role_validation, "failed to create_activity_type_and_role_validation"],
+    ]
 
-        if create_timetable:
-            create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
-        return True
+    for function_list in population_functions:
+        if not function_list[0]():
+            raise Exception(function_list[1])
 
-    else:
-        raise RuntimeError("Could not populate table")
+    if create_timetable:
+        create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
+    return True

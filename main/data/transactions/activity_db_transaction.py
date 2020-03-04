@@ -7,24 +7,42 @@ from main.logger import log_transaction
 from main.data.db_classes.activity_db_class import ActivityType, Activity
 import main.data.transactions.employee_data_transaction as edf
 
+TAGS_CSV = "main/data/transactions/valid_tags.csv"
+
 
 # Returns the activity with the same id as the parameter
+# [Lewis S]
 def return_activity_type_with_id(activity_type_id: int):
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
+# Attempts to return the name of an activity type with a specific activity type ID, this is to combat
+# lazy loading errors
+# [Lewis S]
+def return_activity_type_name_with_activity_type_id(activity_type_id):
+    activity_type: ActivityType = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+    """
+    if not activity_type:
+        log_transaction(f"Failed to return activity type name with activity type ID: {activity_type_id} from DB")
+    else:
+        log_transaction(f"Successfully returned activity type name with activity type ID: {activity_type_id} from DB")
+    """
+    return str(activity_type.name)
+
 
 # Returns an activity with the same name as the parameter
+# [Lewis S]
 def return_activity_type_with_name(activity_type_name: str):
     return ActivityType.query.filter(ActivityType.name == activity_type_name.lower()).first()
 
 
 # Attempts to add a tag to the list of tags in the csv file, if the tag exists in the csv file then the new tag is
 # not added, otherwise the tag is appended to the end of the file
+# [Lewis S]
 def add_tag(tag: str):
     all_tags = return_valid_tags_from_file()
     if tag.lower() in all_tags:
         return False
-    with open("main/data/transactions/valid_tags.csv", "a", newline="") as tag_file:
+    with open(TAGS_CSV, "a", newline="") as tag_file:
         tag_writer = csv.writer(tag_file, delimiter=",")
         tag_writer.write(tag)
     return True
@@ -32,13 +50,14 @@ def add_tag(tag: str):
 
 # Attempts to remove a tag from the tag_list file, if found then the tag parameter is removed from the file. If
 # the tag is not found in the file of tags then the False is returned
+# [Lewis S]
 def remove_tag(tag: str):
     all_tags = return_valid_tags_from_file()
     try:
         all_tags.remove(tag.lower())
     except ValueError:
         return False
-    with open("main/data/transactions/valid_tags.csv", "w+", newline="") as tag_file:
+    with open(TAGS_CSV, "w+", newline="") as tag_file:
         tag_write = csv.writer(tag_file, delimiter=",")
         tag_write.seek(0)
         tag_write.truncate()
@@ -49,7 +68,7 @@ def remove_tag(tag: str):
 # Returns all the tags from the valid_tags.csv file
 def return_valid_tags_from_file():
     all_tags = []
-    with open("main/data/transactions/valid_tags.csv", newline="") as tag_file:
+    with open(TAGS_CSV, newline="") as tag_file:
         tag_reader = csv.reader(tag_file)
         for line in tag_reader:
             all_tags += line
@@ -66,6 +85,7 @@ def check_tags_are_valid(tag_list: list):
 
 
 # Returns all the activity types stored in the database
+# [Lewis S]
 def return_all_activity_types():
     return ActivityType.query.all()
 
@@ -83,10 +103,10 @@ def return_all_activity_types():
 #    -Max staff must be between 0 and 15
 #    -Min staff must be between 0 and 10 (and minimum staff must be less than the maximum staff)
 #    -The tags must match the tags stored in the valid_tags.csv file
-
+# [Lewis S]
 def create_new_activity_type(name: str, description: str, category: str, tags_list: list, miniumum_age: int,
                              maximum_activity_capacity: int, hourly_activity_cost: int, hourly_activity_price: int,
-                             valid_composite_roles: int, max_staff: int, min_staff: int):
+                             max_staff: int, min_staff: int):
 
     if len(name) < 3 or len(name) > 20 or not name.replace(" ", "").isalpha():
         log_transaction(f"Failed to add new activity type {name}: name not correct length or type")
@@ -119,10 +139,6 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
         log_transaction(f"Failed to add new activity type {name}: tag length too long")
         return False
 
-    if not edf.return_roles_from_composition_value(valid_composite_roles):
-        log_transaction(f"Failed to add new activity type {name}: composite roles are not valid")
-        return False
-
     activity_types = return_all_activity_types()
     for activity in activity_types:
         if activity.name == name.lower():
@@ -138,26 +154,35 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     new_activity_type.maximum_activity_capacity = maximum_activity_capacity
     new_activity_type.hourly_activity_cost = hourly_activity_cost
     new_activity_type.hourly_activity_price = hourly_activity_price
-    new_activity_type.valid_composite_roles = valid_composite_roles
     new_activity_type.max_staff = max_staff
     new_activity_type.min_staff = min_staff
-    
+
     add_to_database(new_activity_type)
     return True
 
 
+#  Takes two datetime variables and searches the activity table for a given activity ID that is between the two datetimes.
+#  This function will return false if:
+#       - The activity type is not an integer
+#       - The start and end datetimes are more than 6 hours apart, or are less than an hour apart
+#       - The activity type for the given ID could not be returned
+#  If these are valid then the table is searched and a list of activity istances are returned
+# [Lewis S]
 def return_activity_instances_between_dates(activity_type_id: int, start_time: datetime.datetime, end_time: datetime.datetime):
     start_time = start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute // 30)
     end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute // 30)
 
     if type(activity_type_id) is not int:
-        log_transaction(f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
+        log_transaction(
+            f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
         return False
-    if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
-        log_transaction(f"Failed to return activity with id {activity_type_id} starting on {start_time}: date times invalid")
+    if end_time > start_time + datetime.timedelta(hours=6) or end_time < start_time + datetime.timedelta(hours=1):
+        log_transaction(
+            f"Failed to return activity with id {activity_type_id} starting on {start_time}: date times invalid")
         return False
     if not return_activity_type_with_id(activity_type_id):
-        log_transaction(f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+        log_transaction(
+            f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
         return False
 
     return Activity.query.filter(Activity.activity_type_id == activity_type_id,
@@ -165,6 +190,16 @@ def return_activity_instances_between_dates(activity_type_id: int, start_time: d
                                  Activity.end_time >= end_time).all()
 
 
+# Used for creating a new activity instance, this takes an activity type, facility id, start and end datetimes.
+# The function will fail if the following occur:
+#       - The activity type is not an integer
+#       - The activity duration is larger than 6 hours or smaller than 1 hour
+#       - The activity starts before 6:00am or ends after 10:00pm
+#       - The facility name does not return a valid facility
+#       - The activity type does not return a valid activity type object
+#       - An activity of the same activity type already exists between the two given times
+# If these conditions are met then a new activity instance is created
+# [Lewis S]
 def create_new_activity(activity_type_id: int, facility_name: str, start_time: datetime.datetime, end_time: datetime.datetime):
     facility = edf.return_facility_with_name(facility_name)
     start_time= start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute//30)
@@ -174,6 +209,9 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
         log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type id invalid")
         return False
     if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
+        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
+        return False
+    if end_time.hour < 7 or start_time.hour < 6 or end_time.hour > 22 or start_time.hour > 21:
         log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
         return False
     if not facility:
@@ -193,12 +231,24 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
     new_activity.end_time = end_time
 
     add_to_database(new_activity)
+    log_transaction(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
     return True
 
 
+# Simply returns all activity instances between two datetimes
+# [Lewis S]
 def return_activities_between_dates(start_date: datetime.datetime, end_time: datetime.datetime):
     return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time).all()
 
 
+# Simply returns an activity with an specific id
+# [Lewis S]
 def return_activity_with_id(activity_id: int):
     return Activity.query.filter(Activity.activity_id == activity_id).first()
+
+
+# Returns the max capacity for an activity of a specific type- this is used for combatting lazy loading
+# [Lewis S]
+def return_activity_capacity_with_activity_type_id(activity_type_id):
+    activity_type: ActivityType= ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+    return int(activity_type.maximum_activity_capacity)

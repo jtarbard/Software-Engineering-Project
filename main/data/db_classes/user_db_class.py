@@ -33,8 +33,6 @@ class Employee(User):
 
     employee_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
-    composite_roles = database.Column(database.String, nullable=False) # Integer related to the roles that a user is allowed
-                                                           # To partake in for certain activities
 
     __mapper_args__ = {
         'polymorphic_identity': 'Employee'
@@ -42,12 +40,14 @@ class Employee(User):
 
     router_activities = database.relation("Employee_Router", backref="employee")
 
+    # invisible virtual attribute "allowed_roles" for many-to-many relationship
 
 class Customer(User):
     __tablename__ = 'Customers'
 
     customer_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
+    current_membership = database.Column(database.Integer, database.ForeignKey("Memberships.membership_id"))
 
     __mapper_args__ = {
         'polymorphic_identity': 'Customer'

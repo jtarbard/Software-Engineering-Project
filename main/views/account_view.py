@@ -2,6 +2,9 @@ import re
 import flask
 import datetime
 import main.data.transactions.user_db_transaction as udf
+import main.cookie_transaction as ct
+from main.data.db_classes.transaction_db_class import Receipt, Booking
+from main.data.db_classes.user_db_class import Customer
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -9,15 +12,10 @@ blueprint = flask.Blueprint("account", __name__)
 # Route for executing when the customer clicks a link to the login page
 @blueprint.route("/account/login", methods=["GET"])
 def login_get():
-    account_id = udf.check_valid_account_cookie(flask.request) # Checks if the user is already logged in
-    if account_id: # If an account cookie and ID is found then the customer is checked to
-                   # see if they are in the database
-        customer = udf.return_user(account_id)
-        if customer: # If customer is in the database then the customer is taken to the index page, as they
-                     # should not have access to the login/ register page if they are logged in
-            return flask.redirect("/") # Returns the customer to the index page if they are already logged in
+    user, response = ct.return_user_response(flask.request, True)
+    if user:
+        return flask.redirect("/")
 
-    # Normal login page is loaded if the customer is not logged in
     return flask.render_template("/account/login_register.html", nav=True, footer=True, page_type="login")
 
 
@@ -54,18 +52,16 @@ def login_post():
     # Implies that no error has occurred and the user is redirected to their account. A cookie is then set that
     # Verifies the customer ID and a verification hash
     response = flask.redirect('/account/your_account')
-    udf.set_auth(response, user.user_id)  # Creates user cookie
+    ct.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing when the customer clicks a link to the register page
 @blueprint.route("/account/register", methods=["GET"])
 def register_get():
-    account_id = udf.check_valid_account_cookie(flask.request)
-    if account_id:
-        customer = udf.return_user(account_id)
-        if customer:
-            return flask.redirect("/") # Returns user to home page if they are logged in
+    user, response = ct.return_user_response(flask.request, True)
+    if user:
+        return flask.redirect("/")
 
     return flask.render_template("/account/login_register.html", nav=True, footer=True, page_type="register")
 
@@ -148,31 +144,35 @@ def register_post():
 
     # Account cookie is checked
     response = flask.redirect('/account/your_account')
-    udf.set_auth(response, user.user_id)  # Creates user cookie
+    ct.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing if the user clicks to view their account
 @blueprint.route("/account/your_account")
 def view_account():
-    account_id = udf.check_valid_account_cookie(flask.request) # Returns user ID from cookie
-    if account_id:
-        user = udf.return_user(account_id) # Checks that the customer is in the database
-        if not user: # If the customer is not in the database, then that customer has been deleted, but the user
-                         # still has an account cookie, therefore the cookie must be destroyed as it is no longer valid
-            response = flask.redirect('/account/login')
-            udf.destroy_cookie(response)
-            return response
-    else:
-        return flask.redirect('/account/login') # If the use does not have an account cookie then they are taken to the
-                                                # login page
+    user, response = ct.return_user_response(flask.request, True)
+    if response:
+        return response
 
-    return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user, User_Type=user.__mapper_args__["polymorphic_identity"])
+    returned_bookings = []
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            if receipt.membership:
+                continue
+            for booking in receipt.bookings:
+                if booking.activity.start_time < datetime.datetime.now():
+                    continue
+                returned_bookings.append(booking.activity)
+
+    return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user,
+                                 returned_bookings=returned_bookings)
 
 
 # Route for executing if the user wants to log out
 @blueprint.route("/account/log_out")
 def log_out():
     response = flask.redirect("/")
-    udf.destroy_cookie(response)  # User cookie is destroyed and they are logged out
+    ct.destroy_cookie(response)  # User cookie is destroyed and they are logged out
     return response
