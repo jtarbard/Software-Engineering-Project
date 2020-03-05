@@ -47,7 +47,7 @@ def view_class(activity_id: int):
         customer = udf.return_customer_with_user_id(user.user_id)
         membership = customer.current_membership
 
-    if activity.start_time < datetime.datetime.now():
+    if activity.start_time < datetime.datetime.now() and type(user) is Customer:
         return flask.abort(404)
 
     duration: datetime.timedelta = activity.end_time - activity.start_time
@@ -62,7 +62,6 @@ def view_class(activity_id: int):
                                  final_price=round(final_price, 2), User=user)
 
 
-# TODO: Refactor heavily
 @blueprint.route("/misc/add_booking_to_basket", methods=["POST"])
 def view_classes_post():
     user, response = ct.return_user_response(flask.request, True)
@@ -73,7 +72,7 @@ def view_classes_post():
     activity = adf.return_activity_with_id(data_form.get('activity'))
     booking_amount: int = int(data_form.get("amount_of_people"))
 
-    if not activity:
+    if not activity or not booking_amount:
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity")
 
     is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
@@ -85,35 +84,15 @@ def view_classes_post():
 
     if basket_activities:
         if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(basket_activities) + booking_amount > 15:
-            return flask.render_template("/misc/general_error.html", error="Basket full")
+            return flask.render_template("/misc/general_error.html", error="Basket full", User=user)
 
     spaces_left = activity.activity_type.maximum_activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id))
     if spaces_left <= 0:
-        return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity")
+        return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity", User=user)
 
-    response = flask.redirect("/activities/view_classes")
+    response = ct.add_activity_or_membership_to_basket(activity, flask.request, num_people=booking_amount)
 
-    valid = True
-    if activity:
-        add_instance = "A:" + str(activity.activity_id)
-
-        if "vertex_basket_cookie" not in flask.request.cookies:
-            basket = add_instance
-            for i in range(booking_amount-1):
-                basket += ";" + add_instance
-
-            response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
-            return response
-
-        basket = flask.request.cookies["vertex_basket_cookie"]
-
-        for i in range(booking_amount):
-            basket += ";" + add_instance
-
-        response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
-        return response
-
-    if not valid:
+    if not response:
         return flask.abort(500)
 
     return response

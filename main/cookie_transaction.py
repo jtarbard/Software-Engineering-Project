@@ -1,10 +1,12 @@
 import flask
 import datetime
 import hashlib
+
+from main.data.db_classes.activity_db_class import Activity
 from main.logger import log_transaction
 import main.data.transactions.user_db_transaction as udf
 from flask import Response
-from main.data.db_classes.transaction_db_class import Receipt
+from main.data.db_classes.transaction_db_class import Receipt, Membership, MembershipType
 
 
 def return_user_response(request: flask.request, needs_login: bool):
@@ -73,3 +75,43 @@ def check_valid_account_cookie(request: flask.request):
 def __hash_text(text: str) -> str:
     text = 'salty__' + text + '__text'
     return hashlib.sha512(text.encode('utf-8')).hexdigest()
+
+
+# Returns cookie response
+def add_activity_or_membership_to_basket(booking_object, request: flask.request, num_people=None, duration=None):
+
+    if type(booking_object) is Activity:
+        response = flask.redirect("/activities/view_classes")
+        if not num_people:
+            return None
+        if num_people < 1 or num_people > 8:
+            return None
+        add_instance = "A:" + str(booking_object.activity_id)
+
+    elif type(booking_object) is MembershipType:
+        response = flask.redirect("/info/memberships")
+        if not duration:
+            return None
+        if duration < 1 or duration > 12:
+            return None
+        add_instance = "M:" + str(booking_object.membership_type_id) + ":" + str(duration)
+        num_people = 1
+
+    else:
+        return None
+
+    if "vertex_basket_cookie" not in request.cookies:
+        basket = add_instance
+        for i in range(num_people - 1):
+            basket += ";" + add_instance
+
+        response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
+        return response
+
+    basket = request.cookies["vertex_basket_cookie"]
+
+    for i in range(num_people):
+        basket += ";" + add_instance
+
+    response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
+    return response
