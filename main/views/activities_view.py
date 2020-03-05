@@ -47,6 +47,8 @@ def view_class(activity_id: int):
         customer = udf.return_customer_with_user_id(user.user_id)
         membership = customer.current_membership
 
+    if activity.start_time < datetime.datetime.now():
+        return flask.abort(404)
 
     duration: datetime.timedelta = activity.end_time - activity.start_time
     session_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
