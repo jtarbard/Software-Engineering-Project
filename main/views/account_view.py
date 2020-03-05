@@ -16,7 +16,7 @@ def login_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", nav=True, footer=True, page_type="login")
+    return flask.render_template("/account/login_register.html", page_type="login")
 
 
 # Route for executing when the customer submits login data from the login page
@@ -63,7 +63,7 @@ def register_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", nav=True, footer=True, page_type="register")
+    return flask.render_template("/account/login_register.html", page_type="register")
 
 
 # Route for executing when the customer submits register data from the register page
@@ -166,7 +166,7 @@ def view_account():
                     continue
                 returned_bookings.append(booking.activity)
 
-    return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user,
+    return flask.render_template("/account/your_account.html", User=user,
                                  returned_bookings=returned_bookings)
 
 

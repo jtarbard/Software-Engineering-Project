@@ -21,7 +21,7 @@ def card_payment_post():
 
     if checkout:
         total_price = data_form.get('total_price')
-        return flask.render_template("/transactions/pay_card.html", total_price=total_price)
+        return flask.render_template("/transactions/pay_card.html", total_price=total_price, User=user)
 
     pay = data_form.get('pay')
     if not pay:
@@ -58,5 +58,5 @@ def receipt_get(encrypted_receipt: str):
     if not returned_receipt:
         return flask.abort(404)
     else:
-        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt)
+        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=user)
 

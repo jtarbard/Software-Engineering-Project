@@ -160,7 +160,7 @@ def basket_view():
         total_price += current_price
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
-                                 basket_membership=basket_membership, user=user, total_price=total_price,
+                                 basket_membership=basket_membership, User=user, total_price=total_price,
                                  activity_and_price=activity_and_price)
 
 
