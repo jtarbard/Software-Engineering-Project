@@ -53,7 +53,8 @@ def view_class(activity_id: int):
 
     final_price = session_price
     if membership:
-        final_price = session_price * (membership.membership_type.discount/100)
+        membership = Membership.query.filter_by(membership_id=membership).first().membership_type
+        final_price = session_price * (1 - membership.discount/float(100))
 
     return flask.render_template("/activities/class.html", activity=activity, session_price=round(session_price, 2),
                                  spaces_left=spaces_left, allow_booking=allow_booking, membership=membership,
