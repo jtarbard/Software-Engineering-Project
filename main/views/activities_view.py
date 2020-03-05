@@ -112,14 +112,14 @@ def basket_view():
         return response
 
     if not (basket_activities or basket_membership):
-        return flask.render_template("/account/basket.html")
+        return flask.render_template("/account/basket.html", User=user)
 
     new_activities_basket = ""
     redirect = False
     for activity in basket_activities:
         spaces_left = activity.activity_type.maximum_activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id))
         number_of_activities = basket_activities.count(activity)
-        if spaces_left >= number_of_activities:
+        if spaces_left >= number_of_activities and activity.start_time < datetime.datetime.now():
             if len(new_activities_basket) != 0:
                 new_activities_basket += ";"
             new_activities_basket += "A:" + str(activity.activity_id)
