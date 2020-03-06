@@ -3,7 +3,7 @@ import flask
 import datetime
 import main.data.transactions.user_db_transaction as udf
 import main.cookie_transaction as ct
-from main.data.db_classes.transaction_db_class import Receipt, Booking
+from main.data.db_classes.transaction_db_class import Receipt, Booking, MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer
 
 blueprint = flask.Blueprint("account", __name__)
@@ -166,8 +166,18 @@ def view_account():
                     continue
                 returned_bookings.append(booking.activity)
 
+    membership_type = None
+
+    if user is not None and type(user) is Customer:
+        # user might have a membership
+        customer = udf.return_customer_with_user_id(user.user_id)
+        if customer.current_membership is not None:
+            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
+            membership_type_id = user_membership.membership_type_id
+            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+
     return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user,
-                                 returned_bookings=returned_bookings)
+                                 returned_bookings=returned_bookings, membership_type=membership_type)
 
 
 # Route for executing if the user wants to log out

@@ -98,9 +98,13 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
     basket_activities = []
     basket_membership = None
 
+    #basket_instances = A:10;A:10;A:10
+    #A:10;M:1;A:10
     for basket_instance in basket_instances:
         split_instance = basket_instance.split(":")
 
+
+        #M:1
         if len(split_instance) != 2:
             return False, None, None
 
@@ -173,14 +177,21 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         add_to_database(new_booking)
 
     if basket_membership:
+        total_price = basket_membership.monthly_price
+
         new_membership = Membership()
         new_membership.membership_type_id = basket_membership.membership_type_id
         new_membership.receipt_id = new_receipt.receipt_id
+        new_membership.start_date = datetime.date.today()
+        new_membership.end_date = datetime.date.today() + datetime.timedelta(days=30)
 
-        #TODO: ADD MEMBERSHIP DURATION
-        month_duration = 1
-        total_price += basket_membership.monthly_price * month_duration
+        new_membership.membership_type = basket_membership
+
         add_to_database(new_membership)
+
+        customer = Customer.query.filter_by(user_id=user.user_id).first()
+        customer.current_membership = new_membership.membership_id
+        add_to_database(customer)
 
     new_receipt.total_cost = total_price
     add_to_database(new_receipt)

@@ -1,7 +1,14 @@
+import datetime
+
 import flask
 import main.cookie_transaction as ct
 import main.data.transactions.user_db_transaction as udf
+import main.data.transactions.transaction_db_transaction as db_transaction
 from main.data.db_classes.activity_db_class import Facility
+from main.data.db_classes.user_db_class import Customer
+from main.data.db_classes.transaction_db_class import MembershipType
+from main.data.db_session import add_to_database
+
 blueprint = flask.Blueprint("info", __name__)
 
 
@@ -21,4 +28,54 @@ def facilities_func():
 @blueprint.route('/info/memberships', methods=["GET"])
 def membership_func():
     user, response = ct.return_user_response(flask.request, False)
-    return flask.render_template("info/memberships.html", page_title="Memberships", User=user)
+    standard_id = 1
+    premium_id = 2
+    standard_price = MembershipType.query.filter_by(membership_type_id=standard_id).first().monthly_price
+    premium_price = MembershipType.query.filter_by(membership_type_id=premium_id).first().monthly_price
+
+    return flask.render_template("info/memberships.html", page_title="Memberships",
+                                 User=user,premium_price=premium_price,standard_price=standard_price,
+                                 standard_id=standard_id,premium_id=premium_id)
+
+
+@blueprint.route("/info/memberships/buy", methods=["POST"])
+def buy_membership():
+    user, response = ct.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    membership_id = flask.request.form.get('buy_membership')
+    if membership_id is None:
+        return flask.redirect("/info/memberships")
+
+    is_valid, basket_activities, basket_membership = db_transaction\
+        .return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+
+    if not is_valid:
+        response = flask.redirect("/")
+        response.set_cookie("vertex_basket_cookie", "", max_age=0)
+        return response
+
+    if basket_activities:
+        #TODO: warn user about deleting their activities (in their basket)
+        pass
+
+    response = flask.redirect("/transactions/pay-card")
+    membership_cookie = "M:" + str(membership_id)
+    print(membership_cookie)
+    response.set_cookie("vertex_basket_cookie", membership_cookie, max_age=datetime.timedelta(days=1))
+    return response
+
+
+@blueprint.route("/info/memberships/cancel", methods=["GET"])
+def cancel_membership():
+    user, response = ct.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    if type(user) is Customer:
+        customer = Customer.query.filter_by(user_id=user.user_id).first()
+        customer.current_membership = None
+        add_to_database(customer)
+
+    return flask.redirect("/account/your_account")

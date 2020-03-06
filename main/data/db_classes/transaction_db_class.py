@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from main.data.db_session import database
 
 
@@ -33,8 +33,8 @@ class Membership(database.Model):
 
     membership_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     membership_type_id = database.Column(database.Integer, database.ForeignKey("MembershipTypes.membership_type_id"), nullable=False)
-    start_date = database.Column(database.Date, default=date.today, nullable=False)
-    end_date = database.Column(database.Date, default=date.today, nullable=False)
+    start_date = database.Column(database.Date, nullable=False)
+    end_date = database.Column(database.Date, nullable=False)
     receipt_id = database.Column(database.Integer, database.ForeignKey("Receipts.receipt_id"), nullable=False)
 
     receipt = database.relationship("Receipt", back_populates="membership", uselist=False)

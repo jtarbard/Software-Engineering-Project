@@ -37,7 +37,11 @@ The Vertex memberships!
                         <h3 class="card-header">Premium Membership</h3>
                         <div class="card-block">
                             <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-                            <a href="#" class="btn btn-primary">Purchase</a>
+                            <form method="post" action="/info/memberships/buy">
+                                <input type="submit" class="btn btn-primary" name="Purchase">
+                                <input type="hidden" name="buy_membership" value={{ premium_id }}>
+                                <input type="hidden" name="total_price" value="{{ premium_price }}">
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -49,7 +53,11 @@ The Vertex memberships!
                         <h3 class="card-header">Standard Membership</h3>
                         <div class="card-block">
                             <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-                            <a href="#" class="btn btn-primary">Purchase</a>
+                            <form method="post" action="/info/memberships/buy">
+                                <input type="submit" class="btn btn-primary" name="Purchase">
+                                <input type="hidden" name="buy_membership" value={{ standard_id }}>
+                                <input type="hidden" name="total_price" value="{{ standard_price }}">
+                            </form>
                         </div>
                     </div>
                 </div>
