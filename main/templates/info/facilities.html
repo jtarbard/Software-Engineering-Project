@@ -9,6 +9,7 @@ The Vertex - Facilities!
 
 {% block main_content %}
 <h1>Facilities</h1><br>
+
 <table style="width:60%">
     <tr>
         <th>Name</th>
@@ -17,7 +18,7 @@ The Vertex - Facilities!
         <th>Activities Available</th>
     </tr>
     {% for facility in facilities %}
-    <tr>
+    <tr id = "{{ facility.facility_id }}">
         <th>{{ facility.name }}</th>
         <th>{{ facility.definition }}</th>
         <th>{{ facility.max_space }}</th>
@@ -27,6 +28,9 @@ The Vertex - Facilities!
                 <li>{{ activity.name }}</li>
             {% endfor %}
             </ul>
+        </th>
+        <th>
+            <img src="/static/imgs/facility-img/facility{{ facility.facility_id }}.jpg" width="300px" height="200px">
         </th>
     </tr>
     {% endfor %}
