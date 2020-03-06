@@ -11,20 +11,74 @@ import main.cookie_transaction as ct
 blueprint = flask.Blueprint("activities", __name__)
 
 
-@blueprint.route("/activities/view_classes", methods=["GET"])
-def view_classes_get():
+@blueprint.route("/activities/view_classes", methods=["POST", "GET"])
+def view_classes():
     user, response = ct.return_user_response(flask.request, False)
     if response:
         return response
 
+    data_form = flask.request.form
+
+    start_time = data_form.get("start_time")
+    start_date = data_form.get("start_date")
+    if type(start_date) is str:
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    if type(start_time) is str:
+        try:
+            start_time = datetime.datetime.strptime(start_time, "%H:%M").time()
+        except:
+            start_time = datetime.datetime.strptime(start_time, "%H:%M:%S").time()
+    activity_type_id = data_form.get("activity")
+    facility_id = data_form.get("facility")
+
+    if not start_time:
+        start_time = datetime.datetime.now().time()
+    if not start_date:
+        start_date = datetime.date.today()
+    if not activity_type_id:
+        activity_type_id = "Any"
+    elif activity_type_id != "Any":
+        activity_type_id = int(activity_type_id)
+    if not facility_id:
+        facility_id = "Any"
+    elif facility_id != "Any":
+        facility_id = int(facility_id)
+
+    start_search = datetime.datetime.combine(start_date, start_time)
+
+    if start_search < datetime.datetime.now():
+        flask.abort(500)
+
+    activity_types = adf.return_activity_types("Any")
+
+    facilities = adf.return_facilities("Any")
+
+    if not facilities or not activity_types:
+        flask.abort(500)
+
     activity_dict = {}
-    activity_list = adf.return_activities_between_dates(datetime.datetime.now(), datetime.datetime.now()+datetime.timedelta(days=14))
+    activity_list = adf.return_activities_between_dates_with_facility_and_activity(start_search, datetime.datetime.today() + datetime.timedelta(days=14),
+                                                                                   activity_type_id=activity_type_id, facility_id=facility_id)
 
     for i, activity in enumerate(activity_list):
         activity_capacity = adf.return_activity_capacity_with_activity_type_id(activity.activity_type_id)
         activity_dict[activity_list[i]] = (activity_capacity-len(tdf.return_bookings_with_activity_id(activity.activity_id)))
 
-    return flask.render_template("/activities/classes.html", User=user, activity_dict=activity_dict)
+    search_field_data = {}
+    search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
+    search_field_data["min_date"] = datetime.date.today()
+    search_field_data["max_date"] = datetime.date.today() + datetime.timedelta(days=14)
+    if start_date == datetime.date.today():
+        search_field_data["min_time"] = datetime.datetime.now().strftime("%H:00:00")
+    else:
+        search_field_data["min_time"] = datetime.datetime.now().strftime("00:00:00")
+    search_field_data["from_time"] = start_time.strftime("%H:00:00")
+    search_field_data["facility"] = facility_id
+    search_field_data["activity"] = activity_type_id
+
+    return flask.render_template("/activities/classes.html", User=user, activity_dict=activity_dict,
+                                 activity_types=activity_types, facilities=facilities,
+                                 search_field_data=search_field_data)
 
 
 @blueprint.route("/activities/view_class/<int:activity_id>", methods=["GET"])

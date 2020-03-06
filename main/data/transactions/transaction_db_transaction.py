@@ -128,27 +128,6 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
 
     return True, basket_activities, basket_membership
 
-"""
-def add_items_and_membership_to_basket(request: flask.request, response: flask.Response, membership: MembershipType, activity: Activity):
-
-    if activity:
-        add_instance = "A:" + str(activity.activity_id)
-    elif membership:
-        add_instance = "M" + str(membership.membership_type_id)
-    else:
-        return False, request
-
-    if "vertex_basket_cookie" not in request.cookies:
-        response.set_cookie("vertex_basket_cookie", add_instance, max_age=datetime.timedelta(days=1))
-        return True, response
-
-    basket = request.cookies["vertex_basket_cookie"]
-    basket += ";".encode("utf-8") + add_instance
-
-    response.set_cookie("vertex_basket_cookie", "", max_age=0)
-    return True, response
-"""
-
 
 def return_bookings_with_activity_id(activity_id):
     return Booking.query.filter(Booking.activity_id == activity_id).all()

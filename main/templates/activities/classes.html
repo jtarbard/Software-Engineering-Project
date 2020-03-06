@@ -8,7 +8,38 @@ The Vertex classes!
 {% endblock %}
 
 {% block main_content %}
-    <div
+    <form class="form-inline" method="post">
+        <label for="start_date">Start date:</label>
+        <input type="date" name="start_date" required value="{{search_field_data["start_date"]}}"
+            max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">
+        <label for="start_time">From:</label>
+        <input type="time" name="start_time" required step="3600"
+               value="{{search_field_data["from_time"]}}" min="{{search_field_data["min_time"]}}">
+        <label for="activity">Activity:</label>
+        <select name="activity">
+            <option value="Any" {% if search_field_data["activity"] == "Any" %} selected {% endif %} >Any</option>
+            {% for actvitiy_type in activity_types %}
+                {% if actvitiy_type.activity_type_id == search_field_data["activity"] %}
+                    <option value="{{actvitiy_type.activity_type_id}}" selected>{{actvitiy_type.name.capitalize()}}</option>
+                {% else %}
+                    <option value="{{actvitiy_type.activity_type_id}}" >{{actvitiy_type.name.capitalize()}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <label for="facility">Facility:</label>
+        <select name="facility">
+            <option value="Any"
+            {% if search_field_data["facility"] == "Any" %} selected {% endif %} >Any</option>
+            {% for facility in facilities %}
+                {% if facility.facility_id == search_field_data["facility"] %}
+                    <option value="{{facility.facility_id}}" selected>{{facility.name.capitalize()}}</option>
+                {% else %}
+                    <option value="{{facility.facility_id}}" >{{facility.name.capitalize()}}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+        <input type="submit" name="reload_search" value="Refresh results">
+    </form>
     <div class="table-responsive">
         <table class="table">
             <thead>
