@@ -101,7 +101,7 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
     for basket_instance in basket_instances:
         split_instance = basket_instance.split(":")
 
-        if len(split_instance) != 2:
+        if len(split_instance) not in [2, 3]:
             return False, None, None
 
         if not split_instance[1].isnumeric():
@@ -151,7 +151,7 @@ def add_items_and_membership_to_basket(request: flask.request, response: flask.R
 
 
 def return_bookings_with_activity_id(activity_id):
-    return Booking.query.filter(Booking.activity_id == activity_id).all()
+    return Booking.query.filter(Booking.activity_id == activity_id, Booking.deleted == False).all()
 
 
 def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User):
@@ -198,3 +198,20 @@ def check_encrypted_receipt(encrypted_receipt: str, user: User):
             return receipt
 
     return False
+
+
+def return_receipt_with_id(receipt_id):
+    return Receipt.query.filter(Receipt.receipt_id == receipt_id).first()
+
+
+def set_deletion_for_receipt_bookings_with_activity(receipt, activity):
+    booking_to_delete = Booking.query.filter_by(receipt_id=receipt.receipt_id, activity_id=activity.activity_id).all()
+
+    if not booking_to_delete:
+        return False
+
+    for booking in booking_to_delete:
+        booking.deleted = True
+        add_to_database(booking)
+
+    return True

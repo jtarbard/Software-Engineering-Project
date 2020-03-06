@@ -16,7 +16,7 @@ def login_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", nav=True, footer=True, page_type="login")
+    return flask.render_template("/account/login_register.html", page_type="login")
 
 
 # Route for executing when the customer submits login data from the login page
@@ -63,7 +63,7 @@ def register_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", nav=True, footer=True, page_type="register")
+    return flask.render_template("/account/login_register.html", page_type="register")
 
 
 # Route for executing when the customer submits register data from the register page
@@ -155,18 +155,21 @@ def view_account():
     if response:
         return response
 
-    returned_bookings = []
+    returned_bookings = {}
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
         customer: Customer = udf.return_customer_with_user_id(user.user_id)
         for receipt in customer.purchases:
             if receipt.membership:
                 continue
             for booking in receipt.bookings:
-                if booking.activity.start_time < datetime.datetime.now():
+                if booking.activity.start_time < datetime.datetime.now() or booking.deleted == True:
                     continue
-                returned_bookings.append(booking.activity)
+                if booking.activity not in returned_bookings:
+                    returned_bookings[booking.activity] = [receipt, 1]
+                else:
+                    returned_bookings[booking.activity][1] += 1
 
-    return flask.render_template("/account/your_account.html", nav=True, footer=True, User=user,
+    return flask.render_template("/account/your_account.html", User=user,
                                  returned_bookings=returned_bookings)
 
 
