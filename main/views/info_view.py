@@ -22,3 +22,9 @@ def facilities_func():
 def membership_func():
     user, response = ct.return_user_response(flask.request, False)
     return flask.render_template("info/memberships.html", page_title="Memberships", User=user)
+
+@blueprint.route('/info/facilities/facilities_info', methods=["GET"])
+def facilities_info_func():
+    user, response = ct.return_user_response(flask.request, False)
+    return flask.render_template("info/facilities_info.html",
+                                 facilities=Facility.query.all(), User=user)

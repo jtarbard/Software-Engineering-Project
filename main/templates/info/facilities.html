@@ -17,7 +17,7 @@ The Vertex - Facilities!
         <th>Activities Available</th>
     </tr>
     {% for facility in facilities %}
-    <tr>
+    <tr id = "{{ facility.facility_id }}">
         <th>{{ facility.name }}</th>
         <th>{{ facility.definition }}</th>
         <th>{{ facility.max_space }}</th>
@@ -28,6 +28,7 @@ The Vertex - Facilities!
             {% endfor %}
             </ul>
         </th>
+
     </tr>
     {% endfor %}
 </table>
