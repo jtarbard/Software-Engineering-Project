@@ -38,5 +38,18 @@ The Vertex receipt!
                     </tbody>
                 </table>
             </div>
+            <form>
+                <input type="button" value="Print receipt" onclick="window.print()" class="no-print">
+            </form>
+            <!-- Temporary css - to be moved into stylesheet -->
+            <style>
+                @media print
+                {
+                    .no-print
+                    {
+                        display: none;
+                    }
+                }
+            </style>
         {% endif %}
 {% endblock %}
