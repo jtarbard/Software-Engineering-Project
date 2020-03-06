@@ -21,7 +21,7 @@ def card_payment_post():
 
     if checkout:
         total_price = data_form.get('total_price')
-        return flask.render_template("/transactions/pay_card.html", total_price=total_price)
+        return flask.render_template("/transactions/pay_card.html", total_price=total_price, User=user)
 
     pay = data_form.get('pay')
     if not pay:
@@ -41,7 +41,6 @@ def card_payment_post():
     if not receipt_id:
         flask.abort(500)
 
-    #TODO: Check if works
     encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
 
     response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
@@ -58,5 +57,28 @@ def receipt_get(encrypted_receipt: str):
     if not returned_receipt:
         return flask.abort(404)
     else:
-        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt)
+        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=user)
+
+
+@blueprint.route("/transactions/refund", methods=["POST"])
+def refund_booking():
+    user, response = ct.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    data_form = flask.request.form
+    refund = data_form.get('refund')
+    receipt = tdf.return_receipt_with_id(data_form.get("receipt_id"))
+    activity = adf.return_activity_with_id(data_form.get('activity_id'))
+    print(receipt)
+    print(refund)
+    print(activity)
+    if not (refund and activity and receipt):
+        return flask.abort(500)
+
+    if not tdf.set_deletion_for_receipt_bookings_with_activity(receipt, activity):
+        return flask.abort(500)
+
+    return flask.redirect("/account/your_account")
+
 

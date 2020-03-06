@@ -23,6 +23,7 @@ class Booking(database.Model):
     booking_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     activity_id = database.Column(database.Integer, database.ForeignKey("Activities.activity_id"), nullable=False)
     receipt_id = database.Column(database.Integer, database.ForeignKey("Receipts.receipt_id"), nullable=False)
+    deleted = database.Column(database.Boolean, nullable=False, default=False)
 
     activity = database.relationship("Activity", back_populates="bookings", uselist=False)
     receipt = database.relationship("Receipt", back_populates="bookings", uselist=False)
