@@ -1,6 +1,6 @@
 import flask
 import datetime
-import cryptography
+#import cryptography
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
@@ -70,9 +70,6 @@ def refund_booking():
     refund = data_form.get('refund')
     receipt = tdf.return_receipt_with_id(data_form.get("receipt_id"))
     activity = adf.return_activity_with_id(data_form.get('activity_id'))
-    print(receipt)
-    print(refund)
-    print(activity)
     if not (refund and activity and receipt):
         return flask.abort(500)
 
@@ -80,5 +77,4 @@ def refund_booking():
         return flask.abort(500)
 
     return flask.redirect("/account/your_account")
-
 

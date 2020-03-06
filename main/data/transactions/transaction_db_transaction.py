@@ -98,6 +98,10 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
     basket_activities = []
     basket_membership = None
 
+    duration = None
+
+    #basket_instances = A:10;A:10;A:10
+    #A:10;M:1:3;A:10
     for basket_instance in basket_instances:
         split_instance = basket_instance.split(":")
 
@@ -114,6 +118,7 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
                 return False, None, None
 
             basket_membership = new_membership
+            duration = split_instance[2]
 
         elif split_instance[0] == "A":
             new_activity: Activity = adf.return_activity_with_id(split_instance[1])
@@ -126,28 +131,7 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
         else:
             return False, None, None
 
-    return True, basket_activities, basket_membership
-
-"""
-def add_items_and_membership_to_basket(request: flask.request, response: flask.Response, membership: MembershipType, activity: Activity):
-
-    if activity:
-        add_instance = "A:" + str(activity.activity_id)
-    elif membership:
-        add_instance = "M" + str(membership.membership_type_id)
-    else:
-        return False, request
-
-    if "vertex_basket_cookie" not in request.cookies:
-        response.set_cookie("vertex_basket_cookie", add_instance, max_age=datetime.timedelta(days=1))
-        return True, response
-
-    basket = request.cookies["vertex_basket_cookie"]
-    basket += ";".encode("utf-8") + add_instance
-
-    response.set_cookie("vertex_basket_cookie", "", max_age=0)
-    return True, response
-"""
+    return True, basket_activities, basket_membership, duration
 
 
 def return_bookings_with_activity_id(activity_id):
@@ -173,14 +157,21 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         add_to_database(new_booking)
 
     if basket_membership:
+        total_price = basket_membership.monthly_price
+
         new_membership = Membership()
         new_membership.membership_type_id = basket_membership.membership_type_id
         new_membership.receipt_id = new_receipt.receipt_id
+        new_membership.start_date = datetime.date.today()
+        new_membership.end_date = datetime.date.today() + datetime.timedelta(days=30)
 
-        #TODO: ADD MEMBERSHIP DURATION
-        month_duration = 1
-        total_price += basket_membership.monthly_price * month_duration
+        new_membership.membership_type = basket_membership
+
         add_to_database(new_membership)
+
+        customer = Customer.query.filter_by(user_id=user.user_id).first()
+        customer.current_membership = new_membership.membership_id
+        add_to_database(customer)
 
     new_receipt.total_cost = total_price
     add_to_database(new_receipt)
