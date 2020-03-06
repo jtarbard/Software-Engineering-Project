@@ -115,3 +115,45 @@ def add_activity_or_membership_to_basket(booking_object, request: flask.request,
 
     response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
     return response
+
+
+def change_items_with_id_from_cookie(id: int, num_change: int, response: flask, request: flask.request, is_activity=True):
+    if "vertex_basket_cookie" not in request.cookies:
+        return None
+
+    basket = request.cookies["vertex_basket_cookie"]
+
+    if not basket:
+        return None
+
+    basket_instances = basket.split(";")
+
+    new_basket = ""
+    num_change = int(num_change)
+
+    for basket_instance in basket_instances:
+        split_instance = basket_instance.split(":")
+
+        if len(split_instance) not in [2, 3]:
+            return None
+
+        if not split_instance[1].isnumeric():
+            return None
+
+        if split_instance[1] == id:
+            if (is_activity and split_instance[0] == "A") or (not is_activity and split_instance[0] == "M"):
+                continue
+        if len(new_basket) == 0:
+            new_basket = basket_instance
+        else:
+            new_basket += ";" + basket_instance
+
+    if is_activity:
+        if len(new_basket) == 0 and num_change > 0:
+            new_basket = "A:" + str(id)
+            num_change -= 1
+        for i in range(num_change):
+            new_basket += ";A:" + str(id)
+
+    response.set_cookie("vertex_basket_cookie", new_basket, max_age=datetime.timedelta(days=1))
+    return response
