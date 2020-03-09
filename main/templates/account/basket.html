@@ -17,7 +17,7 @@ The Vertex payments!
             <div class="table-responsive">
                 <table class="table">
                     <thead>
-                        <tr><td colspan="5"> Current bookings </td></tr>
+                        <tr><td colspan="5"> Activities </td></tr>
                     </thead>
                     <tbody>
                         <tr>
@@ -26,7 +26,7 @@ The Vertex payments!
                             <td>Class End Time</td>
                             <td>Facility</td>
                             <td>Number of Bookings</td>
-                            <td>Price</td>
+                            <td>Price Per Item</td>
                             <td>Sub-Price</td>
                             <td>Update</td>
                         </tr>
@@ -37,8 +37,8 @@ The Vertex payments!
                                 <td>{{ activity.end_time }}</td>
                                 <td>{{ activity.facility.name.capitalize() }}</td>
                                 <td>{{ tuple[1] }}</td>
-                                <td>{{ tuple[0] }}</td>
-                                <td>{{ tuple[1] * tuple[0]}}</td>
+                                <td>£{{ tuple[0] }}</td>
+                                <td>£{{ tuple[1] * tuple[0] }}</td>
                                 <td>
                                     <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
                                         <input type="number" name="num_change" max="8" min="0">
@@ -51,28 +51,99 @@ The Vertex payments!
                         <tr>
                             <td colspan="5"></td>
                             <td>Total Price:</td>
-                            <td>{{ total_price }}</td>
+                            <td>£{{ total_activity_price }}</td>
+                        </tr>
+                        {% if current_membership_discount %}
+                        <tr>
+                            <td colspan="5"></td>
+                            <td>Membership discount:</td>
+                            <td>{{ current_membership_discount }}% OFF!</td>
+                        </tr>
+                        <tr>
+                            <td colspan="5"></td>
+                            <td>Discounted Price:</td>
+                            <td>£{{ total_discounted_price }}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <br>
+        {% endif %}
+
+        {% if basket_membership %}
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr><td colspan="5"> Memberships </td></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Name</td>
+                            <td>Discount</td>
+                            <td>Duration</td>
+                            <td>Price per month</td>
+                            <td>Total price</td>
+                        </tr>
+                        <tr>
+                            <td>{{ basket_membership.name }} </td>
+                            <td>{{ basket_membership.discount }} </td>
+                            <td>{{ basket_membership_duration }} </td>
+                            <td>£{{ basket_membership.monthly_price }} </td>
+                            <td>£{{ basket_membership_duration * basket_membership.monthly_price }} </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
+            <br>
         {% endif %}
 
-        {% if basket_membership %}
-            <p>New membership:</p>
-            <ul>
-                <li>
-                    Type: {{ membership.name }}
-                    Discount: {{ membership.discount }}
-                    Price per month: {{ membership.monthly_price }}
-                </li>
-            </ul>
+        {% if basket_membership or basket_activities %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr><td colspan="5"> Final Price </td></tr>
+                    </thead>
+                    <tbody>
+                        {% if basket_activities %}
+                        <tr>
+                            <td>Activity Price</td>
+                            <td>£{{total_activity_price}}</td>
+                        </tr>
+                        {% endif %}
+                        {% if basket_membership %}
+                        <tr>
+                            <td>Membership Price</td>
+                            <td>£{{ basket_membership_duration * basket_membership.monthly_price}}</td>
+                        </tr>
+                        {% endif %}
+                        {% if basket_membership and basket_activities %}
+                        <tr>
+                            <td>Total Price</td>
+                            <td>£{{(basket_membership_duration * basket_membership.monthly_price) + total_activity_price}}</td>
+                        </tr>
+                        {% endif %}
+                        {% if current_membership_discount %}
+                        <tr>
+                            <td>Membership Discount</td>
+                            <td>£{{current_membership_discount}}%</td>
+                        </tr>
+                        <tr>
+                            <td>Discounted Price</td>
+                            <td>£{{final_price}}</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+            <br>
         {% endif %}
 
          <form method="post" action="/transactions/pay-card">
             <input type="submit" name="submit">
              <input type="hidden" name="checkout" value="user_has_checkout">
-             <input type="hidden" name="total_price" value="{{total_price}}">
+             <input type="hidden" name="total_price" value="{{final_price}}">
         </form>
     {% endif %}
 {% endblock %}

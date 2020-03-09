@@ -38,9 +38,15 @@ The Vertex memberships!
                         <div class="card-block">
                             <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
                             <form method="post" action="/info/memberships/buy">
-                                <input type="submit" class="btn btn-primary" name="Purchase">
+                                <input type="submit" class="btn btn-primary" value="Purchase">
                                 <input type="hidden" name="buy_membership" value={{ premium_id }}>
                                 <input type="hidden" name="total_price" value="{{ premium_price }}">
+                                <select name="membership_duration">
+                                    <option value="1" selected>1 month</option>
+                                    <option value="3">3 month</option>
+                                    <option value="6">6 month</option>
+                                    <option value="12">12 month</option>
+                                </select>
                             </form>
                         </div>
                     </div>
@@ -54,9 +60,15 @@ The Vertex memberships!
                         <div class="card-block">
                             <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
                             <form method="post" action="/info/memberships/buy">
-                                <input type="submit" class="btn btn-primary" name="Purchase">
+                                <input type="submit" class="btn btn-primary" value="Purchase">
                                 <input type="hidden" name="buy_membership" value={{ standard_id }}>
                                 <input type="hidden" name="total_price" value="{{ standard_price }}">
+                                <select name="membership_duration">
+                                    <option value="1" selected>1 month</option>
+                                    <option value="3">3 month</option>
+                                    <option value="6">6 month</option>
+                                    <option value="12">12 month</option>
+                                </select>
                             </form>
                         </div>
                     </div>

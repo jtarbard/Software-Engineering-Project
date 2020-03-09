@@ -29,14 +29,15 @@ def card_payment_post():
 
     #TODO: Add card detail handling here
 
-    is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    is_valid, basket_activities, basket_membership, basket_membership_duration = \
+        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid or not(basket_activities or basket_membership):
         response = flask.redirect("/")
         response.set_cookie("vertex_basket_cookie", "", max_age=0)
         return response
 
-    receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user)
+    receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user, basket_membership_duration)
 
     if not receipt_id:
         flask.abort(500)

@@ -44,26 +44,22 @@ def buy_membership():
     if response:
         return response
 
-    membership_id = flask.request.form.get('buy_membership')
+    membership_id = int(flask.request.form.get('buy_membership'))
+    membership_duration = int(flask.request.form.get('membership_duration'))
     if membership_id is None:
         return flask.redirect("/info/memberships")
 
-    is_valid, basket_activities, basket_membership = db_transaction\
-        .return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    is_valid, basket_activities, basket_membership, basket_membership_duration = \
+        db_transaction.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
         response = flask.redirect("/")
         response.set_cookie("vertex_basket_cookie", "", max_age=0)
         return response
 
-    if basket_activities:
-        #TODO: warn user about deleting their activities (in their basket)
-        pass
-
-    response = flask.redirect("/transactions/pay-card")
-    membership_cookie = "M:" + str(membership_id)
-    print(membership_cookie)
-    response.set_cookie("vertex_basket_cookie", membership_cookie, max_age=datetime.timedelta(days=1))
+    new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
+    response = ct.add_activity_or_membership_to_basket(
+        new_membership_type, flask.request, duration = membership_duration)
     return response
 
 

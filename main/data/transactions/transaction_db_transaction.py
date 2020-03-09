@@ -86,19 +86,18 @@ def return_membership_type_with_id(id: int):
 def return_activities_and_memberships_from_basket_cookie_if_exists(request: flask.request):
     # TODO: Comment
     if "vertex_basket_cookie" not in request.cookies:
-        return True, None, None
+        return True, None, None, None
 
     basket = request.cookies["vertex_basket_cookie"]
 
     if not basket:
-        return False, None, None
+        return False, None, None, None
 
     basket_instances = basket.split(";")
 
     basket_activities = []
     basket_membership = None
-
-    duration = None
+    basket_membership_duration = None
 
     #basket_instances = A:10;A:10;A:10
     #A:10;M:1:3;A:10
@@ -106,39 +105,39 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
         split_instance = basket_instance.split(":")
 
         if len(split_instance) not in [2, 3]:
-            return False, None, None
+            return False, None, None, None
 
         if not split_instance[1].isnumeric():
-            return False, None, None
+            return False, None, None, None
 
         if split_instance[0] == "M":
             new_membership = return_membership_type_with_id(split_instance[1])
             # TODO: Comment (Only allow 1 membership; if multiple encountered then return false)
             if basket_membership or not new_membership:
-                return False, None, None
+                return False, None, None, None
 
             basket_membership = new_membership
-            duration = split_instance[2]
+            basket_membership_duration = int(split_instance[2])
 
         elif split_instance[0] == "A":
             new_activity: Activity = adf.return_activity_with_id(split_instance[1])
             # TODO: Add more validation (e.g. date validation)
             if not new_activity:
-                return False, None, None
+                return False, None, None, None
 
             basket_activities.append(new_activity)
 
         else:
-            return False, None, None
+            return False, None, None, None
 
-    return True, basket_activities, basket_membership, duration
+    return True, basket_activities, basket_membership, basket_membership_duration
 
 
 def return_bookings_with_activity_id(activity_id):
     return Booking.query.filter(Booking.activity_id == activity_id, Booking.deleted == False).all()
 
 
-def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User):
+def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User, membership_duration: int):
     new_receipt = Receipt()
     customer = Customer.query.filter(Customer.user_id == user.user_id).first()
     new_receipt.creation_time = datetime.datetime.now()
@@ -157,13 +156,15 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         add_to_database(new_booking)
 
     if basket_membership:
-        total_price = basket_membership.monthly_price
+        total_price -= total_price * basket_membership.discount/100
+
+        total_price += basket_membership.monthly_price * membership_duration
 
         new_membership = Membership()
         new_membership.membership_type_id = basket_membership.membership_type_id
         new_membership.receipt_id = new_receipt.receipt_id
         new_membership.start_date = datetime.date.today()
-        new_membership.end_date = datetime.date.today() + datetime.timedelta(days=30)
+        new_membership.end_date = datetime.date.today() + datetime.timedelta(days=30*membership_duration)
 
         new_membership.membership_type = basket_membership
 
@@ -173,7 +174,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         customer.current_membership = new_membership.membership_id
         add_to_database(customer)
 
-    new_receipt.total_cost = total_price
+    new_receipt.total_cost = round(total_price,2)
     add_to_database(new_receipt)
 
     return new_receipt.receipt_id

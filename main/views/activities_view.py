@@ -77,7 +77,8 @@ def view_classes_post():
     if not activity or not booking_amount:
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity")
 
-    is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    is_valid, basket_activities, basket_membership, basket_membership_duration = \
+        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
         response = flask.redirect("/")
@@ -106,7 +107,8 @@ def basket_view():
     if response:
         return response
 
-    is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    is_valid, basket_activities, basket_membership, basket_membership_duration \
+        = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
         response = flask.redirect("/account/basket")
@@ -135,17 +137,34 @@ def basket_view():
         return response
 
     activity_and_price = dict()
-    total_price = 0
+    total_activity_price = 0
     for activity in basket_activities:
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
         number_of_activities = basket_activities.count(activity)
         activity_and_price[activity] = (current_price, number_of_activities)
-        total_price += current_price
+        total_activity_price += current_price
 
+    current_membership_discount = 0
+    total_discounted_price = 0
+    if basket_membership:
+        total_discounted_price = (total_activity_price - basket_membership.discount/100 * total_activity_price)
+
+        current_membership_discount =  basket_membership.discount
+    else:
+        customer = udf.return_customer_with_user_id(user.user_id)
+        if customer.current_membership is not None:
+            total_discounted_price = total_activity_price - \
+                                     customer.current_membership.membership_type.discount/100 * total_activity_price
+            current_membership_discount = customer.current_membership.membership_type.discount
+
+    final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
-                                 basket_membership=basket_membership, User=user, total_price=total_price,
-                                 activity_and_price=activity_and_price)
+                                 basket_membership=basket_membership, User=user, total_activity_price=total_activity_price,
+                                 activity_and_price=activity_and_price, final_price=round(final_price,2),
+                                 basket_membership_duration=basket_membership_duration,
+                                 total_discounted_price=round(total_discounted_price,2),
+                                 current_membership_discount=current_membership_discount)
 
 
 @blueprint.route("/account/basket", methods=["POST"])
