@@ -8,9 +8,6 @@ The Vertex {{page_type.capitalize()}}
 {% endblock %} <!--Sets the page title to be the page type (either login or register)-->
 
 {% block main_content %}
-    <h1>
-         {{page_type.capitalize()}} <!--Sets the title to be the page type (either login or register)-->
-     </h1>
     <form id="TaskForm" method="post">
         <div class="container">
                 {% if page_type == "login" %} <!-- Shown if this is the login page -->
