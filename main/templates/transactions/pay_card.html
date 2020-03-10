@@ -10,9 +10,78 @@ The Vertex card pay!
 {% block main_content %}
 <h2>Pay page</h2>
 <p>Card details to be added</p>
-<p>Total cost: {{total_price}}</p>
+<p>Total Cost: {{total_price}}</p>
+
 <form method="post">
-    <input type="submit">
+    <label for="card_number">Card Number: </label><br>
+    <input type="tel" id="card_number" name="card_number" pattern="[0-9]{4}\s[0-9]{4}\s[0-9]{4}\s[0-9]{4}"
+    oninvalid="setCustomValidity('Invalid card number!')"
+    placeholder="0000 0000 0000 0000"
+    {% if payment_dictionary.get("card_number") %}
+        value="{{ payment_dictionary.get("card_number") }}"
+    {% endif %}
+    ><br>
+
+    <label for="start_date">Start Date:</label><br>
+    <input type="text" id="start_date" name="start_date" pattern="^(([1][0-2]|[0][1-9])/([0-9][0-9])){1}$"
+    placeholder="MM/YY"
+    {% if payment_dictionary.get("start_date") %}
+        value="{{ payment_dictionary.get("start_date") }}"
+    {% endif %}
+    ><br>
+
+    <label for="expiration_date">Expiration Date:</label><br>
+    <input type="text" id="expiration_date" name="expiration_date" pattern="^(([1][0-2]|[0][1-9])/([0-9][0-9])){1}$"
+    placeholder="MM/YY"
+    {% if payment_dictionary.get("expiration_date") %}
+        value="{{ payment_dictionary.get("expiration_date") }}"
+    {% endif %}
+    ><br>
+
+    <label for="cvc_number">CVC Number: </label><br>
+    <input type="tel" id="cvc_number" name="cvc_number" pattern="[0-9]{3}"
+    oninvalid="setCustomValidity('Invalid CVC number!')"
+    placeholder="000"
+    ><br>
+
+    <label for="street_and_number">Street and Number: </label><br>
+    <input type="text" id="street_and_number" name="street_and_number"
+    {% if payment_dictionary.get("street_and_number") %}
+        value="{{ payment_dictionary.get("street_and_number") }}"
+    {% endif %}
+    ><br>
+
+    <label for="town">Town: </label><br>
+    <input type="text" id="town" name="town"
+    {% if payment_dictionary.get("town") %}
+        value="{{ payment_dictionary.get("town") }}"
+    {% endif %}
+    ><br>
+
+    <label for="city">City: </label><br>
+    <input type="text" id="city" name="city"
+    {% if payment_dictionary.get("city") %}
+        value="{{ payment_dictionary.get("city") }}"
+    {% endif %}
+    ><br>
+
+    <label for="postcode">Postcode: </label><br>
+    <input type="text" id="postcode" name="postcode"
+    {% if payment_dictionary.get("postcode") %}
+        value="{{ payment_dictionary.get("postcode") }}"
+    {% endif %}
+    ><br>
+
+    <label for="remember_card_details">Remember Card Details </label>
+
+
+    <input type="checkbox" id="remember_card_details" name="remember_card_details"
+    {% if payment_dictionary.get("card_number") %}
+        checked
+    {% endif %}
+    ><br>
+
+    <input type="submit" value="pay">
     <input type="hidden" name="pay" value="user_has_paid">
 </form>
 {% endblock %}

@@ -54,6 +54,7 @@ class Customer(User):
     }
 
     purchases = database.relation("Receipt", backref="customer")
+    payment_detail = database.relation("PaymentDetails", backref="customer", uselist=False, lazy=True)
 
 
 class Manager(User):
@@ -65,3 +66,20 @@ class Manager(User):
     __mapper_args__ = {
         'polymorphic_identity': 'Manager'
     }
+
+
+class PaymentDetails(database.Model):
+    __tablename__ = 'PaymentDetails'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    card_number = database.Column(database.String)
+    start_date = database.Column(database.String)
+    expiration_date = database.Column(database.String)
+
+    street_and_number = database.Column(database.String)
+    town = database.Column(database.String)
+    city = database.Column(database.String)
+    postcode = database.Column(database.String)
+
+    customer_id = database.Column(database.Integer, database.ForeignKey('Customers.customer_id'))
+    #imaginary field "customer"

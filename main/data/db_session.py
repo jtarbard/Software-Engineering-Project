@@ -30,3 +30,12 @@ def add_to_database(database_class):
     except SQLAlchemyError as e:
         log_server_error(str(e))
         return False
+
+def delete_from_database(database_class):
+    try:
+        session.delete(database_class)
+        session.commit()
+        return True
+    except SQLAlchemyError as e:
+        log_server_error(str(e))
+        return False
