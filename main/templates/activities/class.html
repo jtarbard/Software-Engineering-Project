@@ -21,7 +21,7 @@ Class!
             <li>Final price: {{ final_price }}</li>
         {% endif %}
     </ul>
-    {% if allow_booking %}
+    {% if spaces_left > 0 %}
     <form action="/misc/add_booking_to_basket" method="post">
         <label for="amount_of_people">Amount of people:</label>
         <input type="number" name="amount_of_people" min="1" max="{{max_booking}}" required>
@@ -30,12 +30,12 @@ Class!
         <input type="submit" value="Book activity">
     </form>
     {% else %}
-        {% if User.__mapper_args__ ['polymorphic_identity'] == "Customer" %}
             <p>Sorry but this activity is full </p>
-        {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+    {% endif %}
+    {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
             <a class="btn-success" href="">Assign self to activity</a>
-        {% else %}
+    {% endif %}
+    {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
             <a class="btn-danger" href="">Remove activity</a>
-        {% endif %}
     {% endif %}
 {% endblock %}
