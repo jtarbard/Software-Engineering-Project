@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block title %}
-The Vertex receipt!
+The Vertex Receipt
 {% endblock %}
 
 {% block main_content %}
@@ -37,6 +37,10 @@ The Vertex receipt!
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <br>
+            <div>
+                <img src="{{qrcode(encrypted_receipt)}}">
             </div>
         {% endif %}
 {% endblock %}
