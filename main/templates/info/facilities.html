@@ -1,6 +1,6 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/facilities.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -8,27 +8,25 @@ The Vertex - Facilities!
 {% endblock %}
 
 {% block main_content %}
-<h1>Facilities</h1><br>
-<table style="width:60%">
-    <tr>
-        <th>Name</th>
-        <th>Description</th>
-        <th>Capacity</th>
-        <th>Activities Available</th>
-    </tr>
-    {% for facility in facilities %}
-    <tr>
-        <th>{{ facility.name }}</th>
-        <th>{{ facility.definition }}</th>
-        <th>{{ facility.max_space }}</th>
-        <th>
-            <ul style="list-style-type:disc;">
-            {% for activity in facility.activities_available %}
-                <li>{{ activity.name }}</li>
-            {% endfor %}
-            </ul>
-        </th>
-    </tr>
-    {% endfor %}
-</table>
+<div class="container">
+    <div class="card-group">
+        <div class="row">
+        {% for facility in facilities %}
+        <div class="col-sm-12 col-md-6">
+            <div class="card">
+              <img src="/static/imgs/facility-img/facility{{ facility.facility_id }}.jpg" class="card-img-top" alt="{{ facility.facility_id }}">
+              <div class="card-body">
+                <h2 class="card-title">{{ facility.name }}</h2>
+                <p class="card-text">
+                    {{ facility.definition }}
+                    <br>
+                    Capacity: {{ facility.max_space }}
+                </p>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
 {% endblock %}

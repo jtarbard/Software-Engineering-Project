@@ -151,6 +151,7 @@ def basket_view():
         total_discounted_price = (total_activity_price - basket_membership.discount/100 * total_activity_price)
 
         current_membership_discount =  basket_membership.discount
+        final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
         if customer.current_membership is not None:
@@ -158,7 +159,8 @@ def basket_view():
                                      customer.current_membership.membership_type.discount/100 * total_activity_price
             current_membership_discount = customer.current_membership.membership_type.discount
 
-    final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
+        final_price = total_discounted_price
+
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
                                  basket_membership=basket_membership, User=user, total_activity_price=total_activity_price,
                                  activity_and_price=activity_and_price, final_price=round(final_price,2),

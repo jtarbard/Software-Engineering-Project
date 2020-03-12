@@ -29,33 +29,28 @@ The Vertex receipt!
                                     <td>{{ booking.activity.start_time }}</td>
                                     <td>{{ booking.activity.end_time }}</td>
                                     <td>{{ booking.activity.facility.name }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                    </table>
-                </div>
-        {% endif %}
-        {% if returned_receipt.membership %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr><td colspan="3"> Membership brought </td></tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Membership type</td>
-                                <td>Start Date</td>
-                                <td>End Date</td>
-                            </tr>
-                            <tr>
-                                <td>{{ returned_receipt.membership.membership_type.name }}</td>
-                                <td>{{ returned_receipt.membership.start_date }}</td>
-                                <td>{{ returned_receipt.membership.end_date }}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <br>
+                        {% endfor %}
+                        <tr>
+                            <td colspan="4"></td>
+                            <td>Total Price:</td>
+                            <td>{{returned_receipt.total_cost}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <form>
+                <input type="button" value="Print receipt" onclick="window.print()" class="no-print">
+            </form>
+            <!-- Temporary css - to be moved into stylesheet -->
+            <style>
+                @media print
+                {
+                    .no-print
+                    {
+                        display: none;
+                    }
+                }
+            </style>
         {% endif %}
             <div>
                 <h3>Total Price: £{{returned_receipt.total_cost}}</h3>

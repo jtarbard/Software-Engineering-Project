@@ -16,7 +16,7 @@ def login_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", page_type="login")
+    return flask.render_template("/account/login_register.html", footer=True, page_type="login", page_title="Login")
 
 
 # Route for executing when the customer submits login data from the login page
@@ -40,14 +40,14 @@ def login_post():
 
     if server_error:  # Returns login page if an error is found
         return flask.render_template("account/login_register.html", page_type="login", ServerError=server_error,
-                                     email=email, has_cookie=True, nav=True, footer=True)
+                                     email=email, has_cookie=True, page_title="Login")
 
     # Checks that the customer exists in the database, if not then the login page returned with an error
     user = udf.check_user_is_in_database_and_password_valid(email, password_first)
     if not user:  # Checks if the user actually exists
         return flask.render_template("account/login_register.html", page_type="login",
                                      ServerError="Input error: Incorrect email or password",
-                                     email=email, has_cookie=True, nav=True, footer=True)
+                                     email=email, has_cookie=True, page_title="Login")
 
     # Implies that no error has occurred and the user is redirected to their account. A cookie is then set that
     # Verifies the customer ID and a verification hash
@@ -63,7 +63,7 @@ def register_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", page_type="register")
+    return flask.render_template("/account/login_register.html", page_type="register", page_title="Register")
 
 
 # Route for executing when the customer submits register data from the register page
@@ -136,7 +136,7 @@ def register_post():
         return flask.render_template("account/login_register.html", page_type="register",
                                      ServerError=server_error, email=email, date_of_birth=str(dob), first_name=first_name,
                                      last_name=last_name, postcode=postcode, address=address, title=title,
-                                     tel_number=tel_number, nav=True, footer=True)
+                                     tel_number=tel_number, page_title="Register")
 
     # user is created and returned
     user = udf.create_new_user_account(title, password_first, first_name, last_name, email, tel_number, formatted_dob,
@@ -165,6 +165,7 @@ def view_account():
             for booking in receipt.bookings:
                 if booking.activity.start_time < datetime.datetime.now() or booking.deleted == True:
                     continue
+
                 if booking.activity not in returned_bookings:
                     returned_bookings[booking.activity] = [receipt, 1]
                 else:

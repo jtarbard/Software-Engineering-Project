@@ -1,6 +1,6 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/memberships.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -8,74 +8,70 @@ The Vertex memberships!
 {% endblock %}
 
 {% block main_content %}
-    <div class="container">
-        <p> Membership description goes here. You should really buy a memberhsip because this makes things so much easier for us so please.</p>
-    </div>
+<div class="container">
+    <p> Membership description goes here. You should really buy a memberhsip because this makes things so much easier for us so please.</p>
+</div>
 
-    <div class="container">
+<div class="container">
+    <div class="card-deck">
 
     <!-- Columns of membership types -->
-        <div class="row">
-            <div class="col-lg-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3 class="card-header">Book Classes</h3>
-                        <div class="card-block">
-                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+    <!-- Free -->
+        <div class="card mb-3 text-center">
+            <div class="card-body">
+                <h3 class="card-header">Book Classes</h3>
+                <div class="card-block">
+                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
 
-                            <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
-                                 TODO: Change text to reflect as well? -->
-                            <a href="#" class="btn btn-primary">Book a Class for free</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3 class="card-header">Premium Membership</h3>
-                        <div class="card-block">
-                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-                            <form method="post" action="/info/memberships/buy">
-                                <input type="submit" class="btn btn-primary" value="Purchase">
-                                <input type="hidden" name="buy_membership" value={{ premium_id }}>
-                                <input type="hidden" name="total_price" value="{{ premium_price }}">
-                                <select name="membership_duration">
-                                    <option value="1" selected>1 month</option>
-                                    <option value="3">3 month</option>
-                                    <option value="6">6 month</option>
-                                    <option value="12">12 month</option>
-                                </select>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h3 class="card-header">Standard Membership</h3>
-                        <div class="card-block">
-                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-                            <form method="post" action="/info/memberships/buy">
-                                <input type="submit" class="btn btn-primary" value="Purchase">
-                                <input type="hidden" name="buy_membership" value={{ standard_id }}>
-                                <input type="hidden" name="total_price" value="{{ standard_price }}">
-                                <select name="membership_duration">
-                                    <option value="1" selected>1 month</option>
-                                    <option value="3">3 month</option>
-                                    <option value="6">6 month</option>
-                                    <option value="12">12 month</option>
-                                </select>
-                            </form>
-                        </div>
-                    </div>
+                    <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
+                         TODO: Change text to reflect as well? -->
+                    <a href="#" class="btn btn-primary">Book a Class for free</a>
                 </div>
             </div>
         </div>
 
-    </div>
+    <!-- Premium -->
+        <div class="card mb-3 text-center">
+            <div class="card-body">
+                <h3 class="card-header">Premium Membership</h3>
+                <div class="card-block">
+                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+                    <form method="post" action="/info/memberships/buy">
+                        <input type="submit" class="btn btn-primary" value="Purchase">
+                        <input type="hidden" name="buy_membership" value={{ premium_id }}>
+                        <input type="hidden" name="total_price" value="{{ premium_price }}">
+                        <select name="membership_duration">
+                            <option value="1" selected>1 month</option>
+                            <option value="3">3 month</option>
+                            <option value="6">6 month</option>
+                            <option value="12">12 month</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
 
+    <!-- Standard -->
+        <div class="card mb-3 text-center">
+            <div class="card-body">
+                <h3 class="card-header">Standard Membership</h3>
+                <div class="card-block">
+                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+                    <form method="post" action="/info/memberships/buy">
+                        <input type="submit" class="btn btn-primary" value="Purchase">
+                        <input type="hidden" name="buy_membership" value={{ standard_id }}>
+                        <input type="hidden" name="total_price" value="{{ standard_price }}">
+                        <select name="membership_duration">
+                            <option value="1" selected>1 month</option>
+                            <option value="3">3 month</option>
+                            <option value="6">6 month</option>
+                            <option value="12">12 month</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
 {% endblock %}
