@@ -4,7 +4,7 @@ import csv
 from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
-from main.data.db_classes.activity_db_class import ActivityType, Activity
+from main.data.db_classes.activity_db_class import ActivityType, Activity, Facility
 import main.data.transactions.employee_data_transaction as edf
 
 TAGS_CSV = "main/data/transactions/valid_tags.csv"
@@ -237,9 +237,19 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
 
 # Simply returns all activity instances between two datetimes
 # [Lewis S]
-def return_activities_between_dates(start_date: datetime.datetime, end_time: datetime.datetime):
-    return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time).all()
-
+def return_activities_between_dates_with_facility_and_activity(start_date: datetime.datetime, end_time: datetime.datetime,
+                                                               activity_type_id="Any", facility_id="Any"):
+    if activity_type_id == "Any" and facility_id == "Any":
+        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time).all()
+    elif activity_type_id == "Any" and facility_id != "Any":
+        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
+                                     Activity.facility_id == facility_id).all()
+    elif facility_id == "Any" and activity_type_id != "Any":
+        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
+                                     Activity.activity_type_id == activity_type_id).all()
+    else:
+        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
+                                     Activity.activity_id == activity_type_id, Activity.facility_id == facility_id).all()
 
 # Simply returns an activity with an specific id
 # [Lewis S]
@@ -252,3 +262,15 @@ def return_activity_with_id(activity_id: int):
 def return_activity_capacity_with_activity_type_id(activity_type_id):
     activity_type: ActivityType= ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
     return int(activity_type.maximum_activity_capacity)
+
+def return_facilities(facility_id):
+    if facility_id == "Any":
+        return Facility.query.all()
+    return Facility.query.filter(Facility.facility_id == facility_id).all()
+
+
+def return_activity_types(activity_type_id):
+    if activity_type_id == "Any":
+        return ActivityType.query.all()
+    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).all()
+
