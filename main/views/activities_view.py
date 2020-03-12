@@ -11,6 +11,18 @@ import main.cookie_transaction as ct
 blueprint = flask.Blueprint("activities", __name__)
 
 
+@blueprint.route("/activities/classes", methods=["GET"])
+def view_classes_types():
+    user, response = ct.return_user_response(flask.request, False)
+    if response:
+        return response
+
+    facilities = adf.return_facilities("Any")
+    activity_types = adf.return_all_activity_types()
+    return flask.render_template("/activities/classes.html", User=user,
+                                 activity_types=activity_types, facilities=facilities)
+
+
 @blueprint.route("/activities/view_classes", methods=["POST", "GET"])
 def view_classes():
     user, response = ct.return_user_response(flask.request, False)
@@ -76,7 +88,7 @@ def view_classes():
     search_field_data["facility"] = facility_id
     search_field_data["activity"] = activity_type_id
 
-    return flask.render_template("/activities/classes.html", User=user, activity_dict=activity_dict,
+    return flask.render_template("/activities/classes_all.html", User=user, activity_dict=activity_dict,
                                  activity_types=activity_types, facilities=facilities,
                                  search_field_data=search_field_data)
 

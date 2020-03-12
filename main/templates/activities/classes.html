@@ -1,6 +1,6 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/classes.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -8,63 +8,42 @@ The Vertex classes!
 {% endblock %}
 
 {% block main_content %}
-    <form class="form-inline" method="post">
-        <label for="start_date">Start date:</label>
-        <input type="date" name="start_date" required value="{{search_field_data["start_date"]}}"
-            max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">
-        <label for="start_time">From:</label>
-        <input type="time" name="start_time" required step="3600"
-               value="{{search_field_data["from_time"]}}" min="{{search_field_data["min_time"]}}">
-        <label for="activity">Activity:</label>
-        <select name="activity">
-            <option value="Any" {% if search_field_data["activity"] == "Any" %} selected {% endif %} >Any</option>
-            {% for actvitiy_type in activity_types %}
-                {% if actvitiy_type.activity_type_id == search_field_data["activity"] %}
-                    <option value="{{actvitiy_type.activity_type_id}}" selected>{{actvitiy_type.name.capitalize()}}</option>
-                {% else %}
-                    <option value="{{actvitiy_type.activity_type_id}}" >{{actvitiy_type.name.capitalize()}}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-        <label for="facility">Facility:</label>
-        <select name="facility">
-            <option value="Any"
-            {% if search_field_data["facility"] == "Any" %} selected {% endif %} >Any</option>
-            {% for facility in facilities %}
-                {% if facility.facility_id == search_field_data["facility"] %}
-                    <option value="{{facility.facility_id}}" selected>{{facility.name.capitalize()}}</option>
-                {% else %}
-                    <option value="{{facility.facility_id}}" >{{facility.name.capitalize()}}</option>
-                {% endif %}
-            {% endfor %}
-        </select>
-        <input type="submit" name="reload_search" value="Refresh results">
-    </form>
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr><td colspan="6"> Time Table </td></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Class name</td>
-                    <td>Class Start Time </td>
-                    <td>Class End Time</td>
-                    <td>Facility</td>
-                    <td>Availability left</td>
-                    <td>Book</td>
-                </tr>
-                {% for activity, avalibility in activity_dict.items() %}
-                    <tr>
-                        <td>{{ activity.activity_type.name }}</td>
-                        <td>{{ activity.start_time }}</td>
-                        <td>{{ activity.end_time }}</td>
-                        <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name }}</a></td>
-                        <td>{{ avalibility }}</td>
-                        <td><a class="btn-danger" href="/activities/view_class/{{ activity.activity_id }}">Book</a></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+        <a href="/activities/view_classes">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center">View All Activities</h2>
+            </div>
+        </div>
     </div>
+        </div>
+    </a>
+    <div class="card-group">
+      <div class="row no-gutters">
+          {% for activity in activity_types %}
+        <div class="col-md-2">
+            <img src="/static/imgs/activities-img/{{ activity.name }}.png" class="card-img" alt="Illustration of {{ activity.name }}">
+        </div>
+        <div class="col-md-4">
+          <div class="card-body">
+            <h2 class="card-title">{{ activity.name }}</h2>
+            <p class="card-text">
+                {{ activity.definition }}
+                <br>
+                Capacity: {{ activity.max_space }}
+            </p>
+          <div class="tags">
+              <p>Tags:</p>
+              {% for tag in activity_types.tags %}
+              <span class="badge badge-secondary">{{ tag }}</span>
+              {% endfor %}
+          </div>
+          </div>
+        </div>
+      {% endfor %}
+      </div>
+    </div>
+</div>
 {% endblock %}
