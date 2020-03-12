@@ -8,35 +8,57 @@ The Vertex receipt!
 {% endblock %}
 
 {% block main_content %}
-<h2>Receipt page</h2>
-{% if returned_receipt %}
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr><td colspan="5"> Classes booked </td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Class Name</td>
-                            <td>Class Start Time </td>
-                            <td>Class End Time</td>
-                            <td>Facility</td>
-                        </tr>
-                        {% for booking in returned_receipt.bookings %}
+    <h2>Receipt page</h2>
+    {% if returned_receipt %}
+        {% if returned_receipt.bookings %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr><td colspan="4"> Classes brought </td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Class Name</td>
+                                <td>Class Start Time </td>
+                                <td>Class End Time</td>
+                                <td>Facility</td>
+                            </tr>
+                            {% for booking in returned_receipt.bookings %}
                                 <tr>
                                     <td>{{ booking.activity.activity_type.name }}</td>
                                     <td>{{ booking.activity.start_time }}</td>
                                     <td>{{ booking.activity.end_time }}</td>
                                     <td>{{ booking.activity.facility.name }}</td>
                                 </tr>
-                        {% endfor %}
-                        <tr>
-                            <td colspan="4"></td>
-                            <td>Total Price:</td>
-                            <td>{{returned_receipt.total_cost}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                            {% endfor %}
+                            </tbody>
+                    </table>
+                </div>
         {% endif %}
+        {% if returned_receipt.membership %}
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr><td colspan="3"> Membership brought </td></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Membership type</td>
+                                <td>Start Date</td>
+                                <td>End Date</td>
+                            </tr>
+                            <tr>
+                                <td>{{ returned_receipt.membership.membership_type.name }}</td>
+                                <td>{{ returned_receipt.membership.start_date }}</td>
+                                <td>{{ returned_receipt.membership.end_date }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <br>
+        {% endif %}
+            <div>
+                <h3>Total Price: £{{returned_receipt.total_cost}}</h3>
+            </div>
+    {% endif %}
 {% endblock %}

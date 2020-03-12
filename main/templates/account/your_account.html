@@ -16,6 +16,12 @@
     {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
     <h3>Router:</h3>
     {% else %}
+    {% if membership_type %}
+    <p>current membership : {{membership_type.name}}<p>
+    <a href="/info/memberships/cancel">cancel membership</a>
+    {% else %}
+    <p>you currently have no membership</p>
+    {% endif %}
     {% if returned_bookings %}
             <div class="table-responsive">
                 <table class="table">

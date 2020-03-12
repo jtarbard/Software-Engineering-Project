@@ -17,8 +17,8 @@ Class!
         <li>Spaces left: {{ spaces_left }}</li>
         <li>Total price: £{{ session_price }}</li>
         {% if membership %}
-            <li>Membership discount type and discount: {{ membership.name + "+" + membership.discount }}</li>
-            <li>Final price: {{ final_price }}</li>
+            <li>You have {{ membership.name }} membership. {{ membership.discount }}% OFF!</li>
+            <li>Final price: £{{ final_price }}</li>
         {% endif %}
     </ul>
     {% if allow_booking %}

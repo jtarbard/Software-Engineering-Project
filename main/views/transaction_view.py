@@ -1,6 +1,6 @@
 import flask
 import datetime
-import cryptography
+#import cryptography
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
@@ -29,14 +29,15 @@ def card_payment_post():
 
     #TODO: Add card detail handling here
 
-    is_valid, basket_activities, basket_membership = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    is_valid, basket_activities, basket_membership, basket_membership_duration = \
+        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid or not(basket_activities or basket_membership):
         response = flask.redirect("/")
         response.set_cookie("vertex_basket_cookie", "", max_age=0)
         return response
 
-    receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user)
+    receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user, basket_membership_duration)
 
     if not receipt_id:
         flask.abort(500)
@@ -70,9 +71,6 @@ def refund_booking():
     refund = data_form.get('refund')
     receipt = tdf.return_receipt_with_id(data_form.get("receipt_id"))
     activity = adf.return_activity_with_id(data_form.get('activity_id'))
-    print(receipt)
-    print(refund)
-    print(activity)
     if not (refund and activity and receipt):
         return flask.abort(500)
 
@@ -80,5 +78,4 @@ def refund_booking():
         return flask.abort(500)
 
     return flask.redirect("/account/your_account")
-
 
