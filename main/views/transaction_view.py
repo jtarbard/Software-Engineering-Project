@@ -111,26 +111,24 @@ def card_payment_post():
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         new_user = udf.return_user(customer.user_id)
-        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, new_user)
+        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, new_user, basket_membership_duration)
     else:
-        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user)
+        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user, basket_membership_duration)
 
     if not receipt_id:
         flask.abort(500)
 
-    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
-
     if user.__mapper_args__['polymorphic_identity'] == "Employee":
         employee = udf.return_employee_with_user_id(user.user_id)
         receipt = tdf.return_receipt_with_id(receipt_id)
-        print(receipt)
-        print(employee)
+
         employee.receipt_assist.append(receipt)
         add_to_database(employee)
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         response = flask.redirect(f"/transactions/view_individual_receipts/{receipt_id}")
     else:
+        encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
         response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
 
     response.set_cookie("vertex_basket_cookie", "", max_age=0)
@@ -183,7 +181,7 @@ def receipt_get(encrypted_receipt: str):
         return flask.abort(404)
     else:
         return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
-                                     encrypted_receipt=encrypted_receipt)
+                                     encrypted_receipt=encrypted_receipt, User=user)
 
 
 @blueprint.route("/transactions/view_individual_receipts/<int:receipt_id>", methods=["GET"])
@@ -199,14 +197,18 @@ def e_m_get(receipt_id: int):
 
     customer_of_receipt = returned_receipt.customer_id
 
+    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(customer_of_receipt))
+
     if user.__mapper_args__['polymorphic_identity'] == "Employee":
         employee: Employee = udf.return_employee_with_user_id(user.user_id)
         print(employee.receipt_assist)
         if returned_receipt in employee.receipt_assist:
-            return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=customer_of_receipt)
+            return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
+                                         User=customer_of_receipt, encrypted_receipt=encrypted_receipt)
 
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
-        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=customer_of_receipt)
+        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
+                                     User=customer_of_receipt, encrypted_receipt=encrypted_receipt)
 
     return flask.abort(404)
 
