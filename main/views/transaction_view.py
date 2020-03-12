@@ -111,9 +111,11 @@ def card_payment_post():
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         new_user = udf.return_user(customer.user_id)
-        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, new_user)
+        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership,
+                                            new_user, basket_membership_duration)
     else:
-        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user)
+        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership,
+                                            user, basket_membership_duration)
 
     if not receipt_id:
         flask.abort(500)
