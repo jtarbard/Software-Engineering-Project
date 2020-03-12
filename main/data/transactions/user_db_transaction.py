@@ -103,3 +103,7 @@ def return_customer_with_user_id(user_id: int):
 
 def return_customer_with_email(customer_email: str):
     return Customer.query.filter(Customer.email == customer_email).first()
+
+
+def return_employee_with_user_id(user_id):
+    return Employee.query.filter(Employee.user_id == user_id).first()

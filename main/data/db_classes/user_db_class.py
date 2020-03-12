@@ -1,5 +1,6 @@
 from datetime import datetime
 from main.data.db_session import database
+from main.data.db_classes.transaction_db_class import receipt_employee
 
 
 # Class mapped to the user table in the database, this is the parent class to the: customer, employee and
@@ -39,8 +40,8 @@ class Employee(User):
     }
 
     router_activities = database.relation("Employee_Router", backref="employee")
-
     # invisible virtual attribute "allowed_roles" for many-to-many relationship
+    # invisible virtual attribute "receipt_assist" for many-to-many relationship
 
 class Customer(User):
     __tablename__ = 'Customers'

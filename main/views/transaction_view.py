@@ -6,7 +6,7 @@ import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
 import main.cookie_transaction as ct
 from main.data.db_classes.transaction_db_class import Receipt
-from main.data.db_classes.user_db_class import Customer, PaymentDetails
+from main.data.db_classes.user_db_class import Customer, PaymentDetails, Employee
 from main.data.db_session import add_to_database, delete_from_database
 
 blueprint = flask.Blueprint("transaction", __name__)
@@ -51,7 +51,7 @@ def card_payment_post():
                                      total_price=total_price, User=user, customer=customer,
                                      payment_dictionary=payment_dictionary, error=error, type=type, checkout=True)
         elif type == "cash":
-            if type(user) is Customer:
+            if user.__mapper_args__['polymorphic_identity'] == "Customer":
                 return flask.abort(500)
             else:
                 if customer_email:
@@ -115,16 +115,24 @@ def card_payment_post():
 
     encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
 
-    if user.__mapper_args__['polymorphic_identity'] != "Customer":
-        returned_receipt = tdf.return_receipt_with_id(receipt_id)
-        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=customer)
+    if user.__mapper_args__['polymorphic_identity'] == "Employee":
+        employee = udf.return_employee_with_user_id(user.user_id)
+        receipt = tdf.return_receipt_with_id(receipt_id)
+        print(receipt)
+        print(employee)
+        employee.receipt_assist.append(receipt)
+        add_to_database(employee)
 
-    response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
+    if user.__mapper_args__['polymorphic_identity'] != "Customer":
+        response = flask.redirect(f"/transactions/view_individual_receipts/{receipt_id}")
+    else:
+        response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
+
     response.set_cookie("vertex_basket_cookie", "", max_age=0)
     return response
 
 
-@blueprint.route("/transactions/receipts/<path:encrypted_receipt>")
+@blueprint.route("/transactions/receipts/<path:encrypted_receipt>", methods=["GET"])
 def receipt_get(encrypted_receipt: str):
     user, response = ct.return_user_response(flask.request, True)
     if response:
@@ -135,6 +143,31 @@ def receipt_get(encrypted_receipt: str):
         return flask.abort(404)
     else:
         return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=user)
+
+
+@blueprint.route("/transactions/view_individual_receipts/<int:receipt_id>", methods=["GET"])
+def e_m_get(receipt_id: int):
+    user, response = ct.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    returned_receipt: Receipt = tdf.return_receipt_with_id(receipt_id)
+
+    if not returned_receipt:
+        return flask.abort(404)
+
+    customer_of_receipt = returned_receipt.customer_id
+
+    if user.__mapper_args__['polymorphic_identity'] == "Employee":
+        employee: Employee = udf.return_employee_with_user_id(user.user_id)
+        print(employee.receipt_assist)
+        if returned_receipt in employee.receipt_assist:
+            return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=customer_of_receipt)
+
+    elif user.__mapper_args__['polymorphic_identity'] == "Manager":
+        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=customer_of_receipt)
+
+    return flask.abort(404)
 
 
 @blueprint.route("/transactions/refund", methods=["POST"])
