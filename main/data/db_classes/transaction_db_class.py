@@ -1,6 +1,13 @@
 from datetime import datetime, date, timedelta
 from main.data.db_session import database
 
+receipt_employee = \
+    database.Table("receipt_employee_association",
+        database.Column("receipt_id", database.Integer, database.ForeignKey("Receipts.receipt_id")),
+        database.Column("employee_id", database.Integer, database.ForeignKey("Employees.employee_id"))
+)
+
+
 class Receipt(database.Model):
     __tablename__ = 'Receipts'
 
@@ -14,6 +21,10 @@ class Receipt(database.Model):
     # Relationships between the different transaction types
     bookings = database.relationship("Booking", back_populates="receipt")
     membership = database.relationship("Membership", back_populates="receipt", uselist=False)
+    employee_assist = \
+        database.relationship("Employee",
+                              secondary=receipt_employee,
+                              backref=database.backref('receipt_assist', lazy='dynamic'))
 
 
 class Booking(database.Model):

@@ -39,9 +39,7 @@ def view_class(activity_id: int):
 
     spaces_left = activity.activity_type.maximum_activity_capacity-len(tdf.return_bookings_with_activity_id(activity.activity_id))
 
-    allow_booking = True
     if type(user) is not Customer or spaces_left <= 0:
-        allow_booking = False
         membership = None
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
@@ -59,7 +57,7 @@ def view_class(activity_id: int):
         final_price = session_price * (1 - membership.discount/float(100))
 
     return flask.render_template("/activities/class.html", activity=activity, session_price=round(session_price, 2),
-                                 spaces_left=spaces_left, allow_booking=allow_booking, membership=membership,
+                                 spaces_left=spaces_left, membership=membership,
                                  final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8))
 
 
@@ -128,7 +126,6 @@ def basket_view():
                 new_activities_basket += ";"
             new_activities_basket += "A:" + str(activity.activity_id)
         else:
-            print(activity.start_time > datetime.datetime.now())
             redirect = True
 
     if redirect:

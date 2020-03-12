@@ -1,5 +1,6 @@
 from datetime import datetime
 from main.data.db_session import database
+from main.data.db_classes.transaction_db_class import receipt_employee
 
 
 # Class mapped to the user table in the database, this is the parent class to the: customer, employee and
@@ -39,8 +40,8 @@ class Employee(User):
     }
 
     router_activities = database.relation("Employee_Router", backref="employee")
-
     # invisible virtual attribute "allowed_roles" for many-to-many relationship
+    # invisible virtual attribute "receipt_assist" for many-to-many relationship
 
 class Customer(User):
     __tablename__ = 'Customers'
@@ -54,6 +55,7 @@ class Customer(User):
     }
 
     purchases = database.relation("Receipt", backref="customer")
+    payment_detail = database.relation("PaymentDetails", backref="customer", uselist=False, lazy=True)
 
 
 class Manager(User):
@@ -65,3 +67,20 @@ class Manager(User):
     __mapper_args__ = {
         'polymorphic_identity': 'Manager'
     }
+
+
+class PaymentDetails(database.Model):
+    __tablename__ = 'PaymentDetails'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    card_number = database.Column(database.String)
+    start_date = database.Column(database.String)
+    expiration_date = database.Column(database.String)
+
+    street_and_number = database.Column(database.String)
+    town = database.Column(database.String)
+    city = database.Column(database.String)
+    postcode = database.Column(database.String)
+
+    customer_id = database.Column(database.Integer, database.ForeignKey('Customers.customer_id'))
+    #imaginary field "customer"

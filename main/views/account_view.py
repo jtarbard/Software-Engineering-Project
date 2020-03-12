@@ -16,7 +16,12 @@ def login_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", footer=True, page_type="login", page_title="Login")
+    if "vertex_basket_cookie" in flask.request.cookies:
+        response = flask.redirect("/account/login")
+        response.set_cookie("vertex_basket_cookie", "", expires=0)
+        return response
+
+    return flask.render_template("/account/login_register.html", page_type="login")
 
 
 # Route for executing when the customer submits login data from the login page
@@ -63,7 +68,13 @@ def register_get():
     if user:
         return flask.redirect("/")
 
-    return flask.render_template("/account/login_register.html", page_type="register", page_title="Register")
+    if "vertex_basket_cookie" in flask.request.cookies:
+        response = flask.redirect("/account/register")
+        response.set_cookie("vertex_basket_cookie", "", expires=0)
+        return response
+
+
+    return flask.render_template("/account/login_register.html", page_type="register")
 
 
 # Route for executing when the customer submits register data from the register page
@@ -185,4 +196,6 @@ def view_account():
 def log_out():
     response = flask.redirect("/")
     ct.destroy_cookie(response)  # User cookie is destroyed and they are logged out
+    if "vertex_basket_cookie" in flask.request.cookies:
+        response.set_cookie("vertex_basket_cookie", "", expires=0)
     return response

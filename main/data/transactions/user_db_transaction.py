@@ -99,3 +99,11 @@ def check_if_email_exists(email: str) -> bool:
 
 def return_customer_with_user_id(user_id: int):
     return Customer.query.filter(Customer.user_id == user_id).first()
+
+
+def return_customer_with_email(customer_email: str):
+    return Customer.query.filter(Customer.email == customer_email).first()
+
+
+def return_employee_with_user_id(user_id):
+    return Employee.query.filter(Employee.user_id == user_id).first()
