@@ -47,7 +47,7 @@ def view_classes():
     start_search = datetime.datetime.combine(start_date, start_time)
 
     if start_search < datetime.datetime.now():
-        flask.abort(500)
+        start_search = datetime.datetime.now()
 
     activity_types = adf.return_activity_types("Any")
 
