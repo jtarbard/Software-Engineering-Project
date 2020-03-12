@@ -17,14 +17,14 @@ Class!
         <li>Spaces left: {{ spaces_left }}</li>
         <li>Total price: £{{ session_price }}</li>
         {% if membership %}
-            <li>Membership discount type and discount: {{ membership.name + "+" + membership.discount }}</li>
-            <li>Final price: {{ final_price }}</li>
+            <li>You have {{ membership.name }} membership. {{ membership.discount }}% OFF!</li>
+            <li>Final price: £{{ final_price }}</li>
         {% endif %}
     </ul>
     {% if allow_booking %}
     <form action="/misc/add_booking_to_basket" method="post">
         <label for="amount_of_people">Amount of people:</label>
-        <input type="number" name="amount_of_people" min="1" max="{{ spaces_left }}" required>
+        <input type="number" name="amount_of_people" min="1" max="{{max_booking}}" required>
             <!--TODO: Add start and end of session times-->
         <input name="activity" type="hidden" value="{{ activity.activity_id }}">
         <input type="submit" value="Book activity">
