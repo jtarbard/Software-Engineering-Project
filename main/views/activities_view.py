@@ -124,7 +124,6 @@ def view_classes_post():
     data_form = flask.request.form
     activity = adf.return_activity_with_id(data_form.get('activity'))
     booking_amount: int = int(data_form.get("amount_of_people"))
-    mmembership = data_form.get('membership')
 
     if not activity or not booking_amount:
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity")
@@ -205,12 +204,13 @@ def basket_view():
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
-        if customer.current_membership is not None:
+        if customer and customer.current_membership is not None:
             total_discounted_price = total_activity_price - \
                                      customer.current_membership.membership_type.discount/100 * total_activity_price
             current_membership_discount = customer.current_membership.membership_type.discount
-
-        final_price = total_discounted_price
+            final_price = total_discounted_price
+        else:
+            final_price = total_activity_price
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
                                  basket_membership=basket_membership, User=user, total_activity_price=total_activity_price,
