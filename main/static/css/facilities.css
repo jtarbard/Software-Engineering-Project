@@ -1,0 +1,8 @@
+img {
+    object-fit: cover;
+    height: 35vh;
+}
+
+.card {
+    margin-bottom: 5vh;
+}

@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from main.data.db_session import database
 
 
@@ -23,6 +23,7 @@ class Booking(database.Model):
     booking_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     activity_id = database.Column(database.Integer, database.ForeignKey("Activities.activity_id"), nullable=False)
     receipt_id = database.Column(database.Integer, database.ForeignKey("Receipts.receipt_id"), nullable=False)
+    deleted = database.Column(database.Boolean, nullable=False, default=False)
 
     activity = database.relationship("Activity", back_populates="bookings", uselist=False)
     receipt = database.relationship("Receipt", back_populates="bookings", uselist=False)
@@ -33,8 +34,8 @@ class Membership(database.Model):
 
     membership_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     membership_type_id = database.Column(database.Integer, database.ForeignKey("MembershipTypes.membership_type_id"), nullable=False)
-    start_date = database.Column(database.Date, default=date.today, nullable=False)
-    end_date = database.Column(database.Date, default=date.today, nullable=False)
+    start_date = database.Column(database.Date, nullable=False)
+    end_date = database.Column(database.Date, nullable=False)
     receipt_id = database.Column(database.Integer, database.ForeignKey("Receipts.receipt_id"), nullable=False)
 
     receipt = database.relationship("Receipt", back_populates="membership", uselist=False)

@@ -27,7 +27,7 @@ The Vertex classes!
                         <td>{{ activity.activity_type.name }}</td>
                         <td>{{ activity.start_time }}</td>
                         <td>{{ activity.end_time }}</td>
-                        <td>{{ activity.facility.name }}</td>
+                        <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name }}</a></td>
                         <td>{{ avalibility }}</td>
                         <td><a class="btn-danger" href="/activities/view_class/{{ activity.activity_id }}">Book</a></td>
                     </tr>
