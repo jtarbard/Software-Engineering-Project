@@ -16,6 +16,11 @@ def login_get():
     if user:
         return flask.redirect("/")
 
+    if "vertex_basket_cookie" in flask.request.cookies:
+        response = flask.redirect("/account/login")
+        response.set_cookie("vertex_basket_cookie", "", expires=0)
+        return response
+
     return flask.render_template("/account/login_register.html", page_type="login")
 
 
@@ -62,6 +67,12 @@ def register_get():
     user, response = ct.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
+
+    if "vertex_basket_cookie" in flask.request.cookies:
+        response = flask.redirect("/account/register")
+        response.set_cookie("vertex_basket_cookie", "", expires=0)
+        return response
+
 
     return flask.render_template("/account/login_register.html", page_type="register")
 
@@ -178,4 +189,6 @@ def view_account():
 def log_out():
     response = flask.redirect("/")
     ct.destroy_cookie(response)  # User cookie is destroyed and they are logged out
+    if "vertex_basket_cookie" in flask.request.cookies:
+        response.set_cookie("vertex_basket_cookie", "", expires=0)
     return response
