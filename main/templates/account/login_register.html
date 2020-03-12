@@ -8,9 +8,6 @@ The Vertex {{page_type.capitalize()}}
 {% endblock %} <!--Sets the page title to be the page type (either login or register)-->
 
 {% block main_content %}
-    <h1>
-         {{page_type.capitalize()}} <!--Sets the title to be the page type (either login or register)-->
-     </h1>
     <form id="TaskForm" method="post">
         <div class="container">
                 {% if page_type == "login" %} <!-- Shown if this is the login page -->
@@ -25,9 +22,7 @@ The Vertex {{page_type.capitalize()}}
                         </div>
                     </div>
                     <input type="submit" id="submit" value="Login" class="btn-success">
-                    {% if not ServerError%}
-                        <p>Don't have an account? <br><a href="/account/register">Register now</a></p>
-                    {% endif %}
+                    <p>Don't have an account? <br><a href="/account/register">Register now</a></p>
                     <div id="break"></div>
                 {% else %} <!-- Shown if this is the register page -->
                     <div class="row">
@@ -331,9 +326,9 @@ The Vertex {{page_type.capitalize()}}
                 {% endif %}
         </div>
     </form>
-    <div id="ErrorDiv" {% if ServerError%} style="visibility: visible" {% endif %}>
+    <div class="container" id="ErrorDiv" {% if ServerError%} style="visibility: visible" {% endif %}>
         <p>
             {{ ServerError }} <!-- Outputs a server error if there is one -->
         </p>
-    </div>
+    </divclass>
 {% endblock %}
