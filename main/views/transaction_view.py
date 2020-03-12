@@ -1,6 +1,11 @@
+import os
+from pyzbar.pyzbar import decode
+from PIL import Image
 import flask
 import datetime
-#import cryptography
+from werkzeug.utils import secure_filename
+import cryptography
+
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
@@ -27,12 +32,12 @@ def card_payment_post():
     if not pay:
         return flask.abort(404)
 
-    #TODO: Add card detail handling here
+    # TODO: Add card detail handling here
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
-    if not is_valid or not(basket_activities or basket_membership):
+    if not is_valid or not (basket_activities or basket_membership):
         response = flask.redirect("/")
         response.set_cookie("vertex_basket_cookie", "", max_age=0)
         return response
@@ -49,16 +54,52 @@ def card_payment_post():
     return response
 
 
+@blueprint.route("/transactions/receipts/check_receipt_input", methods=["POST"])
+def check_receipt_qr_code():
+    user, response = ct.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    if 'file' not in flask.request.files:
+        return flask.redirect("/account/your_account")
+
+    receipt_file = flask.request.files["file"]
+
+    if len(receipt_file.filename) < 1:
+        return flask.redirect("/account/your_account")
+
+    if receipt_file and receipt_file.filename.rsplit(".", 1)[1].lower() in ["png", "jpg", "jpeg"]:
+
+        file_direct = os.path.join("tmp", str(user.user_id) + datetime.datetime.now().strftime("-%m-%d-%Y-%H-%M-%S") \
+                                   + "." + receipt_file.filename.rsplit(".", 1)[1].lower())
+        receipt_file.save(file_direct)
+
+        try:
+            data = decode(Image.open(file_direct))
+            encrypted_receipt = data[0][0].decode("utf-8")
+        except:
+            return flask.redirect("/account/your_account")
+
+        os.remove(file_direct)
+        response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
+        return response
+
+    else:
+        return flask.redirect("/account/your_account")
+
+
 @blueprint.route("/transactions/receipts/<path:encrypted_receipt>")
 def receipt_get(encrypted_receipt: str):
     user, response = ct.return_user_response(flask.request, True)
     if response:
         return response
-    returned_receipt: Receipt = tdf.check_encrypted_receipt(encrypted_receipt, user)
-    if not returned_receipt:
+    try:
+        returned_receipt: Receipt = tdf.check_encrypted_receipt(encrypted_receipt, user)
+    except:
         return flask.abort(404)
     else:
-        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt, User=user)
+        return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
+                                     encrypted_receipt=encrypted_receipt)
 
 
 @blueprint.route("/transactions/refund", methods=["POST"])
@@ -78,4 +119,3 @@ def refund_booking():
         return flask.abort(500)
 
     return flask.redirect("/account/your_account")
-

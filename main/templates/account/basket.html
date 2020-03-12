@@ -39,9 +39,9 @@ The Vertex payments!
                                 <td>{{ tuple[1] }}</td>
                                 <td>£{{ tuple[0] }}</td>
                                 <td>£{{ tuple[1] * tuple[0] }}</td>
-                                <td>
+                                <td>    
                                     <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
-                                        <input type="number" name="num_change" max="8" min="0">
+                                        <input type="number" name="num_change" max="8" min="0" value="{{tuple[1]}}">
                                         <input type="submit" name="update" value="Update">
                                         <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
                                     </form>

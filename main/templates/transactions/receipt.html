@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block title %}
-The Vertex receipt!
+The Vertex Receipt
 {% endblock %}
 
 {% block main_content %}
@@ -38,6 +38,7 @@ The Vertex receipt!
                     </tbody>
                 </table>
             </div>
+
             <form>
                 <input type="button" value="Print receipt" onclick="window.print()" class="no-print">
             </form>
@@ -51,6 +52,10 @@ The Vertex receipt!
                     }
                 }
             </style>
+            <br>
+            <div>
+                <img src="{{qrcode(encrypted_receipt)}}">
+            </div>
         {% endif %}
             <div>
                 <h3>Total Price: £{{returned_receipt.total_cost}}</h3>

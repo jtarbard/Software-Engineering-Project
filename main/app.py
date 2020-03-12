@@ -1,6 +1,8 @@
 import flask
+from flask_qrcode import QRcode
 
 flask_app = flask.Flask(__name__)
+QRcode(flask_app)
 
 
 # All app blueprints are added

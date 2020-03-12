@@ -1,7 +1,6 @@
 from datetime import datetime, date, timedelta
 from main.data.db_session import database
 
-
 class Receipt(database.Model):
     __tablename__ = 'Receipts'
 
