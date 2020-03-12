@@ -11,20 +11,78 @@ import main.cookie_transaction as ct
 blueprint = flask.Blueprint("activities", __name__)
 
 
-@blueprint.route("/activities/view_classes", methods=["GET"])
-def view_classes_get():
+@blueprint.route("/activities/view_classes", methods=["POST", "GET"])
+def view_classes():
     user, response = ct.return_user_response(flask.request, False)
     if response:
         return response
 
+    data_form = flask.request.form
+
+    start_time = data_form.get("start_time")
+    start_date = data_form.get("start_date")
+    if type(start_date) is str:
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    if type(start_time) is str:
+        try:
+            start_time = datetime.datetime.strptime(start_time, "%H:%M").time()
+        except:
+            start_time = datetime.datetime.strptime(start_time, "%H:%M:%S").time()
+    activity_type_id = data_form.get("activity")
+    facility_id = data_form.get("facility")
+
+    if not start_time:
+        start_time = datetime.datetime.now().time()
+    if not start_date:
+        start_date = datetime.date.today()
+    if not activity_type_id:
+        activity_type_id = "Any"
+    elif activity_type_id != "Any":
+        activity_type_id = int(activity_type_id)
+    if not facility_id:
+        facility_id = "Any"
+    elif facility_id != "Any":
+        facility_id = int(facility_id)
+
+    start_search = datetime.datetime.combine(start_date, start_time)
+
+    if start_search < datetime.datetime.now():
+        start_search = datetime.datetime.now()
+
+    activity_types = adf.return_activity_types("Any")
+
+    facilities = adf.return_facilities("Any")
+
+    if not facilities or not activity_types:
+        flask.abort(500)
+
     activity_dict = {}
-    activity_list = adf.return_activities_between_dates(datetime.datetime.now(), datetime.datetime.now()+datetime.timedelta(days=14))
+    activity_list = adf.return_activities_between_dates_with_facility_and_activity(start_search,
+                                                                                   datetime.datetime.today() + datetime.timedelta(
+                                                                                       days=14),
+                                                                                   activity_type_id=activity_type_id,
+                                                                                   facility_id=facility_id)
 
     for i, activity in enumerate(activity_list):
         activity_capacity = adf.return_activity_capacity_with_activity_type_id(activity.activity_type_id)
-        activity_dict[activity_list[i]] = (activity_capacity-len(tdf.return_bookings_with_activity_id(activity.activity_id)))
+        activity_dict[activity_list[i]] = (
+                activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id)))
 
-    return flask.render_template("/activities/classes.html", User=user, activity_dict=activity_dict)
+    search_field_data = {}
+    search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
+    search_field_data["min_date"] = datetime.date.today()
+    search_field_data["max_date"] = datetime.date.today() + datetime.timedelta(days=14)
+    if start_date == datetime.date.today():
+        search_field_data["min_time"] = datetime.datetime.now().strftime("%H:00:00")
+    else:
+        search_field_data["min_time"] = datetime.datetime.now().strftime("00:00:00")
+    search_field_data["from_time"] = start_time.strftime("%H:00:00")
+    search_field_data["facility"] = facility_id
+    search_field_data["activity"] = activity_type_id
+
+    return flask.render_template("/activities/classes.html", User=user, activity_dict=activity_dict,
+                                 activity_types=activity_types, facilities=facilities,
+                                 search_field_data=search_field_data)
 
 
 @blueprint.route("/activities/view_class/<int:activity_id>", methods=["GET"])
@@ -37,7 +95,8 @@ def view_class(activity_id: int):
     if not activity:
         return flask.abort(404)
 
-    spaces_left = activity.activity_type.maximum_activity_capacity-len(tdf.return_bookings_with_activity_id(activity.activity_id))
+    spaces_left = activity.activity_type.maximum_activity_capacity - len(
+        tdf.return_bookings_with_activity_id(activity.activity_id))
 
     if type(user) is not Customer or spaces_left <= 0:
         membership = None
@@ -54,7 +113,7 @@ def view_class(activity_id: int):
     final_price = session_price
     if membership:
         membership = Membership.query.filter_by(membership_id=membership).first().membership_type
-        final_price = session_price * (1 - membership.discount/float(100))
+        final_price = session_price * (1 - membership.discount / float(100))
 
     return flask.render_template("/activities/class.html", activity=activity, session_price=round(session_price, 2),
                                  spaces_left=spaces_left, membership=membership,
@@ -70,7 +129,6 @@ def view_classes_post():
     data_form = flask.request.form
     activity = adf.return_activity_with_id(data_form.get('activity'))
     booking_amount: int = int(data_form.get("amount_of_people"))
-    mmembership = data_form.get('membership')
 
     if not activity or not booking_amount:
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity")
@@ -84,10 +142,12 @@ def view_classes_post():
         return response
 
     if basket_activities:
-        if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(basket_activities) + booking_amount > 15:
+        if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(
+                basket_activities) + booking_amount > 15:
             return flask.render_template("/misc/general_error.html", error="Basket full", User=user)
 
-    spaces_left = activity.activity_type.maximum_activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id))
+    spaces_left = activity.activity_type.maximum_activity_capacity - len(
+        tdf.return_bookings_with_activity_id(activity.activity_id))
     if spaces_left <= 0:
         return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity", User=user)
 
@@ -119,7 +179,8 @@ def basket_view():
     new_activities_basket = ""
     redirect = False
     for activity in basket_activities:
-        spaces_left = activity.activity_type.maximum_activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id))
+        spaces_left = activity.activity_type.maximum_activity_capacity - len(
+            tdf.return_bookings_with_activity_id(activity.activity_id))
         number_of_activities = basket_activities.count(activity)
         if spaces_left >= number_of_activities and activity.start_time > datetime.datetime.now():
             if len(new_activities_basket) != 0:
@@ -145,24 +206,28 @@ def basket_view():
     current_membership_discount = 0
     total_discounted_price = 0
     if basket_membership:
-        total_discounted_price = (total_activity_price - basket_membership.discount/100 * total_activity_price)
+        total_discounted_price = (total_activity_price - basket_membership.discount / 100 * total_activity_price)
 
-        current_membership_discount =  basket_membership.discount
+        current_membership_discount = basket_membership.discount
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
-        if customer.current_membership is not None:
-            total_discounted_price = total_activity_price - \
-                                     customer.current_membership.membership_type.discount/100 * total_activity_price
-            current_membership_discount = customer.current_membership.membership_type.discount
+        if customer and customer.current_membership is not None:
+            customer_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
 
-        final_price = total_discounted_price
+            total_discounted_price = total_activity_price - \
+                                     customer_membership.membership_type.discount / 100 * total_activity_price
+            current_membership_discount = customer_membership.membership_type.discount
+            final_price = total_discounted_price
+        else:
+            final_price = total_activity_price
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
-                                 basket_membership=basket_membership, User=user, total_activity_price=total_activity_price,
-                                 activity_and_price=activity_and_price, final_price=round(final_price,2),
+                                 basket_membership=basket_membership, User=user,
+                                 total_activity_price=total_activity_price,
+                                 activity_and_price=activity_and_price, final_price=round(final_price, 2),
                                  basket_membership_duration=basket_membership_duration,
-                                 total_discounted_price=round(total_discounted_price,2),
+                                 total_discounted_price=round(total_discounted_price, 2),
                                  current_membership_discount=current_membership_discount)
 
 
@@ -191,7 +256,8 @@ def basket_delete_activity():
 
     if len(item) != num_items:
         return flask.abort(500)
-    response = ct.change_items_with_id_from_cookie(item[1], num_change, flask.redirect("/account/basket"), flask.request, is_activity=is_activity)
+    response = ct.change_items_with_id_from_cookie(item[1], num_change, flask.redirect("/account/basket"),
+                                                   flask.request, is_activity=is_activity)
 
     if not response:
         flask.abort(500)

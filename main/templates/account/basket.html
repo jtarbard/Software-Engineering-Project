@@ -143,14 +143,14 @@ The Vertex payments!
          <form method="post" action="/transactions/pay-card">
             <input type="submit" name="submit" value="Pay By Card">
              <input type="hidden" name="checkout" value="user_has_checkout">
-             <input type="hidden" name="total_price" value="{{total_price}}">
+             <input type="hidden" name="total_price" value="{{final_price}}">
              <input type="hidden" name="payment_type" value="card">
         </form>
         {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
             <form method="post" action="/transactions/pay-card">
             <input type="submit" name="submit" value="Pay With Cash">
              <input type="hidden" name="checkout" value="user_has_checkout">
-             <input type="hidden" name="total_price" value="{{total_price}}">
+             <input type="hidden" name="total_price" value="{{final_price}}">
                 <input type="hidden" name="payment_type" value="cash">
         </form>
         {% endif %}
