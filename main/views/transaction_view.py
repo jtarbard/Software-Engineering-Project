@@ -183,7 +183,7 @@ def card_payment_post():
                 </tr>
                 <tr>
                     <td colspan="4"><h6>Membership</h6></td>
-                <tr>
+                </tr>
                 <tr> 
                     <td><strong>Membership Name &nbsp</strong></td>
                     <td><strong>Start Time &nbsp</strong></td>
@@ -222,7 +222,7 @@ def card_payment_post():
         img.save(file_direct)
 
         with app.open_resource("../"+file_direct) as fp:
-            message.attach("../"+file_direct, "image/png", fp.read())
+            message.attach("Vertex_Receipt_"+str(receipt_id), "image/png", fp.read())
 
         try:
             mail.send(message)
