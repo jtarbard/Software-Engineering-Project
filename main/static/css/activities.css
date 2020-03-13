@@ -1,0 +1,10 @@
+.card, .c-body{
+    margin-bottom: 5vh;
+}
+
+img {
+    object-fit: contain;
+    max-height: 20vh;
+}
+
+

@@ -20,14 +20,12 @@ The Vertex classes!
             </a>
         </div>
     </div>
-    <div class="card">
-    </div>
     <div class="row no-gutters">
             {% for activity in activity_types %}
-        <div class="col-md-2">
+        <div class="col-md-2 c-img">
             <img src="/static/imgs/activities-img/{{ activity.name }}.png" class="card-img" alt="Illustration of {{ activity.name }}">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 c-body">
             <div class="card-body">
                 <h2 class="card-title">{{ activity.name }}</h2>
                 <p class="card-text">
@@ -41,7 +39,7 @@ The Vertex classes!
                     <span class="badge badge-secondary">{{ tag }}</span>
                     {% endfor %}
                 </div>
-                <div class="button">
+                <div class="buttons">
                     <a class="btn btn-dark" href="">Book</a>
                     <a class="btn btn-dark" href="">Bulk Book</a>
                 </div>
