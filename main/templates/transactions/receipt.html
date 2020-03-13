@@ -29,9 +29,10 @@ The Vertex Receipt
                                     <td>{{ booking.activity.start_time }}</td>
                                     <td>{{ booking.activity.end_time }}</td>
                                     <td>{{ booking.activity.facility.name }}</td>
+                                </tr>
                         {% endfor %}
                         <tr>
-                            <td colspan="4"></td>
+                            <td colspan="2"></td>
                             <td>Total Price:</td>
                             <td>{{returned_receipt.total_cost}}</td>
                         </tr>

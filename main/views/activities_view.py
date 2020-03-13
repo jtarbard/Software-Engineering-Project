@@ -151,7 +151,9 @@ def basket_view():
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
-        if customer.current_membership is not None:
+        print(customer)
+        print(customer.current_membership)
+        if customer and customer.current_membership is not None:
             total_discounted_price = total_activity_price - \
                                      customer.current_membership.membership_type.discount/100 * total_activity_price
             current_membership_discount = customer.current_membership.membership_type.discount

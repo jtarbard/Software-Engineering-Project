@@ -4,6 +4,10 @@ from PIL import Image
 import flask
 import datetime
 from werkzeug.utils import secure_filename
+from flask import current_app as app
+from flask_mail import Message, Mail
+import qrcode
+
 
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
@@ -109,29 +113,123 @@ def card_payment_post():
         response.set_cookie("vertex_basket_cookie", "", max_age=0)
         return response
 
+    new_user = user
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         new_user = udf.return_user(customer.user_id)
-        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, new_user)
-    else:
-        receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, user)
+
+    receipt_id = tdf.create_new_receipt(basket_activities, basket_membership, new_user, basket_membership_duration)
 
     if not receipt_id:
         flask.abort(500)
 
-    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
+    receipt = tdf.return_receipt_with_id(receipt_id)
+
+    if not receipt:
+        return flask.abort(500)
 
     if user.__mapper_args__['polymorphic_identity'] == "Employee":
         employee = udf.return_employee_with_user_id(user.user_id)
-        receipt = tdf.return_receipt_with_id(receipt_id)
-        print(receipt)
-        print(employee)
         employee.receipt_assist.append(receipt)
         add_to_database(employee)
+
+    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         response = flask.redirect(f"/transactions/view_individual_receipts/{receipt_id}")
     else:
         response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
+
+    with app.app_context():
+        app.config["MAIL_USE_TLS"] = False
+        app.config["MAIL_USE_SSL"] = True
+        app.config["MAIL_PORT"] = 465
+        app.config["MAIL_SERVER"] = "smtp.gmail.com"
+        app.config["MAIL_USERNAME"] = "vertexleeds@gmail.com"
+        app.config["MAIL_DEFAULT_SENDER"] = "vertexleeds@gmail.com"
+        app.config["MAIL_PASSWORD"] = "WeAreTeam10"
+
+        mail = Mail(app)
+
+        message = Message(f"Vertex Booking Receipt", recipients=[f"{new_user.email}"])
+        message.html = """"<h1>Thank you for purchasing at The Vertex</h1> <br>
+                           <h3>Receipt:</h3>
+                           <table> 
+                                <thead>
+                                    <tr><td colspan="4"><h6> Classes brought &nbsp</h6></td></tr>
+                                </head>
+                                <tbody> 
+                                    <tr> 
+                                        <td><strong>Class Name &nbsp</strong></td>
+                                        <td><strong>Class Start Time &nbsp</strong></td>
+                                        <td><strong>Class End Time &nbsp</strong></td>
+                                        <td><strong>Facility &nbsp</strong></td>
+                                    </tr>
+                                    <tr>
+                                    """
+        for booking in receipt.bookings:
+            message.html += f"""
+                <tr>
+                    <td>{ booking.activity.activity_type.name }</td>
+                    <td>{ booking.activity.start_time }</td>
+                    <td>{ booking.activity.end_time }</td>
+                    <td>{ booking.activity.facility.name }</td>
+                <tr>
+                """
+
+        if receipt.membership:
+            message.html += f"""
+                <tr>
+                    <td colspan="4" rowspan="1"></td>
+                </tr>
+                <tr>
+                    <td colspan="4"><h6>Membership</h6></td>
+                <tr>
+                <tr> 
+                    <td><strong>Membership Name &nbsp</strong></td>
+                    <td><strong>Start Time &nbsp</strong></td>
+                    <td><strong>End Time &nbsp</strong></td>
+                    <td><strong>Discount &nbsp</strong></td>
+                </tr>
+                <tr> 
+                    <td>{receipt.membership.membership_type.name} &nbsp</td>
+                    <td>{receipt.membership.start_date} &nbsp</td>
+                    <td>{receipt.membership.start_date} &nbsp</td>
+                    <td>{receipt.membership.membership_type.discount} &nbsp</td>
+                </tr>
+            """
+        message.html += f"""
+                <tr>
+                    <td colspan="2"></td>
+                    <td><strong>Total Price: &nbsp</strong></td>
+                    <td>{receipt.total_cost}</td>
+                </tr>
+            </tbody>
+        </table>
+        """
+
+        file_direct = os.path.join("tmp", str(user.user_id) + datetime.datetime.now().strftime("-%m-%d-%Y-%H-%M-%S") + ".png")
+
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(encrypted_receipt)
+        qr.make(fit=True)
+
+        img = qr.make_image(fill_color="black", back_color="white")
+        img.save(file_direct)
+
+        with app.open_resource("../"+file_direct) as fp:
+            message.attach("../"+file_direct, "image/png", fp.read())
+
+        try:
+            mail.send(message)
+        except:
+            pass
+
+        os.remove(file_direct)
 
     response.set_cookie("vertex_basket_cookie", "", max_age=0)
     return response
@@ -183,7 +281,7 @@ def receipt_get(encrypted_receipt: str):
         return flask.abort(404)
     else:
         return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
-                                     encrypted_receipt=encrypted_receipt)
+                                     encrypted_receipt=encrypted_receipt, User=user)
 
 
 @blueprint.route("/transactions/view_individual_receipts/<int:receipt_id>", methods=["GET"])
