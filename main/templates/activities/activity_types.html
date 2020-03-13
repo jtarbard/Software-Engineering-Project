@@ -40,8 +40,11 @@ The Vertex classes!
                     {% endfor %}
                 </div>
                 <div class="buttons">
-                    <a class="btn btn-dark" href="">Book</a>
-                    <a class="btn btn-dark" href="">Bulk Book</a>
+                    <form method="post">
+                    <input type="hidden" name="activity" value="{{ activity.activity_type_id }}">
+                    <button class="btn btn-dark" type="submit" name="amount" value="single">Book</button>
+                    <button class="btn btn-dark" type="submit" name="amount" value="multiple">Bulk Book</button>
+                    </form>
                 </div>
             </div>
         </div>

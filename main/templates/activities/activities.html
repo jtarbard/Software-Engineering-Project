@@ -19,8 +19,8 @@ The Vertex classes!
         <select name="activity">
             <option value="Any" {% if search_field_data["activity"] == "Any" %} selected {% endif %} >Any</option>
             {% for actvitiy_type in activity_types %}
-                {% if actvitiy_type.activity_type_id == search_field_data["activity"] %}
-                    <option value="{{actvitiy_type.activity_type_id}}" selected>{{actvitiy_type.name.capitalize()}}</option>
+                {% if actvitiy_type.activity_type_id == search_field_data["activity"] or actvitiy_type.activity_type_id == sent_activity %}
+                    <option value="{{actvitiy_type.activity_type_id}}" selected="selected">{{actvitiy_type.name.capitalize()}}</option>
                 {% else %}
                     <option value="{{actvitiy_type.activity_type_id}}" >{{actvitiy_type.name.capitalize()}}</option>
                 {% endif %}
@@ -29,7 +29,7 @@ The Vertex classes!
         <label for="facility">Facility:</label>
         <select name="facility">
             <option value="Any"
-            {% if search_field_data["facility"] == "Any" %} selected {% endif %} >Any</option>
+            {% if search_field_data["facility"] == "Any" %} selected="selected" {% endif %} >Any</option>
             {% for facility in facilities %}
                 {% if facility.facility_id == search_field_data["facility"] %}
                     <option value="{{facility.facility_id}}" selected>{{facility.name.capitalize()}}</option>
