@@ -11,7 +11,7 @@ import main.cookie_transaction as ct
 blueprint = flask.Blueprint("activities", __name__)
 
 
-@blueprint.route("/activities/classes", methods=["GET"])
+@blueprint.route("/activities/types", methods=["GET"])
 def view_classes_types():
     user, response = ct.return_user_response(flask.request, False)
     if response:
@@ -19,11 +19,10 @@ def view_classes_types():
 
     facilities = adf.return_facilities("Any")
     activity_types = adf.return_all_activity_types()
-    return flask.render_template("/activities/classes.html", User=user,
-                                 activity_types=activity_types, facilities=facilities)
+    return flask.render_template("/activities/activity_types.html", User=user,
+                                 activity_types=activity_types, facilities=facilities, page_title="Activities")
 
-
-@blueprint.route("/activities/view_classes", methods=["POST", "GET"])
+@blueprint.route("/activities/view_activities", methods=["POST", "GET"])
 def view_classes():
     user, response = ct.return_user_response(flask.request, False)
     if response:
@@ -88,12 +87,12 @@ def view_classes():
     search_field_data["facility"] = facility_id
     search_field_data["activity"] = activity_type_id
 
-    return flask.render_template("/activities/classes_all.html", User=user, activity_dict=activity_dict,
+    return flask.render_template("/activities/activities.html", User=user, activity_dict=activity_dict,
                                  activity_types=activity_types, facilities=facilities,
                                  search_field_data=search_field_data)
 
 
-@blueprint.route("/activities/view_class/<int:activity_id>", methods=["GET"])
+@blueprint.route("/activities/view_activity/<int:activity_id>", methods=["GET"])
 def view_class(activity_id: int):
     user, response = ct.return_user_response(flask.request, True)
     if response:
@@ -122,7 +121,7 @@ def view_class(activity_id: int):
         membership = Membership.query.filter_by(membership_id=membership).first().membership_type
         final_price = session_price * (1 - membership.discount/float(100))
 
-    return flask.render_template("/activities/class.html", activity=activity, session_price=round(session_price, 2),
+    return flask.render_template("/activities/activity.html", activity=activity, session_price=round(session_price, 2),
                                  spaces_left=spaces_left, membership=membership,
                                  final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8))
 
