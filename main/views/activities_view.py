@@ -34,10 +34,15 @@ def view_classes_types():
         return flask.render_template("/activities/activity_types.html", User=user,
                                      activity_types=activity_types, facilities=facilities, page_title="Activities")
 
-@blueprint.route('/activities/view_activities',  methods=["POST", "GET"])
+
+@blueprint.route('/activities/view_activities',  methods=["POST", "GET"], defaults={'multiple': False, 'sent_activity': 0})
 @blueprint.route('/activities/<sent_activity>_<multiple>',  methods=["POST", "GET"])
-def view_classes(multiple=False, sent_activity=0):
+def view_classes(multiple, sent_activity):
+    print(multiple)
+    print(type(multiple))
     sent_activity = int(sent_activity)
+
+
 
     user, response = ct.return_user_response(flask.request, False)
     if response:
