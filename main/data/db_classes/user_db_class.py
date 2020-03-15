@@ -43,17 +43,19 @@ class Employee(User):
     # invisible virtual attribute "allowed_roles" for many-to-many relationship
     # invisible virtual attribute "receipt_assist" for many-to-many relationship
 
+
 class Customer(User):
     __tablename__ = 'Customers'
 
     customer_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     user_id = database.Column(database.Integer, database.ForeignKey("Users.user_id"), nullable=False)
-    current_membership = database.Column(database.Integer, database.ForeignKey("Memberships.membership_id"))
+    current_membership_id = database.Column(database.Integer, database.ForeignKey("Memberships.membership_id"))
 
     __mapper_args__ = {
         'polymorphic_identity': 'Customer'
     }
 
+    current_membership = database.relation("Membership")
     purchases = database.relation("Receipt", backref="customer")
     payment_detail = database.relation("PaymentDetails", backref="customer", uselist=False, lazy=True)
 

@@ -4,3 +4,19 @@ Barbell -
 https://www.pexels.com/photo/person-holding-black-barbell-703014/
 Treadmill -
 https://www.pexels.com/photo/an-on-treadmill-1954524/
+
+activities-img:
+Basketball by ProSymbols from the Noun Project
+Badminton by ProSymbols from the Noun Project
+Boxing Kit by ProSymbols from the Noun Project
+Climbing by ProSymbols from the Noun Project
+Tennis by ProSymbols from the Noun Project
+swimmer by ProSymbols from the Noun Project
+Diving by ProSymbols from the Noun Project
+aquatics by ProSymbols from the Noun Project
+yoga by ProSymbols from the Noun Project
+taekwondo by ProSymbols from the Noun Project
+Trampoline by ProSymbols from the Noun Project
+Rugby by ProSymbols from the Noun Project
+Cricket by IconTrack from the Noun Project
+weightlifting by ProSymbols from the Noun Project

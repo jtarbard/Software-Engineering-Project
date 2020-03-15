@@ -1,0 +1,41 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+
+{% endblock %}
+
+{% block title %}
+Class!
+{% endblock %}
+
+{% block main_content %}
+<h2>{{activity.activity_type.name.capitalize()}}</h2>
+    <p>Details</p>
+    <ul>
+        <li>Start time: {{ activity.start_time }} </li>
+        <li>End time: {{ activity.end_time }} </li>
+        <li>Minimum age: {{ activity.activity_type.minimum_age }} </li>
+        <li>Spaces left: {{ spaces_left }}</li>
+        <li>Total price: £{{ session_price }}</li>
+        {% if membership %}
+            <li>You have {{ membership.name }} membership. {{ membership.discount }}% OFF!</li>
+            <li>Final price: £{{ final_price }}</li>
+        {% endif %}
+    </ul>
+    {% if spaces_left > 0 %}
+    <form action="/misc/add_booking_to_basket" method="post">
+        <label for="amount_of_people">Amount of people:</label>
+        <input type="number" name="amount_of_people" min="1" max="{{max_booking}}" value="1" required>
+            <!--TODO: Add start and end of session times-->
+        <input name="activity" type="hidden" value="{{ activity.activity_id }}">
+        <input type="submit" value="Book activity">
+    </form>
+    {% else %}
+            <p>Sorry but this activity is full </p>
+    {% endif %}
+    {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
+            <a class="btn-success" href="">Assign self to activity</a>
+    {% endif %}
+    {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+            <a class="btn-danger" href="">Remove activity</a>
+    {% endif %}
+{% endblock %}

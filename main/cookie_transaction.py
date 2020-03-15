@@ -81,7 +81,7 @@ def __hash_text(text: str) -> str:
 def add_activity_or_membership_to_basket(booking_object, request: flask.request, num_people=1, duration=None):
 
     if type(booking_object) is Activity:
-        response = flask.redirect("/activities/view_classes")
+        response = flask.redirect("/activities/types")
         if not num_people:
             return None
         if num_people < 1 or num_people > 8:

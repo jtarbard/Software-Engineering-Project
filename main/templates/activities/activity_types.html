@@ -1,0 +1,54 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/activity_types.css') }}">
+{% endblock %}
+
+{% block title %}
+The Vertex classes!
+{% endblock %}
+
+{% block main_content %}
+<div class="container">
+    <div class="row">
+            <div class="col-sm-12">
+            <a href="/activities/view_activities">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title text-center">View All Activities</h2>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="row no-gutters">
+            {% for activity in activity_types %}
+        <div class="col-md-2 c-img">
+            <img src="/static/imgs/activities-img/{{ activity.name }}.png" class="card-img" alt="Illustration of {{ activity.name }}">
+        </div>
+        <div class="col-md-4 c-body">
+            <div class="card-body">
+                <h2 class="card-title">{{ activity.name }}</h2>
+                <p class="card-text">
+                    {{ activity.definition }}
+                    <br>
+                    Capacity: {{ activity.max_space }}
+                </p>
+                <div class="tags">
+                    <p>Tags:</p>
+                    {% for tag in activity_types.tags %}
+                    <span class="badge badge-secondary">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                <div class="buttons">
+                    <form method="post">
+                    <input type="hidden" name="activity" value="{{ activity.activity_type_id }}">
+                    <button class="btn btn-dark" type="submit" name="amount" value="single">Book</button>
+                    <button class="btn btn-dark" type="submit" name="amount" value="multiple">Bulk Book</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
