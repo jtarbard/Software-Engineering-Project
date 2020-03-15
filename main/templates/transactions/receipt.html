@@ -18,10 +18,10 @@ The Vertex Receipt
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Class Name</td>
-                                <td>Class Start Time </td>
-                                <td>Class End Time</td>
-                                <td>Facility</td>
+                                <td><strong>Class Name</strong></td>
+                                <td><strong>Class Start Time</strong></td>
+                                <td><strong>Class End Time</strong></td>
+                                <td><strong>Facility</strong></td>
                             </tr>
                             {% for booking in returned_receipt.bookings %}
                                 <tr>
@@ -29,15 +29,36 @@ The Vertex Receipt
                                     <td>{{ booking.activity.start_time }}</td>
                                     <td>{{ booking.activity.end_time }}</td>
                                     <td>{{ booking.activity.facility.name }}</td>
-                        {% endfor %}
-                        <tr>
-                            <td colspan="4"></td>
-                            <td>Total Price:</td>
-                            <td>{{returned_receipt.total_cost}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+                                </tr>
+                            {% endfor %}
+                            <tr>
+                                <td colspan="4" rowspan="1"></td>
+                            </tr>
+                            {% if returned_receipt.membership %}
+                            <tr>
+                                <td colspan="4">Membership</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Membership Name</strong></td>
+                                <td><strong>Start Time</strong></td>
+                                <td><strong>End Time</strong></td>
+                                <td><strong>Discount</strong></td>
+                            </tr>
+                                <tr>
+                                    <td>{{returned_receipt.membership.membership_type.name}}</td>
+                                    <td>{{returned_receipt.membership.start_date}}</td>
+                                    <td>{{returned_receipt.membership.start_date}}</td>
+                                    <td>{{returned_receipt.membership.membership_type.discount}}</td>
+                                </tr>
+                            {% endif %}
+                            <tr>
+                                <td colspan="2"></td>
+                                <td>Total Price:</td>
+                                <td>{{returned_receipt.total_cost}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
             <form>
                 <input type="button" value="Print receipt" onclick="window.print()" class="no-print">
