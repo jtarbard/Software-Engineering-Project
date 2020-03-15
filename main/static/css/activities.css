@@ -1,10 +1,4 @@
-.card, .c-body{
-    margin-bottom: 5vh;
+.form-inline {
+    width: 80%
 }
-
-img {
-    object-fit: contain;
-    max-height: 20vh;
-}
-
 

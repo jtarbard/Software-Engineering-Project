@@ -1,5 +1,6 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/activities.css') }}">
 
 {% endblock %}
 
@@ -40,6 +41,10 @@ The Vertex classes!
         </select>
         <input type="submit" name="reload_search" value="Refresh results">
     </form>
+    <form>
+        {% if multiple == true %}
+            <button class="btn btn-primary" type="submit" name="book">Book</button>
+        {% endif %}
     <div class="table-responsive">
         <table class="table">
             <thead>
@@ -54,17 +59,22 @@ The Vertex classes!
                     <td>Availability left</td>
                     <td>Book</td>
                 </tr>
-                {% for activity, avalibility in activity_dict.items() %}
+                {% for activity, availability in activity_dict.items() %}
                     <tr>
                         <td>{{ activity.activity_type.name }}</td>
                         <td>{{ activity.start_time }}</td>
                         <td>{{ activity.end_time }}</td>
                         <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name }}</a></td>
-                        <td>{{ avalibility }}</td>
-                        <td><a class="btn-danger" href="/activities/view_activity/{{ activity.activity_id }}">Book</a></td>
+                        <td>{{ availability }}</td>
+                        {% if multiple == true %}
+                        <td><input type="checkbox" id="{{activity.activity_id}}" name="{{activity.activity_id}}" value="{{activity.activity_id}}"></td>
+                        {% else %}
+                        <td><a class="btn btn-danger" href="/activities/view_activity/{{ activity.activity_id }}">Book</a></td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>
+            </form>
         </table>
     </div>
 {% endblock %}
