@@ -49,11 +49,7 @@ def view_classes(multiple, sent_activity: int):
 
     bulk_activities = data_form.getlist("bulk_activity")
 
-    print(bulk_activities)
-
     if bulk_activities:
-        print(type(bulk_activities))
-
         is_valid, basket_activities, basket_membership, basket_membership_duration = \
             tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
@@ -92,14 +88,10 @@ def view_classes(multiple, sent_activity: int):
                 return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
                                              User=user)
 
-        print(added_activities)
-
         response = ct.add_activities(added_activities, flask.request)
 
         if not response:
             return flask.abort(500)
-
-        print(added_activities)
 
         return response
 
@@ -355,8 +347,6 @@ def basket_delete_activity():
 
     if len(item) != num_items:
         return flask.abort(500)
-
-    print(item[1])
 
     response = ct.change_items_with_id_from_cookie(item[1], num_change, flask.redirect("/account/basket"),
                                                    flask.request, is_activity=is_activity)

@@ -82,8 +82,9 @@ def card_payment_post():
         customer = udf.return_customer_with_email(customer_email)
 
     check_box = flask.request.form.get("remember_card_details")
+
     if check_box == "on":
-        if customer.payment_detail is not None:
+        if customer.payment_detail:
             payment_detail = customer.payment_detail
         else:
             payment_detail = PaymentDetails()
@@ -98,7 +99,7 @@ def card_payment_post():
         payment_detail.postcode = data_form.get('postcode')
         add_to_database(payment_detail)
 
-    elif customer.payment_detail is not None:
+    elif customer.payment_detail:
         delete_from_database(customer.payment_detail)
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
