@@ -280,14 +280,27 @@ def basket_view():
         response.set_cookie("vertex_basket_cookie", new_activities_basket, max_age=datetime.timedelta(days=1))
         return response
 
+    activity_type_count = [0 for activity in adf.return_all_activity_types()]
+    for activity in basket_activities:
+        activity_type_count[activity.activity_type_id] += 1
+
     activity_and_price = dict()
     total_activity_price = 0
     for activity in basket_activities:
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
         number_of_activities = basket_activities.count(activity)
-        activity_and_price[activity] = (current_price, number_of_activities)
-        total_activity_price += current_price
+        num_activity_type = activity_type_count[activity.activity_type_id]
+        if num_activity_type >= 3:
+            bulk_discount = 0.15
+        elif num_activity_type >= 5:
+            bulk_discount = 0.3
+        elif num_activity_type >= 10:
+            bulk_discount = 0.5
+        else:
+            bulk_discount = 1
+        activity_and_price[activity] = (current_price, number_of_activities, bulk_discount)
+        total_activity_price += current_price - (current_price * bulk_discount)
 
     current_membership_discount = 0
     total_discounted_price = 0

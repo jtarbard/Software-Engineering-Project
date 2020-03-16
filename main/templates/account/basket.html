@@ -27,6 +27,7 @@ The Vertex payments!
                             <td>Facility</td>
                             <td>Number of Bookings</td>
                             <td>Price Per Item</td>
+                            <td>Bulk discount</td>
                             <td>Sub-Price</td>
                             <td>Update</td>
                         </tr>
@@ -38,7 +39,8 @@ The Vertex payments!
                                 <td>{{ activity.facility.name.capitalize() }}</td>
                                 <td>{{ tuple[1] }}</td>
                                 <td>£{{ tuple[0] }}</td>
-                                <td>£{{ tuple[1] * tuple[0] }}</td>
+                                <td>{{ tuple[2] * 100 }}%</td>
+                                <td>£{{ (tuple[1] * tuple[0])- (tuple[1] * tuple[0]* tuple[2]) }}</td>
                                 <td>    
                                     <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
                                         <input type="number" name="num_change" max="8" min="0" value="{{tuple[1]}}">
