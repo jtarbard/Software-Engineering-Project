@@ -161,7 +161,15 @@ def change_items_with_id_from_cookie(id: int, num_change: int, response: flask, 
 
         if split_instance[1] == id:
             if (is_activity and split_instance[0] == "A") or (not is_activity and split_instance[0] == "M"):
+                if num_change <= 0:
+                    continue
+                if len(new_basket) == 0:
+                    new_basket = "A:" + str(id)
+                else:
+                    new_basket += ";A:" + str(id)
+                num_change -= 1
                 continue
+
         if len(new_basket) == 0:
             new_basket = basket_instance
         else:
@@ -192,9 +200,6 @@ def add_activities(added_activities, request):
 
     for activity in added_activities:
         basket_to_add += ";" + "A:" + str(activity.activity_id)
-
-
-
 
     response.set_cookie("vertex_basket_cookie", current_basket+basket_to_add, max_age=datetime.timedelta(days=1))
     return response

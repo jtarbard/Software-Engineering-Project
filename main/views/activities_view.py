@@ -298,8 +298,6 @@ def basket_view():
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
-        print(customer)
-        print(customer.current_membership)
         if customer and customer.current_membership is not None:
             customer_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
 
@@ -344,6 +342,9 @@ def basket_delete_activity():
 
     if len(item) != num_items:
         return flask.abort(500)
+
+    print(item[1])
+
     response = ct.change_items_with_id_from_cookie(item[1], num_change, flask.redirect("/account/basket"),
                                                    flask.request, is_activity=is_activity)
 
