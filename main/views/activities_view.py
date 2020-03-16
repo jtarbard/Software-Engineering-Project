@@ -281,7 +281,7 @@ def basket_view():
         return response
 
     activity_type_count = [0 for activity in adf.return_all_activity_types()]
-    for activity in basket_activities:
+    for activity in list(dict.fromkeys(basket_activities)):
         activity_type_count[activity.activity_type_id] += 1
 
     activity_and_price = dict()
@@ -291,14 +291,14 @@ def basket_view():
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
         number_of_activities = basket_activities.count(activity)
         num_activity_type = activity_type_count[activity.activity_type_id]
-        if num_activity_type >= 3:
-            bulk_discount = 0.15
+        if num_activity_type >= 10:
+            bulk_discount = 0.5
         elif num_activity_type >= 5:
             bulk_discount = 0.3
-        elif num_activity_type >= 10:
-            bulk_discount = 0.5
+        elif num_activity_type >= 3:
+            bulk_discount = 0.15
         else:
-            bulk_discount = 1
+            bulk_discount = 0
         activity_and_price[activity] = (current_price, number_of_activities, bulk_discount)
         total_activity_price += current_price - (current_price * bulk_discount)
 
