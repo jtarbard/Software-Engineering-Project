@@ -41,7 +41,7 @@ The Vertex classes!
         </select>
         <input type="submit" name="reload_search" value="Refresh results">
     </form>
-    <form>
+    <form method="post">
         {% if multiple == 'True' %}
             <button class="btn btn-primary" type="submit" name="book">Book</button>
         {% endif %}
@@ -67,7 +67,9 @@ The Vertex classes!
                         <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name }}</a></td>
                         <td>{{ availability }}</td>
                         {% if multiple == 'True' %}
-                            <td><input type="checkbox" id="{{activity.activity_id}}" name="{{activity.activity_id}}" value="{{activity.activity_id}}"></td>
+                                <td>
+                                    <input type="checkbox" id="{{activity.activity_id}}" name="bulk_activity" value="{{activity.activity_id}}">
+                                </td>
                         {% else %}
                             <td><a class="btn btn-danger" href="/activities/view_activity/{{ activity.activity_id }}">Book</a></td>
                         {% endif %}

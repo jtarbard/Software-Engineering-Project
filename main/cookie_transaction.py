@@ -176,3 +176,25 @@ def change_items_with_id_from_cookie(id: int, num_change: int, response: flask, 
 
     response.set_cookie("vertex_basket_cookie", new_basket, max_age=datetime.timedelta(days=1))
     return response
+
+
+def add_activities(added_activities, request):
+    response = flask.redirect("/activities/types")
+    basket_to_add = ""
+    current_basket = ""
+
+    if "vertex_basket_cookie" not in request.cookies:
+        basket_to_add += "A:" + str(added_activities[0].activity_id)
+        del added_activities[0]
+
+    else:
+        current_basket = request.cookies["vertex_basket_cookie"]
+
+    for activity in added_activities:
+        basket_to_add += ";" + "A:" + str(activity.activity_id)
+
+
+
+
+    response.set_cookie("vertex_basket_cookie", current_basket+basket_to_add, max_age=datetime.timedelta(days=1))
+    return response

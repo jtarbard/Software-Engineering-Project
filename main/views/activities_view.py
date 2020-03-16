@@ -5,6 +5,7 @@ import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
 import main.data.transactions.employee_data_transaction as edf
+from main.data.db_classes.activity_db_class import Activity
 from main.data.db_classes.transaction_db_class import Membership
 from main.data.db_classes.user_db_class import Customer
 import main.cookie_transaction as ct
@@ -35,20 +36,72 @@ def view_classes_types():
                                      activity_types=activity_types, facilities=facilities, page_title="Activities")
 
 
-@blueprint.route('/activities/view_activities',  methods=["POST", "GET"], defaults={'multiple': False, 'sent_activity': 0})
-@blueprint.route('/activities/<sent_activity>_<multiple>',  methods=["POST", "GET"])
-def view_classes(multiple, sent_activity):
-    print(multiple)
-    print(type(multiple))
+@blueprint.route('/activities/view_activities', methods=["POST", "GET"], defaults={'multiple': False, 'sent_activity': 0})
+@blueprint.route('/activities/<sent_activity>_<multiple>', methods=["POST", "GET"])
+def view_classes(multiple, sent_activity: int):
     sent_activity = int(sent_activity)
-
-
 
     user, response = ct.return_user_response(flask.request, False)
     if response:
         return response
 
     data_form = flask.request.form
+
+    bulk_activities = data_form.getlist("bulk_activity")
+
+    print(bulk_activities)
+
+    if bulk_activities:
+        print(type(bulk_activities))
+
+        is_valid, basket_activities, basket_membership, basket_membership_duration = \
+            tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+
+        if not is_valid:
+            response = flask.redirect("/")
+            response.set_cookie("vertex_basket_cookie", "", max_age=0)
+            return response
+
+        if basket_activities:
+            if (basket_membership and len(basket_activities) > 14) or len(
+                    basket_activities) > 15:
+                return flask.render_template("/misc/general_error.html", error="Basket full", User=user)
+
+        try:
+            activity_type = adf.return_activity_with_id(bulk_activities[0]).activity_type
+        except:
+            return flask.abort(500)
+
+        added_activities = []
+        for activity_id in bulk_activities:
+            added_activity: Activity = adf.return_activity_with_id(activity_id)
+            if not added_activity:
+                return flask.abort(500)
+
+            if activity_type != added_activity.activity_type:
+                return flask.abort(500)
+
+            if added_activity in added_activities:
+                return flask.abort(500)
+
+            added_activities.append(added_activity)
+            spaces_left = activity_type.maximum_activity_capacity - len(
+                tdf.return_bookings_with_activity_id(activity_id))
+
+            if spaces_left <= 0:
+                return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
+                                             User=user)
+
+        print(added_activities)
+
+        response = ct.add_activities(added_activities, flask.request)
+
+        if not response:
+            return flask.abort(500)
+
+        print(added_activities)
+
+        return response
 
     start_time = data_form.get("start_time")
     start_date = data_form.get("start_date")
