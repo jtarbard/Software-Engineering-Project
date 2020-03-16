@@ -146,13 +146,28 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
 
     total_price = 0
 
+    activity_type_count = [0 for activity in adf.return_all_activity_types()]
+    for activity in list(dict.fromkeys(basket_activities)):
+        activity_type_count[activity.activity_type_id] += 1
+
     for activity in basket_activities:
         new_booking = Booking()
         new_booking.activity_id = activity.activity_id
         new_booking.receipt_id = new_receipt.receipt_id
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
-        total_price += current_price
+
+        num_activity_type = activity_type_count[activity.activity_type_id]
+        if num_activity_type >= 10:
+            bulk_discount = 0.5
+        elif num_activity_type >= 5:
+            bulk_discount = 0.3
+        elif num_activity_type >= 3:
+            bulk_discount = 0.15
+        else:
+            bulk_discount = 0
+
+        total_price += current_price - current_price*bulk_discount
         add_to_database(new_booking)
 
     if basket_membership:

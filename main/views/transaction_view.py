@@ -83,7 +83,6 @@ def card_payment_post():
 
     check_box = flask.request.form.get("remember_card_details")
     if check_box == "on":
-        payment_detail = None
         if customer.payment_detail is not None:
             payment_detail = customer.payment_detail
         else:
