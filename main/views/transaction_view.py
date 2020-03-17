@@ -55,6 +55,7 @@ def card_payment_post():
             return flask.render_template("/transactions/pay_card.html",
                                      total_price=total_price, User=user, customer=customer,
                                      payment_dictionary=payment_dictionary, error=error, type=type, checkout=True)
+
         elif type == "cash":
             if user.__mapper_args__['polymorphic_identity'] == "Customer":
                 return flask.abort(500)
@@ -106,9 +107,7 @@ def card_payment_post():
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid or not (basket_activities or basket_membership):
-        response = flask.redirect("/")
-        response.set_cookie("vertex_basket_cookie", "", max_age=0)
-        return response
+        return cl.destroy_basket_cookie(response)
 
     new_user = user
     if user.__mapper_args__['polymorphic_identity'] != "Customer":

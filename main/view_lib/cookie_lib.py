@@ -20,7 +20,7 @@ def return_user_response(request: flask.request, needs_login: bool):
         if not user:  # If the customer is not in the database, then that customer has been deleted, but the user
             # still has an account cookie, therefore the cookie must be destroyed as it is no longer valid
             response = flask.redirect('/account/login')
-            destroy_cookie(response)
+            destroy_account_cookie(response)
     elif needs_login:
         response = flask.redirect('/account/login')
 
@@ -36,10 +36,15 @@ def set_auth(response: Response, user_id: int):
     val = "{}:{}".format(user_id, hash_val)  # Sets the user's id as well as hash value
     response.set_cookie("vertex_account_cookie", val, max_age=datetime.timedelta(days=30))  # Sets cookie
 
-# TODO: Add cookie name parameter
+
 # Destroys the user's account cookie, this is mainly utilised when the user wants to log out
-def destroy_cookie(response: Response):
+def destroy_account_cookie(response: Response):
     response.set_cookie("vertex_account_cookie", "", expires=0)  # Sets cookie to expire immediately
+
+
+# Destroys the user's basket cookie, used if clearing the user's basket or if the cookie is invalid
+def destroy_basket_cookie(response: Response):
+    response.set_cookie("vertex_basket_cookie", "", expires=0)  # Sets cookie to expire immediately
 
 
 # Validates that the user has a valid cookie, if so, then the user can access their account
@@ -65,7 +70,7 @@ def check_valid_account_cookie(request: flask.request):
     except ValueError:
         response: Response = flask.redirect("/login")  # If there is an error, then the cookie is invalid and is destroyed
         log_transaction(f"IP:{request.access_route} contains invalid cookie")
-        destroy_cookie(response)
+        destroy_account_cookie(response)
     else:
         return user_id # User_id is returned and the customer can successful access their account data
 

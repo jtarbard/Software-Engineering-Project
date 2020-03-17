@@ -195,7 +195,7 @@ def view_account():
 @blueprint.route("/account/log_out")
 def log_out():
     response = flask.redirect("/")
-    cl.destroy_cookie(response)  # User cookie is destroyed and they are logged out
+    cl.destroy_account_cookie(response)  # User cookie is destroyed and they are logged out
     if "vertex_basket_cookie" in flask.request.cookies:
         response.set_cookie("vertex_basket_cookie", "", expires=0)
     return response
