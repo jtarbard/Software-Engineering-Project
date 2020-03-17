@@ -48,9 +48,10 @@ def view_classes(multiple, sent_activity: int):
 
     bulk_activities = data_form.getlist("bulk_activity")
 
+    is_valid, basket_activities, basket_membership, basket_membership_duration = \
+        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+
     if bulk_activities:
-        is_valid, basket_activities, basket_membership, basket_membership_duration = \
-            tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
         if not is_valid:
             return cl.destroy_account_cookie(flask.redirect("/"))
@@ -140,8 +141,12 @@ def view_classes(multiple, sent_activity: int):
 
     for i, activity in enumerate(activity_list):
         activity_capacity = adf.return_activity_capacity_with_activity_type_id(activity.activity_type_id)
-        activity_dict[activity_list[i]] = (
-                activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id)))
+        amount_in_basket = basket_activities.count(activity)
+        if amount_in_basket >= 8:
+            continue
+        activity_dict[activity_list[i]] = (activity_capacity -
+                                           len(tdf.return_bookings_with_activity_id(activity.activity_id))-
+                                           amount_in_basket)
 
     search_field_data = {}
     search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
