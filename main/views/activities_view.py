@@ -53,9 +53,7 @@ def view_classes(multiple, sent_activity: int):
             tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
         if not is_valid:
-            response = flask.redirect("/")
-            response.set_cookie("vertex_basket_cookie", "", max_age=0)
-            return response
+            return cl.destroy_account_cookie(flask.redirect("/"))
 
         if basket_activities:
             if (basket_membership and len(basket_activities) > 14) or len(

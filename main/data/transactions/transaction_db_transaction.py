@@ -1,15 +1,15 @@
 # Holds all functions related to the users of the website and the transactions with the database
 import flask
 import datetime
-from main.data.db_session import session, add_to_database
+from main.data.db_session import add_to_database
 from main.logger import log_transaction
 from main.data.db_classes.transaction_db_class import MembershipType, Receipt, Membership
 from main.data.db_classes.activity_db_class import Activity
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 from main.data.db_classes.transaction_db_class import Booking
-from main.data.db_classes.user_db_class import User, Customer
-
+from main.data.db_classes.user_db_class import User, Customer, PaymentDetails
+import main.view_lib.basket_lib as bl
 
 #  A simple function that returns a list of all the membership types currently in the gym
 def return_all_membership_types():
@@ -146,9 +146,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
 
     total_price = 0
 
-    activity_type_count = [0 for activity in adf.return_all_activity_types()]
-    for activity in list(dict.fromkeys(basket_activities)):
-        activity_type_count[activity.activity_type_id] += 1
+    activity_type_count = bl.return_activity_type_count_from_activity_list(basket_activities)
 
     for activity in basket_activities:
         new_booking = Booking()
@@ -157,17 +155,9 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
 
-        num_activity_type = activity_type_count[activity.activity_type_id]
-        if num_activity_type >= 10:
-            bulk_discount = 0.5
-        elif num_activity_type >= 5:
-            bulk_discount = 0.3
-        elif num_activity_type >= 3:
-            bulk_discount = 0.15
-        else:
-            bulk_discount = 0
+        bulk_discount = bl.return_bulk_discount(activity, activity_type_count=activity_type_count)
 
-        total_price += current_price - current_price*bulk_discount
+        total_price += current_price - (current_price * bulk_discount)
         add_to_database(new_booking)
 
     if basket_membership:
@@ -220,5 +210,27 @@ def set_deletion_for_receipt_bookings_with_activity(receipt, activity):
     for booking in booking_to_delete:
         booking.deleted = True
         add_to_database(booking)
+
+    return True
+
+
+# [Lewis S]
+# Adds a customers card details to the database as well as connecting to the customer table for an key relationship
+def add_new_card_details(card_number, start_date, expiration_date, street_and_number, town, city,
+                         postcode, customer_obj: Customer):
+
+    payment_detail = PaymentDetails()
+
+    payment_detail.card_number = card_number
+    payment_detail.start_date = start_date
+    payment_detail.expiration_date = expiration_date
+    payment_detail.street_and_number = street_and_number
+    payment_detail.town = town
+    payment_detail.city = city
+    payment_detail.postcode = postcode
+    add_to_database(payment_detail)
+
+    customer_obj.payment_detail = payment_detail
+    add_to_database(customer_obj)
 
     return True

@@ -6,6 +6,7 @@ import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
 from main.data.db_classes.transaction_db_class import Membership
 import main.view_lib.cookie_lib as cl
+import main.view_lib.basket_lib as bl
 
 blueprint = flask.Blueprint("basket", __name__)
 
@@ -27,9 +28,7 @@ def view_classes_post():
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
-        response = flask.redirect("/")
-        response.set_cookie("vertex_basket_cookie", "", max_age=0)
-        return response
+        return cl.destroy_account_cookie(flask.redirect("/"))
 
     if basket_activities:
         if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(
@@ -59,9 +58,7 @@ def basket_view():
         = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
-        response = flask.redirect("/account/basket")
-        response.set_cookie("vertex_basket_cookie", "", max_age=0)
-        return response
+        return cl.destroy_account_cookie(flask.redirect("/account/basket"))
 
     if not (basket_activities or basket_membership):
         return flask.render_template("/account/basket.html", User=user)
@@ -84,9 +81,7 @@ def basket_view():
         response.set_cookie("vertex_basket_cookie", new_activities_basket, max_age=datetime.timedelta(days=1))
         return response
 
-    activity_type_count = [0 for activity in adf.return_all_activity_types()]
-    for activity in list(dict.fromkeys(basket_activities)):
-        activity_type_count[activity.activity_type_id] += 1
+    activity_type_count = bl.return_activity_type_count_from_activity_list(basket_activities)
 
     activity_and_price = dict()
     total_activity_price = 0
@@ -94,15 +89,9 @@ def basket_view():
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
         number_of_activities = basket_activities.count(activity)
-        num_activity_type = activity_type_count[activity.activity_type_id]
-        if num_activity_type >= 10:
-            bulk_discount = 0.5
-        elif num_activity_type >= 5:
-            bulk_discount = 0.3
-        elif num_activity_type >= 3:
-            bulk_discount = 0.15
-        else:
-            bulk_discount = 0
+
+        bulk_discount = bl.return_bulk_discount(activity, activity_type_count=activity_type_count)
+
         activity_and_price[activity] = (current_price, number_of_activities, bulk_discount)
         total_activity_price += current_price - (current_price * bulk_discount)
 
@@ -115,7 +104,7 @@ def basket_view():
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
-        if customer and customer.current_membership is not None:
+        if customer and customer.current_membership:
             customer_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
 
             total_discounted_price = total_activity_price - \
@@ -141,6 +130,10 @@ def basket_delete_activity():
         return response
 
     data_form = flask.request.form
+
+    if data_form.get("delete_basket"):
+        return cl.destroy_basket_cookie(flask.redirect("/account/basket"))
+
     booking = data_form.get("update")
     booking_data = data_form.get("booking_id")
     num_change = int(data_form.get("num_change"))

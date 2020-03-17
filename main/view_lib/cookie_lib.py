@@ -38,13 +38,15 @@ def set_auth(response: Response, user_id: int):
 
 
 # Destroys the user's account cookie, this is mainly utilised when the user wants to log out
-def destroy_account_cookie(response: Response):
+def destroy_account_cookie(response: Response) -> Response:
     response.set_cookie("vertex_account_cookie", "", expires=0)  # Sets cookie to expire immediately
+    return response
 
 
 # Destroys the user's basket cookie, used if clearing the user's basket or if the cookie is invalid
-def destroy_basket_cookie(response: Response):
+def destroy_basket_cookie(response: Response) -> Response:
     response.set_cookie("vertex_basket_cookie", "", expires=0)  # Sets cookie to expire immediately
+    return response
 
 
 # Validates that the user has a valid cookie, if so, then the user can access their account

@@ -1,5 +1,4 @@
 import flask
-from flask import current_app as app
 
 blueprint = flask.Blueprint("misc", __name__)
 

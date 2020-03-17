@@ -3,7 +3,7 @@ import flask
 import datetime
 import main.data.transactions.user_db_transaction as udf
 import main.view_lib.cookie_lib as cl
-from main.data.db_classes.transaction_db_class import Receipt, Booking, MembershipType, Membership
+from main.data.db_classes.transaction_db_class import MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer
 
 blueprint = flask.Blueprint("account", __name__)

@@ -2,7 +2,6 @@ import datetime
 
 import flask
 import main.view_lib.cookie_lib as cl
-import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as db_transaction
 from main.data.db_classes.activity_db_class import Facility
 from main.data.db_classes.user_db_class import Customer
@@ -53,9 +52,7 @@ def buy_membership():
         db_transaction.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
-        response = flask.redirect("/")
-        response.set_cookie("vertex_basket_cookie", "", max_age=0)
-        return response
+        return cl.destroy_account_cookie(flask.redirect("/"))
 
     new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
     response = cl.add_activity_or_membership_to_basket(

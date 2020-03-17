@@ -4,17 +4,17 @@ from PIL import Image
 import flask
 import datetime
 from flask import current_app as app
-from flask_mail import Message, Mail
-import qrcode
+from flask_mail import Mail
 
 
+import main.view_lib.transaction_lib as tl
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
 import main.view_lib.cookie_lib as cl
+import main.data.db_session as ds
 from main.data.db_classes.transaction_db_class import Receipt
-from main.data.db_classes.user_db_class import Customer, PaymentDetails, Employee
-from main.data.db_session import add_to_database, delete_from_database
+from main.data.db_classes.user_db_class import Employee
 
 blueprint = flask.Blueprint("transaction", __name__)
 
@@ -42,14 +42,8 @@ def card_payment_post():
             else:
                 customer = udf.return_customer_with_email(customer_email)
 
-            if customer.payment_detail is not None:
-                payment_dictionary["card_number"] = customer.payment_detail.card_number
-                payment_dictionary["start_date"] = customer.payment_detail.start_date
-                payment_dictionary["expiration_date"] = customer.payment_detail.expiration_date
-                payment_dictionary["street_and_number"] = customer.payment_detail.street_and_number
-                payment_dictionary["town"] = customer.payment_detail.town
-                payment_dictionary["city"] = customer.payment_detail.city
-                payment_dictionary["postcode"] = customer.payment_detail.postcode
+            if customer.payment_detail:
+                payment_dictionary = vars(customer.payment_detail)
 
             return flask.render_template("/transactions/pay_card.html",
                                      total_price=total_price, User=user, customer=customer,
@@ -84,23 +78,12 @@ def card_payment_post():
     check_box = flask.request.form.get("remember_card_details")
 
     if check_box == "on":
-        if customer.payment_detail:
-            payment_detail = customer.payment_detail
-        else:
-            payment_detail = PaymentDetails()
-            customer.payment_detail = payment_detail
-
-        payment_detail.card_number = data_form.get('card_number')
-        payment_detail.start_date = data_form.get('start_date')
-        payment_detail.expiration_date = data_form.get('expiration_date')
-        payment_detail.street_and_number = data_form.get('street_and_number')
-        payment_detail.town = data_form.get('town')
-        payment_detail.city = data_form.get('city')
-        payment_detail.postcode = data_form.get('postcode')
-        add_to_database(payment_detail)
+        tdf.add_new_card_details(data_form.get('card_number'), data_form.get('start_date'),
+                                 data_form.get('expiration_date'), data_form.get('street_and_number'),
+                                 data_form.get('town'), data_form.get('city'), data_form.get('postcode'), customer)
 
     elif customer.payment_detail:
-        delete_from_database(customer.payment_detail)
+        ds.delete_from_database(customer.payment_detail)
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
@@ -128,14 +111,13 @@ def card_payment_post():
     if user.__mapper_args__['polymorphic_identity'] == "Employee":
         employee = udf.return_employee_with_user_id(user.user_id)
         employee.receipt_assist.append(receipt)
-        add_to_database(employee)
+        ds.add_to_database(employee)
 
     encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         response = flask.redirect(f"/transactions/view_individual_receipts/{receipt_id}")
     else:
-        encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
         response = flask.redirect(f"/transactions/receipts/{encrypted_receipt}")
 
     with app.app_context():
@@ -149,76 +131,11 @@ def card_payment_post():
 
         mail = Mail(app)
 
-        message = Message(f"Vertex Booking Receipt", recipients=[f"{new_user.email}"])
-        message.html = """"<h1>Thank you for purchasing at The Vertex</h1> <br>
-                           <h3>Receipt:</h3>
-                           <table> 
-                                <thead>
-                                    <tr><td colspan="4"><h6> Classes brought &nbsp</h6></td></tr>
-                                </head>
-                                <tbody> 
-                                    <tr> 
-                                        <td><strong>Class Name &nbsp</strong></td>
-                                        <td><strong>Class Start Time &nbsp</strong></td>
-                                        <td><strong>Class End Time &nbsp</strong></td>
-                                        <td><strong>Facility &nbsp</strong></td>
-                                    </tr>
-                                    <tr>
-                                    """
-        for booking in receipt.bookings:
-            message.html += f"""
-                <tr>
-                    <td>{ booking.activity.activity_type.name }</td>
-                    <td>{ booking.activity.start_time }</td>
-                    <td>{ booking.activity.end_time }</td>
-                    <td>{ booking.activity.facility.name }</td>
-                <tr>
-                """
-
-        if receipt.membership:
-            message.html += f"""
-                <tr>
-                    <td colspan="4" rowspan="1"></td>
-                </tr>
-                <tr>
-                    <td colspan="4"><h6>Membership</h6></td>
-                </tr>
-                <tr> 
-                    <td><strong>Membership Name &nbsp</strong></td>
-                    <td><strong>Start Time &nbsp</strong></td>
-                    <td><strong>End Time &nbsp</strong></td>
-                    <td><strong>Discount &nbsp</strong></td>
-                </tr>
-                <tr> 
-                    <td>{receipt.membership.membership_type.name} &nbsp</td>
-                    <td>{receipt.membership.start_date} &nbsp</td>
-                    <td>{receipt.membership.start_date} &nbsp</td>
-                    <td>{receipt.membership.membership_type.discount} &nbsp</td>
-                </tr>
-            """
-        message.html += f"""
-                <tr>
-                    <td colspan="2"></td>
-                    <td><strong>Total Price: &nbsp</strong></td>
-                    <td>{receipt.total_cost}</td>
-                </tr>
-            </tbody>
-        </table>
-        """
+        message = tl.return_email_message(receipt, new_user)
 
         file_direct = os.path.join("tmp", str(user.user_id) + datetime.datetime.now().strftime("-%m-%d-%Y-%H-%M-%S") + ".png")
 
-        qr = qrcode.QRCode(
-            version=1,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
-            box_size=10,
-            border=4,
-        )
-        qr.add_data(encrypted_receipt)
-        qr.make(fit=True)
-
-        img = qr.make_image(fill_color="black", back_color="white")
-        img.save(file_direct)
+        tl.create_new_qrcode_image(file_direct, encrypted_receipt)
 
         with app.open_resource("../"+file_direct) as fp:
             message.attach("Vertex_Receipt_"+str(receipt_id), "image/png", fp.read())
@@ -230,7 +147,7 @@ def card_payment_post():
 
         os.remove(file_direct)
 
-    response.set_cookie("vertex_basket_cookie", "", max_age=0)
+    response = cl.destroy_basket_cookie(response)
     return response
 
 
