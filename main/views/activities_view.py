@@ -141,12 +141,18 @@ def view_classes(multiple, sent_activity: int):
 
     for i, activity in enumerate(activity_list):
         activity_capacity = adf.return_activity_capacity_with_activity_type_id(activity.activity_type_id)
-        amount_in_basket = basket_activities.count(activity)
-        if amount_in_basket >= 8:
+        if basket_activities:
+            amount_in_basket = basket_activities.count(activity)
+            if amount_in_basket >= 8:
+                continue
+        else:
+            amount_in_basket = 0
+
+        avaliability = (activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id)) - amount_in_basket)
+        if avaliability <= 0:
             continue
-        activity_dict[activity_list[i]] = (activity_capacity -
-                                           len(tdf.return_bookings_with_activity_id(activity.activity_id))-
-                                           amount_in_basket)
+
+        activity_dict[activity_list[i]] = avaliability
 
     search_field_data = {}
     search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
