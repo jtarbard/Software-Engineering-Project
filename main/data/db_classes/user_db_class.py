@@ -1,6 +1,5 @@
 from datetime import datetime
 from main.data.db_session import database
-from main.data.db_classes.transaction_db_class import receipt_employee
 
 
 # Class mapped to the user table in the database, this is the parent class to the: customer, employee and

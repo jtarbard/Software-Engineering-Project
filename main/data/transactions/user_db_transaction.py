@@ -1,12 +1,7 @@
 # Holds all functions related to the users of the website and the transactions with the database
-import flask
-import hashlib
-import datetime
 import main.data.db_session as db
 
-from flask import Response
 from passlib.handlers.sha2_crypt import sha512_crypt as crypto
-from main.data.db_classes.transaction_db_class import Receipt
 from main.data.db_classes.user_db_class import Customer, User, Employee, Manager
 from main.logger import log_transaction
 
