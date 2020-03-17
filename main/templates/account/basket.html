@@ -148,6 +148,7 @@ The Vertex payments!
              <input type="hidden" name="total_price" value="{{final_price}}">
              <input type="hidden" name="payment_type" value="card">
         </form>
+
         {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
             <form method="post" action="/transactions/pay-card">
             <input type="submit" name="submit" value="Pay With Cash">
@@ -156,6 +157,12 @@ The Vertex payments!
                 <input type="hidden" name="payment_type" value="cash">
         </form>
         {% endif %}
+
+        <br>
+
+        <form method="post">
+            <input type="submit" name="delete_basket" value="Delete all items">
+        </form>
     {% endif %}
 {% endblock %}
 

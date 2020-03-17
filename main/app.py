@@ -13,6 +13,7 @@ def register_blueprints():
     from main.views import account_view
     from main.views import transaction_view
     from main.views import activities_view
+    from main.views import basket_view
 
     flask_app.register_blueprint(index_view.blueprint)
     flask_app.register_blueprint(misc_view.blueprint)
@@ -20,6 +21,7 @@ def register_blueprints():
     flask_app.register_blueprint(account_view.blueprint)
     flask_app.register_blueprint(transaction_view.blueprint)
     flask_app.register_blueprint(activities_view.blueprint)
+    flask_app.register_blueprint(basket_view.blueprint)
 
 
 # Database is setup
@@ -54,6 +56,14 @@ def configure():
     else:
         print("Database already populated")
 
+    print("Configuring error handling pages")
+
+    import main.view_lib.misc_lib as ml
+
+    flask_app.register_error_handler(404, ml.page_not_found)
+    flask_app.register_error_handler(405, ml.page_not_found)
+    flask_app.register_error_handler(500, ml.page_error)
+
     print("Starting application:")
 
 
@@ -62,3 +72,4 @@ if __name__ == '__main__':
     flask_app.run(debug=True)
 else:
     configure()
+

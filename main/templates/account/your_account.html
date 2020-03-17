@@ -9,8 +9,6 @@
 
 {% block main_content %}
     <h2>Welcome: {{ User.first_name }} ({{ User.__mapper_args__ ['polymorphic_identity'] }} account)</h2>
-    <a href="/account/log_out">Log out</a><br>
-    <a href="/">Return to index</a><br>
     {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
 
     {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
