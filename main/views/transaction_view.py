@@ -30,6 +30,12 @@ def card_payment_post():
     type = data_form.get("payment_type")
     customer_email = data_form.get("customer_email")
 
+    is_valid, basket_activities, basket_membership, basket_membership_duration = \
+        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+
+    if not (basket_activities or basket_membership) or not is_valid:
+        return flask.redirect("/")
+
     if checkout:
         total_price = data_form.get('total_price')
 
@@ -84,12 +90,6 @@ def card_payment_post():
 
     elif customer.payment_detail:
         ds.delete_from_database(customer.payment_detail)
-
-    is_valid, basket_activities, basket_membership, basket_membership_duration = \
-        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
-
-    if not is_valid or not (basket_activities or basket_membership):
-        return cl.destroy_basket_cookie(response)
 
     new_user = user
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
@@ -148,6 +148,10 @@ def card_payment_post():
         os.remove(file_direct)
 
     response = cl.destroy_basket_cookie(response)
+    response.headers["Last-Modified"] = datetime.datetime.now()
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "-1"
     return response
 
 
