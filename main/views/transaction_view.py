@@ -12,7 +12,7 @@ import qrcode
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
-import main.cookie_transaction as ct
+import main.view_lib.cookie_lib as cl
 from main.data.db_classes.transaction_db_class import Receipt
 from main.data.db_classes.user_db_class import Customer, PaymentDetails, Employee
 from main.data.db_session import add_to_database, delete_from_database
@@ -22,7 +22,7 @@ blueprint = flask.Blueprint("transaction", __name__)
 
 @blueprint.route("/transactions/pay-card", methods=["POST"])
 def card_payment_post():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -238,7 +238,7 @@ def card_payment_post():
 
 @blueprint.route("/transactions/receipts/check_receipt_input", methods=["POST"])
 def check_receipt_qr_code():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -272,7 +272,7 @@ def check_receipt_qr_code():
 
 @blueprint.route("/transactions/receipts/<path:encrypted_receipt>", methods=["GET"])
 def receipt_get(encrypted_receipt: str):
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -287,7 +287,7 @@ def receipt_get(encrypted_receipt: str):
 
 @blueprint.route("/transactions/view_individual_receipts/<int:receipt_id>", methods=["GET"])
 def e_m_get(receipt_id: int):
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -316,7 +316,7 @@ def e_m_get(receipt_id: int):
 
 @blueprint.route("/transactions/refund", methods=["POST"])
 def refund_booking():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 

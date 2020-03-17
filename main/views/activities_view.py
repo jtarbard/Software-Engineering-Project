@@ -4,18 +4,17 @@ import datetime
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
-import main.data.transactions.employee_data_transaction as edf
 from main.data.db_classes.activity_db_class import Activity
 from main.data.db_classes.transaction_db_class import Membership
 from main.data.db_classes.user_db_class import Customer
-import main.cookie_transaction as ct
+import main.view_lib.cookie_lib as cl
 
 blueprint = flask.Blueprint("activities", __name__)
 
 
 @blueprint.route("/activities/types", methods=["POST", "GET"])
 def view_classes_types():
-    user, response = ct.return_user_response(flask.request, False)
+    user, response = cl.return_user_response(flask.request, False)
     if response:
         return response
 
@@ -41,7 +40,7 @@ def view_classes_types():
 def view_classes(multiple, sent_activity: int):
     sent_activity = int(sent_activity)
 
-    user, response = ct.return_user_response(flask.request, False)
+    user, response = cl.return_user_response(flask.request, False)
     if response:
         return response
 
@@ -88,7 +87,7 @@ def view_classes(multiple, sent_activity: int):
                 return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
                                              User=user)
 
-        response = ct.add_activities(added_activities, flask.request)
+        response = cl.add_activities(added_activities, flask.request)
 
         if not response:
             return flask.abort(500)
@@ -165,7 +164,7 @@ def view_classes(multiple, sent_activity: int):
 
 @blueprint.route("/activities/view_activity/<int:activity_id>", methods=["GET"])
 def view_class(activity_id: int):
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -200,7 +199,7 @@ def view_class(activity_id: int):
 
 @blueprint.route("/misc/add_booking_to_basket", methods=["POST"])
 def view_classes_post():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -229,7 +228,7 @@ def view_classes_post():
     if spaces_left <= 0:
         return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity", User=user)
 
-    response = ct.add_activity_or_membership_to_basket(activity, flask.request, num_people=booking_amount)
+    response = cl.add_activity_or_membership_to_basket(activity, flask.request, num_people=booking_amount)
 
     if not response:
         return flask.abort(500)
@@ -239,7 +238,7 @@ def view_classes_post():
 
 @blueprint.route("/account/basket", methods=["GET"])
 def basket_view():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -324,7 +323,7 @@ def basket_view():
 
 @blueprint.route("/account/basket", methods=["POST"])
 def basket_delete_activity():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -348,7 +347,7 @@ def basket_delete_activity():
     if len(item) != num_items:
         return flask.abort(500)
 
-    response = ct.change_items_with_id_from_cookie(item[1], num_change, flask.redirect("/account/basket"),
+    response = cl.change_items_with_id_from_cookie(item[1], num_change, flask.redirect("/account/basket"),
                                                    flask.request, is_activity=is_activity)
 
     if not response:

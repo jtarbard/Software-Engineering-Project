@@ -2,7 +2,7 @@ import re
 import flask
 import datetime
 import main.data.transactions.user_db_transaction as udf
-import main.cookie_transaction as ct
+import main.view_lib.cookie_lib as cl
 from main.data.db_classes.transaction_db_class import Receipt, Booking, MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer
 
@@ -12,7 +12,7 @@ blueprint = flask.Blueprint("account", __name__)
 # Route for executing when the customer clicks a link to the login page
 @blueprint.route("/account/login", methods=["GET"])
 def login_get():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
 
@@ -57,14 +57,14 @@ def login_post():
     # Implies that no error has occurred and the user is redirected to their account. A cookie is then set that
     # Verifies the customer ID and a verification hash
     response = flask.redirect('/account/your_account')
-    ct.set_auth(response, user.user_id)  # Creates user cookie
+    cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing when the customer clicks a link to the register page
 @blueprint.route("/account/register", methods=["GET"])
 def register_get():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
 
@@ -155,14 +155,14 @@ def register_post():
 
     # Account cookie is checked
     response = flask.redirect('/account/your_account')
-    ct.set_auth(response, user.user_id)  # Creates user cookie
+    cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing if the user clicks to view their account
 @blueprint.route("/account/your_account")
 def view_account():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -195,7 +195,7 @@ def view_account():
 @blueprint.route("/account/log_out")
 def log_out():
     response = flask.redirect("/")
-    ct.destroy_cookie(response)  # User cookie is destroyed and they are logged out
+    cl.destroy_cookie(response)  # User cookie is destroyed and they are logged out
     if "vertex_basket_cookie" in flask.request.cookies:
         response.set_cookie("vertex_basket_cookie", "", expires=0)
     return response

@@ -1,7 +1,7 @@
 import datetime
 
 import flask
-import main.cookie_transaction as ct
+import main.view_lib.cookie_lib as cl
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as db_transaction
 from main.data.db_classes.activity_db_class import Facility
@@ -14,20 +14,20 @@ blueprint = flask.Blueprint("info", __name__)
 
 @blueprint.route('/info/about', methods=["GET"])
 def about_func():
-    user, response = ct.return_user_response(flask.request, False)
+    user, response = cl.return_user_response(flask.request, False)
     return flask.render_template("/info/about.html", User=user)
 
 
 @blueprint.route('/info/facilities', methods=["GET"])
 def facilities_func():
-    user, response = ct.return_user_response(flask.request, False)
+    user, response = cl.return_user_response(flask.request, False)
     return flask.render_template("info/facilities.html",
                                  facilities=Facility.query.all(), page_title="Facilities", User=user)
 
 
 @blueprint.route('/info/memberships', methods=["GET"])
 def membership_func():
-    user, response = ct.return_user_response(flask.request, False)
+    user, response = cl.return_user_response(flask.request, False)
     standard_id = 1
     premium_id = 2
     standard_price = MembershipType.query.filter_by(membership_type_id=standard_id).first().monthly_price
@@ -40,7 +40,7 @@ def membership_func():
 
 @blueprint.route("/info/memberships/buy", methods=["POST"])
 def buy_membership():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -58,14 +58,14 @@ def buy_membership():
         return response
 
     new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
-    response = ct.add_activity_or_membership_to_basket(
+    response = cl.add_activity_or_membership_to_basket(
         new_membership_type, flask.request, duration = membership_duration)
     return response
 
 
 @blueprint.route("/info/memberships/cancel", methods=["GET"])
 def cancel_membership():
-    user, response = ct.return_user_response(flask.request, True)
+    user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
