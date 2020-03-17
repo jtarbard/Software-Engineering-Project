@@ -4,7 +4,7 @@ import datetime
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
-from main.data.db_classes.activity_db_class import Activity
+from main.data.db_classes.activity_db_class import Activity, ActivityType
 from main.data.db_classes.transaction_db_class import Membership
 from main.data.db_classes.user_db_class import Customer
 import main.view_lib.cookie_lib as cl
