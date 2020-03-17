@@ -56,6 +56,14 @@ def configure():
     else:
         print("Database already populated")
 
+    print("Configuring error handling pages")
+
+    import main.view_lib.misc_lib as ml
+
+    flask_app.register_error_handler(404, ml.page_not_found)
+    flask_app.register_error_handler(405, ml.page_not_found)
+    flask_app.register_error_handler(500, ml.page_error)
+
     print("Starting application:")
 
 
@@ -64,3 +72,4 @@ if __name__ == '__main__':
     flask_app.run(debug=True)
 else:
     configure()
+

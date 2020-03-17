@@ -3,7 +3,6 @@ from pyzbar.pyzbar import decode
 from PIL import Image
 import flask
 import datetime
-from werkzeug.utils import secure_filename
 from flask import current_app as app
 from flask_mail import Message, Mail
 import qrcode
