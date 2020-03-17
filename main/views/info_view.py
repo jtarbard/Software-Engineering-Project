@@ -1,5 +1,3 @@
-import datetime
-
 import flask
 import main.view_lib.cookie_lib as cl
 import main.data.transactions.transaction_db_transaction as db_transaction
@@ -12,20 +10,27 @@ blueprint = flask.Blueprint("info", __name__)
 
 
 @blueprint.route('/info/about', methods=["GET"])
-def about_func():
+def about_view():
     user, response = cl.return_user_response(flask.request, False)
     return flask.render_template("/info/about.html", User=user)
 
 
+@blueprint.route('/info/contact_us', methods=["GET"])
+def contact_us_view():
+    user, response = cl.return_user_response(flask.request, False)
+    return flask.render_template("/info/contact_us.html", User=user)
+
+
+
 @blueprint.route('/info/facilities', methods=["GET"])
-def facilities_func():
+def facilities_view():
     user, response = cl.return_user_response(flask.request, False)
     return flask.render_template("info/facilities.html",
                                  facilities=Facility.query.all(), page_title="Facilities", User=user)
 
 
 @blueprint.route('/info/memberships', methods=["GET"])
-def membership_func():
+def membership_view():
     user, response = cl.return_user_response(flask.request, False)
     standard_id = 1
     premium_id = 2
