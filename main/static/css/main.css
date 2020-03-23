@@ -2,8 +2,30 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+    background-color: #F2F2F2;
+    color: #1E1E1E;
+}
+
 #page-title {
-  height: 15vh;
+    height: 15vh;
+    background-color:#5BBDC8;
+    padding-top: 0.5vh;
+    color: white;
+}
+
+#page-description {
+  padding-bottom: 1.5vh;
+  margin-top: -2.5vh;
+  margin-bottom: 7.5vh;
+  background-color: #5BBDC8;
+  color: white;
+}
+
+
+.bg-black {
+    background-color: #1E1E1E;
+    color: #F2F2F2;
 }
 
 #page-title h1 {
@@ -14,4 +36,10 @@ html {
   height: 8vh;
   padding: 1vh 0 1vh;
   line-height: 6vh;
+}
+
+.card {
+  border-color: #F2F2F2;
+  background-color: #1E1E1E;
+  color: #F2F2F2;
 }

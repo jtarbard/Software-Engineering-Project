@@ -7,71 +7,77 @@
 The Vertex memberships!
 {% endblock %}
 
+{% block page_description %}
+Membership description goes here. You should really buy a memberhsip because this makes things so much easier for us so please.
+{% endblock %}
+
 {% block main_content %}
-<div class="container">
-    <p> Membership description goes here. You should really buy a memberhsip because this makes things so much easier for us so please.</p>
-</div>
 
 <div class="container">
-    <div class="card-deck">
+    <div class="card-group">
+        <div class="row">
+            <!-- Columns of membership types -->
+            <!-- Free -->
+            <div class="col-lg-4">
+                <div id="book" class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title">Free Account</h3>
+                        <div class="card-block">
+                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
 
-    <!-- Columns of membership types -->
-    <!-- Free -->
-        <div class="card mb-3 text-center">
-            <div class="card-body">
-                <h3 class="card-header">Book Classes</h3>
-                <div class="card-block">
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-
-                    <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
-                         TODO: Change text to reflect as well? -->
-                    <a href="#" class="btn btn-primary">Book a Class for free</a>
+                            <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
+                                 TODO: Change text to reflect as well? -->
+                            <a href="#" class="btn btn-primary">Book a Class for free</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Premium -->
+            <div class="col-lg-4">
+                <div id="premium" class="card text-center">
+                    <div class="card-body">
+                        <h3 class="card-title">Premium Membership</h3>
+                        <div class="card-block">
+                            <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+                            <form method="post" action="/info/memberships/buy">
+                                <input type="submit" class="btn btn-primary" value="Purchase">
+                                <input type="hidden" name="buy_membership" value={{ premium_id }}>
+                                <input type="hidden" name="total_price" value="{{ premium_price }}">
+                                <select name="membership_duration" class="custom-select">
+                                  <option value="1" selected>1 Month</option>
+                                  <option value="3">3 Months</option>
+                                  <option value="6">6 Months</option>
+                                  <option value="12">12 Months</option>
+                                </select>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Standard -->
+                <div class="col-lg-4">
+                    <div id="standard" class="card text-center">
+                        <div class="card-body">
+                            <h3 class="card-title">Standard Membership</h3>
+                            <div class="card-block">
+                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+                                <form method="post" action="/info/memberships/buy">
+                                    <input type="submit" class="btn btn-primary" value="Purchase">
+                                    <input type="hidden" name="buy_membership" value={{ standard_id }}>
+                                    <input type="hidden" name="total_price" value="{{ standard_price }}">
+                                    <select name="membership_duration" class="custom-select">
+                                      <option value="1" selected>1 Month</option>
+                                      <option value="3">3 Month</option>
+                                      <option value="6">6 Month</option>
+                                      <option value="12">12 Month</option>
+                                    </select>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-
-    <!-- Premium -->
-        <div class="card mb-3 text-center">
-            <div class="card-body">
-                <h3 class="card-header">Premium Membership</h3>
-                <div class="card-block">
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-                    <form method="post" action="/info/memberships/buy">
-                        <input type="submit" class="btn btn-primary" value="Purchase">
-                        <input type="hidden" name="buy_membership" value={{ premium_id }}>
-                        <input type="hidden" name="total_price" value="{{ premium_price }}">
-                        <select name="membership_duration">
-                            <option value="1" selected>1 month</option>
-                            <option value="3">3 month</option>
-                            <option value="6">6 month</option>
-                            <option value="12">12 month</option>
-                        </select>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-    <!-- Standard -->
-        <div class="card mb-3 text-center">
-            <div class="card-body">
-                <h3 class="card-header">Standard Membership</h3>
-                <div class="card-block">
-                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-                    <form method="post" action="/info/memberships/buy">
-                        <input type="submit" class="btn btn-primary" value="Purchase">
-                        <input type="hidden" name="buy_membership" value={{ standard_id }}>
-                        <input type="hidden" name="total_price" value="{{ standard_price }}">
-                        <select name="membership_duration">
-                            <option value="1" selected>1 month</option>
-                            <option value="3">3 month</option>
-                            <option value="6">6 month</option>
-                            <option value="12">12 month</option>
-                        </select>
-                    </form>
-                </div>
-            </div>
-        </div>
-        
     </div>
-</div>
+
 {% endblock %}

@@ -15,7 +15,7 @@ blueprint = flask.Blueprint("info", __name__)
 @blueprint.route('/info/about', methods=["GET"])
 def about_func():
     user, response = ct.return_user_response(flask.request, False)
-    return flask.render_template("/info/about.html", User=user)
+    return flask.render_template("/info/about.html", page_title="About", User=user)
 
 
 @blueprint.route('/info/facilities', methods=["GET"])
