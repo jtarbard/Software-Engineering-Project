@@ -200,6 +200,7 @@ def create_activity_type_and_role_validation():
 
     return True
 
+
 # Defines all of the membership types currently available
 def create_membership_types():
     log_transaction("Creating database membership types:")

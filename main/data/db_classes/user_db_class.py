@@ -1,6 +1,8 @@
 from datetime import datetime
 from main.data.db_session import database
 
+from main.helper_functions.cryptography import hash_text, verify_hash
+
 
 # Class mapped to the user table in the database, this is the parent class to the: customer, employee and
 # manager classes; this is defined by the __mapper_args__ field
@@ -25,6 +27,23 @@ class User(database.Model):
         'polymorphic_on': discriminator
     }
 
+    def __init__(self, first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date=None):
+        self.first_name = first_name
+        self.last_name = last_name.lower()
+        self.title = title.lower()
+        self.email = email
+        self.password = hash_text(password)
+        self.dob = dob
+        self.tel_number = tel_number
+        self.country = country.lower()
+        self.postal_code = postal_code
+        self.address = address.lower()
+        if creation_date is not None:
+            self.creation_date = creation_date
+
+    def password_match(self, plain_text_password) -> bool:
+        return verify_hash(self.password, plain_text_password)
+
 
 # Employee class that maps to the user table, data is automatically added to the user table when referencing the
 # employee, manager and customer tables
@@ -42,6 +61,9 @@ class Employee(User):
     # invisible virtual attribute "allowed_roles" for many-to-many relationship
     # invisible virtual attribute "receipt_assist" for many-to-many relationship
 
+    def __init__(self, first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date=None):
+        super().__init__(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date)
+
 
 class Customer(User):
     __tablename__ = 'Customers'
@@ -58,6 +80,9 @@ class Customer(User):
     purchases = database.relation("Receipt", backref="customer")
     payment_detail = database.relation("PaymentDetails", backref="customer", uselist=False, lazy=True)
 
+    def __init__(self, first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date=None):
+        super().__init__(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date)
+
 
 class Manager(User):
     __tablename__ = 'Managers'
@@ -68,6 +93,9 @@ class Manager(User):
     __mapper_args__ = {
         'polymorphic_identity': 'Manager'
     }
+
+    def __init__(self, first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date=None):
+        super().__init__(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address, creation_date)
 
 
 class PaymentDetails(database.Model):
