@@ -141,8 +141,8 @@ def register_post():
     elif formatted_dob > current_date - datetime.timedelta(days=365 * 16):  # Checks that user is over 16
         server_error = "Input Error: Incorrect date of birth entered (must be over 16)"
 
-    if server_error: # If there was an error then the normal register page is loaded with all the values that the user
-                     # entered inserted into the fields
+    if server_error:  # If there was an error then the normal register page is loaded with all the values that the user
+                      # entered inserted into the fields
 
         return flask.render_template("account/login_register.html", page_type="register",
                                      ServerError=server_error, email=email, date_of_birth=str(dob), first_name=first_name,
@@ -150,8 +150,9 @@ def register_post():
                                      tel_number=tel_number, page_title="Register")
 
     # user is created and returned
-    user = udf.create_new_user_account(title, password_first, first_name, last_name, email, tel_number, formatted_dob,
-                                  postcode, address, country, 0)
+    user = udf.create_new_user_account(0, title=title, password=password_first, first_name=first_name, last_name=last_name,
+                                       email=email, tel_number=tel_number, dob=formatted_dob, postal_code=postcode,
+                                       address=address, country=country)
 
     # Account cookie is checked
     response = flask.redirect('/account/your_account')

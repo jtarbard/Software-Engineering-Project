@@ -2,11 +2,8 @@ import flask
 from flask_qrcode import QRcode
 from flask_mail import Mail
 
-flask_app = flask.Flask(__name__)
-QRcode(flask_app)
-
 # All app blueprints are added
-def register_blueprints():
+def register_blueprints(app):
     from main.views import index_view
     from main.views import misc_view
     from main.views import info_view
@@ -15,39 +12,39 @@ def register_blueprints():
     from main.views import activities_view
     from main.views import basket_view
 
-    flask_app.register_blueprint(index_view.blueprint)
-    flask_app.register_blueprint(misc_view.blueprint)
-    flask_app.register_blueprint(info_view.blueprint)
-    flask_app.register_blueprint(account_view.blueprint)
-    flask_app.register_blueprint(transaction_view.blueprint)
-    flask_app.register_blueprint(activities_view.blueprint)
-    flask_app.register_blueprint(basket_view.blueprint)
+    app.register_blueprint(index_view.blueprint)
+    app.register_blueprint(misc_view.blueprint)
+    app.register_blueprint(info_view.blueprint)
+    app.register_blueprint(account_view.blueprint)
+    app.register_blueprint(transaction_view.blueprint)
+    app.register_blueprint(activities_view.blueprint)
+    app.register_blueprint(basket_view.blueprint)
 
 
 # Database is setup
-def setup_db():
+def setup_db(app):
     import main.data.db_session as db_session
-    db_session.global_init(flask_app)
+    db_session.global_init(app)
 
 
 # Error logging is created so all errors are recorded
-def create_logging():
+def create_logging(app):
     import main.logger as logger
     logger.create_transaction_logger()
-    logger.create_flask_logger(flask_app)
+    logger.create_flask_logger(app)
 
 
 # App is configured
-def configure():
+def configure(app):
     print("Configuring Flask app:")
 
-    create_logging()
+    create_logging(app)
     print("Logging created")
 
-    setup_db()
+    setup_db(app)
     print("DB setup completed")
 
-    register_blueprints()
+    register_blueprints(app)
     print("Registered blueprints")
 
     import main.data.transactions.reset_transaction as rt
@@ -60,16 +57,26 @@ def configure():
 
     import main.view_lib.misc_lib as ml
 
-    flask_app.register_error_handler(404, ml.page_not_found)
-    flask_app.register_error_handler(405, ml.page_not_found)
-    flask_app.register_error_handler(500, ml.page_error)
+    app.register_error_handler(404, ml.page_not_found)
+    app.register_error_handler(405, ml.page_not_found)
+    app.register_error_handler(500, ml.page_error)
 
     print("Starting application:")
 
 
+# www.patricksoftwareblog.com/structuring-a-flask-project
+def create_app(config_filename=None):
+    app = flask.Flask(__name__, instance_relative_config=True)
+    # app.config.from_pyfile(config_filename)
+    # initialize_extensions(app)
+    configure(app)
+    return app
+
+
+flask_app = create_app()
+
+
 if __name__ == '__main__':
-    configure()
     flask_app.run(debug=True)
-else:
-    configure()
+    QRcode(flask_app)
 

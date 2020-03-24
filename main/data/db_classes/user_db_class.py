@@ -1,6 +1,8 @@
 from datetime import datetime
 from main.data.db_session import database
 
+from main.helper_functions.cryptography import hash_text, verify_hash
+
 
 # Class mapped to the user table in the database, this is the parent class to the: customer, employee and
 # manager classes; this is defined by the __mapper_args__ field
@@ -24,6 +26,17 @@ class User(database.Model):
     __mapper_args__ = {
         'polymorphic_on': discriminator
     }
+
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        self.last_name = kwargs["last_name"].lower()
+        self.title = kwargs["title"].lower()
+        self.password = hash_text(kwargs["password"])
+        self.country = kwargs["country"].lower()
+        self.address = kwargs["address"].lower()
+
+    def password_match(self, plain_text_password) -> bool:
+        return verify_hash(self.password, plain_text_password)
 
 
 # Employee class that maps to the user table, data is automatically added to the user table when referencing the
@@ -68,20 +81,3 @@ class Manager(User):
     __mapper_args__ = {
         'polymorphic_identity': 'Manager'
     }
-
-
-class PaymentDetails(database.Model):
-    __tablename__ = 'PaymentDetails'
-
-    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    card_number = database.Column(database.String)
-    start_date = database.Column(database.String)
-    expiration_date = database.Column(database.String)
-
-    street_and_number = database.Column(database.String)
-    town = database.Column(database.String)
-    city = database.Column(database.String)
-    postcode = database.Column(database.String)
-
-    customer_id = database.Column(database.Integer, database.ForeignKey('Customers.customer_id'))
-    #imaginary field "customer"

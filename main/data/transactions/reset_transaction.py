@@ -25,16 +25,13 @@ PASSWORD = "WeAreTeam10"
 
 # Populates the database with all the facilities in out leisure center
 def create_facilities():
-    facility_num = 8
-    facilities = [Facility() for i in range(facility_num)]
-
     names = [
         "Main Swimming Pool", "Gym", "Sports Hall 1",
         "Sports Hall 2", "Climbing Wall", "Tennis Courts",
         "Outside Playing Field", "Studio Room"
     ]
 
-    definitions = [
+    descriptions = [
         "Main Swimming Pool description",
         "Gym description",
         "Sports Hall 1 description",
@@ -45,19 +42,16 @@ def create_facilities():
         "Studio Room description"
     ]
 
-    max_capacity = [
+    max_capacities = [
         70, 50, 80, 50, 10, 8, 150, 30
     ]
 
-    for i in range(facility_num):
-        facilities[i].name = names[i].lower()
-        facilities[i].definition = definitions[i]
-        facilities[i].max_space = max_capacity[i]
+    facilities = [Facility(name=names[i], description=descriptions[i], max_capacity=max_capacities[i])
+                  for i in range(len(names))]
 
-        if add_to_database(facilities[i]):
-            pass
-        else:
-            log_transaction(f"Failed to add facility: {facilities[i].name}")
+    for i, facility in enumerate(facilities):
+        if not add_to_database(facility):
+            log_transaction(f"Failed to add facility: {names[i]}")
             return False
     return True
 
@@ -65,9 +59,6 @@ def create_facilities():
 # Creates all of the current job roles for staff
 def create_roles():
     log_transaction("Creating database job roles:")
-
-    role_num = 10
-    roles = [Role() for i in range(role_num)]
 
     names = [
         "Lifeguard", "Sports Coach",
@@ -92,7 +83,7 @@ def create_roles():
 
     hourly_pay = [7.00, 10.00, 10.00, 9.00, 12.00, 9.00, 12.00, 12.00, 11.00, 14.00]
 
-    for i in range(role_num):
+    for i in range(len(names)):
         if not edf.create_new_role(names[i], description[i], hourly_pay[i]):
             return False
     return True
@@ -127,8 +118,6 @@ def create_activity_types():
         "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded",
         "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded"
     ]
-
-    set_tags = [""]
 
     tags = [
         ["..."],
@@ -200,6 +189,7 @@ def create_activity_type_and_role_validation():
 
     return True
 
+
 # Defines all of the membership types currently available
 def create_membership_types():
     log_transaction("Creating database membership types:")
@@ -210,9 +200,10 @@ def create_membership_types():
 def create_base_account_types():
     i = 0
     for user_type, email in EMAIL_TYPES.items():
-        udf.create_new_user_account("mr", PASSWORD, "team_10", user_type, email,
-                                    "0113 243 1751", datetime.today()-timedelta(weeks=52*20), "LS2 9JT",
-                                    "Woodhouse, Leeds", "uk", i)
+        udf.create_new_user_account(i, title="mr", password=PASSWORD, first_name="team_10", last_name=user_type,
+                                    email=email, tel_number="0113 243 1751",
+                                    dob=datetime.today()-timedelta(weeks=52*20), postal_code="LS2 9JT",
+                                    address="Woodhouse, Leeds", country="uk")
         i += 1
     return True
 
@@ -266,7 +257,7 @@ def create_pseudorandom_activity_instances(end_date: timedelta):
                 add_activities_with_times(returned_times, day_amount, activity_type)
 
             else:
-                amount_today = random.choices([1, 1, 1, 2, 2, 3], k=1)[0]
+                amount_today = random.choice([1, 1, 1, 2, 2, 3])
                 returned_times = return_random_times(amount_today)
                 add_activities_with_times(returned_times, day_amount, activity_type)
 

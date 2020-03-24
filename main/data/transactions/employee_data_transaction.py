@@ -32,10 +32,7 @@ def create_new_role(role_name: str, description: str, hourly_pay: float):
             log_transaction(f"Failed to add new role {role_name}: role name already exists")
             return False
 
-    new_role = Role()
-    new_role.role_name = role_name.lower()
-    new_role.description = description
-    new_role.hourly_pay = hourly_pay
+    new_role = Role(role_name=role_name, description=description, hourly_pay=hourly_pay)
 
     add_to_database(new_role)
     log_transaction(f"Added new role {role_name}")
