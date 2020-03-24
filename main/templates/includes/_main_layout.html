@@ -43,7 +43,7 @@ as the basic body -->
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base href="/account/register">Register</a></li>
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base href="/account/login">Login</a></li>
             {% else %}
-            <li class="nav-item"><a class="nav-link glyphicon glyphicon-user" base href="/account/your_account">My Account</a></li>
+            <li class="nav-item"><a class="nav-link glyphicon glyphicon-user" base href="/account/">My Account</a></li>
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base href="/account/basket">View Basket</a></li>
             {% endif %}
         </ul>
@@ -57,14 +57,8 @@ as the basic body -->
 <div class="fluid-container" id="page-title">
   <div class="container">
     <h1>{{ page_title }}</h1>
+    {% block page_description %} {% endblock %}
   </div>
-</div>
-<div class="fluid-container" id="page-description">
-    <div class="container">
-        <p>
-           {% block page_description %} {% endblock %}
-        </p>
-    </div>
 </div>
 {% endif %}
 

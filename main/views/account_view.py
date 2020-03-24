@@ -161,8 +161,48 @@ def register_post():
 
 
 # Route for executing if the user clicks to view their account
-@blueprint.route("/account/")
+@blueprint.route("/account", methods=["GET"])
 def view_account():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    membership_type = None
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+
+        if customer.current_membership is not None:
+            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
+            membership_type_id = user_membership.membership_type_id
+            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+
+    return flask.render_template("/account/account.html", User=user, membership_type=membership_type)
+
+
+@blueprint.route("/account/receipts", methods=["GET"])
+def view_account_receipts():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    returned_receipts = {}
+    membership_type = None
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            returned_receipts[receipt.receipt_id] = receipt
+
+        if customer.current_membership is not None:
+            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
+            membership_type_id = user_membership.membership_type_id
+            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+
+    return flask.render_template("/account/receipts.html", User=user,
+                                 returned_bookings=returned_receipts, membership_type=membership_type)
+
+
+@blueprint.route("/account/bookings", methods=["GET"])
+def view_account_bookings():
     user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
@@ -188,9 +228,8 @@ def view_account():
             membership_type_id = user_membership.membership_type_id
             membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
 
-    return flask.render_template("/account/account_homepage.html", User=user,
-                                 returned_bookings=returned_bookings, membership_type=membership_type, page_title=user.first_name.title())
-
+    return flask.render_template("/account/bookings.html", User=user,
+                                 returned_bookings=returned_bookings, membership_type=membership_type)
 
 # Route for executing if the user wants to log out
 @blueprint.route("/account/log_out")
