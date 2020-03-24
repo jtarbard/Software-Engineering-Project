@@ -1,6 +1,7 @@
-from main.data.db_classes.transaction_db_class import Receipt, PaymentDetails, MembershipType, Membership, Booking
 import random
 import datetime
+
+from main.data.db_classes.transaction_db_class import Receipt, PaymentDetails, MembershipType, Membership, Booking
 
 
 def test_receipt_legal():

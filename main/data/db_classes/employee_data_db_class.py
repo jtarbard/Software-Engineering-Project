@@ -14,7 +14,7 @@ class Employee_Router(database.Model):
 
     employee_id = database.Column(database.Integer, database.ForeignKey("Employees.employee_id"), nullable=False)
     activity_id = database.Column(database.Integer, database.ForeignKey("Activities.activity_id"), nullable=False)
-    role_id = database.Column(database.String, database.ForeignKey("Roles.role_id"), nullable=False)
+    role_id = database.Column(database.Integer, database.ForeignKey("Roles.role_id"), nullable=False)
 
     __table_args__ = (
         database.PrimaryKeyConstraint("employee_id", "activity_id"),
@@ -39,3 +39,7 @@ class Role(database.Model):
     activities_with_role = database.relationship("ActivityType",
                                                 secondary=activity_roles,
                                                 backref=database.backref("allowed_roles", lazy="dynamic"))
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.role_name = kwargs.get("role_name", "UNSET_ROLE").lower()
