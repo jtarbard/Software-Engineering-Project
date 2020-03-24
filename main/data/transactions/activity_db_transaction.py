@@ -146,7 +146,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
             return False
 
     new_activity_type = ActivityType(name=name, description=description, category=category, tags=tags,
-                                     miniumum_age=miniumum_age, maximum_activity_capacity=maximum_activity_capacity,
+                                     minimum_age=miniumum_age, maximum_activity_capacity=maximum_activity_capacity,
                                      hourly_activity_cost=hourly_activity_cost,
                                      hourly_activity_price=hourly_activity_price,
                                      max_staff=max_staff, min_staff=min_staff)
