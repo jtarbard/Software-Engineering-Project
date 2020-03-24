@@ -9,14 +9,13 @@ The Vertex - Facilities!
 
 {% block main_content %}
 <div class="container">
-    <div class="card-group">
-        <div class="row">
+    <div class="card-deck">
         {% for facility in facilities %}
         <div class="col-sm-12 col-md-6" id="{{facility.facility_id}}">
             <div class="card">
               <img src="/static/imgs/facility-img/facility{{ facility.facility_id }}.jpg" class="card-img-top" alt="{{ facility.facility_id }}">
               <div class="card-body">
-                <h2 class="card-title">{{ facility.name }}</h2>
+                <h2 class="card-title">{{ facility.name.title() }}</h2>
                 <p class="card-text">
                     {{ facility.description }}
                     <br>
@@ -26,7 +25,6 @@ The Vertex - Facilities!
             </div>
         </div>
         {% endfor %}
-        </div>
     </div>
 </div>
 {% endblock %}
