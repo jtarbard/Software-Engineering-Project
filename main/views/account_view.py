@@ -155,13 +155,13 @@ def register_post():
                                        address=address, country=country)
 
     # Account cookie is checked
-    response = flask.redirect('/account/your_account')
+    response = flask.redirect('/account/')
     cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing if the user clicks to view their account
-@blueprint.route("/account/your_account")
+@blueprint.route("/account/")
 def view_account():
     user, response = cl.return_user_response(flask.request, True)
     if response:
@@ -188,8 +188,8 @@ def view_account():
             membership_type_id = user_membership.membership_type_id
             membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
 
-    return flask.render_template("/account/your_account.html", User=user,
-                                 returned_bookings=returned_bookings, membership_type=membership_type)
+    return flask.render_template("/account/account_homepage.html", User=user,
+                                 returned_bookings=returned_bookings, membership_type=membership_type, page_title=user.first_name.title())
 
 
 # Route for executing if the user wants to log out
