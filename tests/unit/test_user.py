@@ -33,8 +33,9 @@ def test_new_customer_legal(new_user):
 
     users = []
     for i in range(3):
-        users.append(new_user(types[i], titles[i], passwords[i], first_names[i], last_names[i], emails[i], tels[i],
-                              bdays[i], postcodes[i], addresses[i], countries[i]))
+        users.append(new_user(types[i], title=titles[i], password=passwords[i], first_name=first_names[i],
+                              last_name=last_names[i], email=emails[i], tel_number=tels[i],
+                              dob=bdays[i], postal_code=postcodes[i], address=addresses[i], country=countries[i]))
         assert users[i].title == exp_titles[i]
         assert not users[i].password == exp_passwords[i]
         assert users[i].password_match(passwords[i])

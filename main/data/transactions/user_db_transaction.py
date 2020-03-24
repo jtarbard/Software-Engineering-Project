@@ -10,13 +10,13 @@ from main.logger import log_transaction
 #   - 0 : customer account
 #   - 1 : employee account
 #   - 2 : manager account
-def create_new_user_account(title, password, first_name, last_name, email, tel_number, dob, postal_code, address, country, usertype):
+def create_new_user_account(usertype, **kwargs):
     if usertype == 0:
-        new_user: Customer = Customer(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address)
+        new_user: Customer = Customer(**kwargs)
     elif usertype == 1:
-        new_user: Employee = Employee(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address)
+        new_user: Employee = Employee(**kwargs)
     elif usertype == 2:
-        new_user: Manager = Manager(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address)
+        new_user: Manager = Manager(**kwargs)
     else:
         return False
 

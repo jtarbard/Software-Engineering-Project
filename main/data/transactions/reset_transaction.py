@@ -211,9 +211,10 @@ def create_membership_types():
 def create_base_account_types():
     i = 0
     for user_type, email in EMAIL_TYPES.items():
-        udf.create_new_user_account("mr", PASSWORD, "team_10", user_type, email,
-                                    "0113 243 1751", datetime.today()-timedelta(weeks=52*20), "LS2 9JT",
-                                    "Woodhouse, Leeds", "uk", i)
+        udf.create_new_user_account(i, title="mr", password=PASSWORD, first_name="team_10", last_name=user_type,
+                                    email=email, tel_number="0113 243 1751",
+                                    dob=datetime.today()-timedelta(weeks=52*20), postal_code="LS2 9JT",
+                                    address="Woodhouse, Leeds", country="uk")
         i += 1
     return True
 

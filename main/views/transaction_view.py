@@ -8,6 +8,7 @@ from flask_mail import Mail
 
 
 import main.view_lib.transaction_lib as tl
+import main.helper_functions.cryptography as crypt
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
@@ -113,7 +114,7 @@ def card_payment_post():
         employee.receipt_assist.append(receipt)
         ds.add_to_database(employee)
 
-    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
+    encrypted_receipt = crypt.hash_text(str(receipt_id) + "-" + str(user.user_id))
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         response = flask.redirect(f"/transactions/view_individual_receipts/{receipt_id}")
@@ -217,7 +218,7 @@ def e_m_get(receipt_id: int):
 
     customer_of_receipt = returned_receipt.customer_id
 
-    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(customer_of_receipt))
+    encrypted_receipt = crypt.hash_text(str(receipt_id) + "-" + str(customer_of_receipt))
 
     if user.__mapper_args__['polymorphic_identity'] == "Employee":
         employee: Employee = udf.return_employee_with_user_id(user.user_id)

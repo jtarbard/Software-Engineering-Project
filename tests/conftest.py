@@ -9,15 +9,15 @@ from main.data.db_classes.user_db_class import Customer, Employee, Manager
 def new_user():
     """
     Tests Customer, Employee, and Manager classes
-    :return: an object of the
+    :return: an object of the appropriate class, with the supplied parameters
     """
-    def _create_user(user_type, title, password, first_name, last_name, email, tel_number, dob, postal_code, address, country):
+    def _create_user(user_type, **kwargs):
         if user_type.lower() == 'customer':
-            return Customer(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address)
+            return Customer(**kwargs)
         elif user_type.lower() == 'employee':
-            return Employee(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address)
+            return Employee(**kwargs)
         elif user_type.lower() == 'manager':
-            return Manager(first_name, last_name, title, email, password, dob, tel_number, country, postal_code, address)
+            return Manager(**kwargs)
         else:
             raise Exception(f"[TESTING: conftest.py > new_user()] Unknown user type {user_type}")
 

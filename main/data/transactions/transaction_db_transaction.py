@@ -7,8 +7,8 @@ from main.data.db_classes.transaction_db_class import MembershipType, Receipt, M
 from main.data.db_classes.activity_db_class import Activity
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
-from main.data.db_classes.transaction_db_class import Booking
-from main.data.db_classes.user_db_class import User, Customer, PaymentDetails
+from main.data.db_classes.transaction_db_class import Booking, PaymentDetails
+from main.data.db_classes.user_db_class import User, Customer
 import main.view_lib.basket_lib as bl
 
 #  A simple function that returns a list of all the membership types currently in the gym
@@ -43,11 +43,7 @@ def create_new_membership_type(name: str, description: str, discount: int, month
             log_transaction(f"Failed to add new membership {name}: membership name already exists")
             return False
 
-    new_membership = MembershipType()
-    new_membership.name = name.lower()
-    new_membership.description = description.lower()
-    new_membership.discount = discount
-    new_membership.monthly_price = monthly_price
+    new_membership = MembershipType(name, description, discount, monthly_price)
 
     log_transaction(f"Adding new membership {name}")
     return add_to_database(new_membership)
@@ -138,10 +134,8 @@ def return_bookings_with_activity_id(activity_id):
 
 
 def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User, membership_duration: int):
-    new_receipt = Receipt()
     customer = Customer.query.filter(Customer.user_id == user.user_id).first()
-    new_receipt.creation_time = datetime.datetime.now()
-    new_receipt.customer_id = customer.customer_id
+    new_receipt = Receipt(customer.customer_id, 0, datetime.datetime.now())
     add_to_database(new_receipt)
 
     total_price = 0
@@ -149,9 +143,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
     activity_type_count = bl.return_activity_type_count_from_activity_list(basket_activities)
 
     for activity in basket_activities:
-        new_booking = Booking()
-        new_booking.activity_id = activity.activity_id
-        new_booking.receipt_id = new_receipt.receipt_id
+        new_booking = Booking(activity.activity_id, new_receipt.receipt_id)
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
 
@@ -165,11 +157,10 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
 
         total_price += basket_membership.monthly_price * membership_duration
 
-        new_membership = Membership()
-        new_membership.membership_type_id = basket_membership.membership_type_id
-        new_membership.receipt_id = new_receipt.receipt_id
-        new_membership.start_date = datetime.date.today()
-        new_membership.end_date = datetime.date.today() + datetime.timedelta(days=30*membership_duration)
+        new_membership = Membership(basket_membership.membership_type_id,
+                                    datetime.date.today(),
+                                    datetime.date.today() + datetime.timedelta(days=30*membership_duration),
+                                    new_receipt.receipt_id)
 
         new_membership.membership_type = basket_membership
 
@@ -179,7 +170,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         customer.current_membership = new_membership.membership_id
         add_to_database(customer)
 
-    new_receipt.total_cost = round(total_price,2)
+    new_receipt.total_cost = round(total_price, 2)
     add_to_database(new_receipt)
 
     return new_receipt.receipt_id
