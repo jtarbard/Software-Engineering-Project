@@ -61,10 +61,10 @@ The Vertex classes!
                 </tr>
                 {% for activity, availability in activity_dict.items() %}
                     <tr>
-                        <td>{{ activity.activity_type.name }}</td>
+                        <td>{{ activity.activity_type.name.title() }}</td>
                         <td>{{ activity.start_time }}</td>
                         <td>{{ activity.end_time }}</td>
-                        <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name }}</a></td>
+                        <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name.title()}}</a></td>
                         <td>{{ availability }}</td>
                         {% if multiple == 'True' %}
                                 <td>
@@ -76,7 +76,7 @@ The Vertex classes!
                     </tr>
                 {% endfor %}
             </tbody>
-            </form>
         </table>
-    </div>
+    </form>
+</div>
 {% endblock %}

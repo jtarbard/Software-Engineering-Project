@@ -85,9 +85,11 @@ def card_payment_post():
     check_box = flask.request.form.get("remember_card_details")
 
     if check_box == "on":
-        tdf.add_new_card_details(data_form.get('card_number'), data_form.get('start_date'),
-                                 data_form.get('expiration_date'), data_form.get('street_and_number'),
-                                 data_form.get('town'), data_form.get('city'), data_form.get('postcode'), customer)
+        tdf.add_new_card_details(customer, card_number=data_form.get('card_number'), start_date=data_form.get('start_date'),
+                                 expiration_date=data_form.get('expiration_date'),
+                                 street_and_number=data_form.get('street_and_number'),
+                                 town=data_form.get('town'), city=data_form.get('city'),
+                                 postcode=data_form.get('postcode'))
 
     elif customer.payment_detail:
         ds.delete_from_database(customer.payment_detail)

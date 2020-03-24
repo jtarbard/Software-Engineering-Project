@@ -1,3 +1,39 @@
-.card {
-    min-width: 18rem;
+
+
+/*Customer colours*/
+
+/*#book {*/
+/*    background-color: black;*/
+/*    border-left: 2vw solid #E1234B;*/
+/*    color: white;*/
+/*}*/
+
+
+/*#premium {*/
+/*    background-color: black;*/
+/*    border-left: 2vw solid #E1234B;*/
+/*    color: white;*/
+/*}*/
+
+/*#standard {*/
+/*    background-color: black;*/
+/*    border-left: 2vw solid #E1234B;*/
+/*    color: white;*/
+/*}*/
+
+.btn {
+    background-color: #E1234B;
+    border-color: #E1234B;
+    color: #F2F2F2;
 }
+
+.custom-select {
+    max-width: 40%;
+}
+
+.card {
+    padding-top: 5vh;
+    padding-bottom: 5vh;
+    margin-bottom: 3vh;
+}
+
