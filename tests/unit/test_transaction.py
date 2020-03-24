@@ -39,14 +39,14 @@ def test_membership_legal():
 def test_membership_type_legal():
     names = ["Standard", "Premium"]
     descriptions = ["Lorem ipsum",
-                   "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!@#$%^&*()_+-=[]{};':,./<>?\"/*-+`~"]
+                   "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!@#$%^&*()\\_+-=[]{};':,./<>?\"/*-+`~"]
     discounts = [0, 100]
     monthly_prices = [0, 100]
 
     # Change expected result as implementation decision changes, but the tests should still pass after those changes
     exp_names = ["Standard", "Premium"]
     exp_descriptions = ["Lorem ipsum",
-                        "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!@#$%^&*()_+-=[]{};':,./<>?\"/*-+`~"]
+                        "1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM!@#$%^&*()\\_+-=[]{};':,./<>?\"/*-+`~"]
     exp_discounts = [0, 100]
     exp_monthly_prices = [0, 100]
     for i in range(len(names)):
@@ -84,10 +84,10 @@ def test_payment_details_legal():
                                         expiration_date=expir_dates[i],
                                         street_and_number=street_and_numbers[i], town=towns[i], city=cities[i],
                                         postcode=postcodes[i])
-    assert payment_detail.card_number == exp_card_nums[i]
-    assert payment_detail.start_date == exp_start_dates[i]
-    assert payment_detail.expiration_date == exp_expir_dates[i]
-    assert payment_detail.street_and_number == exp_street_and_numbers[i]
-    assert payment_detail.town == exp_towns[i]
-    assert payment_detail.city == exp_cities[i]
-    assert payment_detail.postcode == exp_postcodes[i]
+        assert payment_detail.card_number == exp_card_nums[i]
+        assert payment_detail.start_date == exp_start_dates[i]
+        assert payment_detail.expiration_date == exp_expir_dates[i]
+        assert payment_detail.street_and_number == exp_street_and_numbers[i]
+        assert payment_detail.town == exp_towns[i]
+        assert payment_detail.city == exp_cities[i]
+        assert payment_detail.postcode == exp_postcodes[i]

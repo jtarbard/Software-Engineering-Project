@@ -40,6 +40,10 @@ class ActivityType(database.Model):
 
     # invisible virtual attribute "allowed_roles" for many-to-many relationship
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.name = kwargs.get("name", "UNKNOWN_ACTIVITY_TYPE").lower()
+
 
 class Activity(database.Model):
     __tablename__ = 'Activities'
@@ -62,9 +66,14 @@ class Facility(database.Model):
 
     facility_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     name = database.Column(database.String, nullable=False)
-    definition = database.Column(database.String, nullable=False)
-    max_space = database.Column(database.Integer, nullable=False)
+    description = database.Column(database.String, nullable=False)
+    max_capacity = database.Column(database.Integer, nullable=False)
+
     current_activities = database.relationship("Activity", back_populates="facility")
 
     # invisible backref list parameter from ActivityType : activities_available
     # e.g. Facility.query.first().activities_available
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.name = kwargs.get("name", "UNKNOWN_FACILITY_NAME").lower()

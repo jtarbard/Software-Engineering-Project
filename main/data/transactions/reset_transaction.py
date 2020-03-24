@@ -25,16 +25,13 @@ PASSWORD = "WeAreTeam10"
 
 # Populates the database with all the facilities in out leisure center
 def create_facilities():
-    facility_num = 8
-    facilities = [Facility() for i in range(facility_num)]
-
     names = [
         "Main Swimming Pool", "Gym", "Sports Hall 1",
         "Sports Hall 2", "Climbing Wall", "Tennis Courts",
         "Outside Playing Field", "Studio Room"
     ]
 
-    definitions = [
+    descriptions = [
         "Main Swimming Pool description",
         "Gym description",
         "Sports Hall 1 description",
@@ -45,19 +42,16 @@ def create_facilities():
         "Studio Room description"
     ]
 
-    max_capacity = [
+    max_capacities = [
         70, 50, 80, 50, 10, 8, 150, 30
     ]
 
-    for i in range(facility_num):
-        facilities[i].name = names[i].lower()
-        facilities[i].definition = definitions[i]
-        facilities[i].max_space = max_capacity[i]
+    facilities = [Facility(name=names[i], description=descriptions[i], max_capacity=max_capacities[i])
+                  for i in range(len(names))]
 
-        if add_to_database(facilities[i]):
-            pass
-        else:
-            log_transaction(f"Failed to add facility: {facilities[i].name}")
+    for i, facility in enumerate(facilities):
+        if not add_to_database(facility):
+            log_transaction(f"Failed to add facility: {names[i]}")
             return False
     return True
 
