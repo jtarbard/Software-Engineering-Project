@@ -74,9 +74,10 @@ The Vertex Receipt
                 }
             </style>
             <br>
-            <div>
-                <img src="{{qrcode(encrypted_receipt)}}">
-            </div>
+{#            Temporarily disabled. This worked on the stable branch#}
+{#            <div>#}
+{#                <img src="{{qrcode(encrypted_receipt)}}">#}
+{#            </div>#}
         {% endif %}
             <div>
                 <h3>Total Price: £{{returned_receipt.total_cost}}</h3>

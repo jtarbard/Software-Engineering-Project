@@ -26,12 +26,6 @@ class Receipt(database.Model):
                               secondary=receipt_employee,
                               backref=database.backref('receipt_assist', lazy='dynamic'))
 
-    def __init__(self, customer_id, total_cost=0, creation_time=None):
-        self.customer_id = customer_id
-        self.total_cost = total_cost
-        if creation_time is not None:
-            self.creation_time = creation_time
-
 
 class Booking(database.Model):
     __tablename__ = "Bookings"
@@ -43,11 +37,6 @@ class Booking(database.Model):
 
     activity = database.relationship("Activity", back_populates="bookings", uselist=False)
     receipt = database.relationship("Receipt", back_populates="bookings", uselist=False)
-
-    def __init__(self, activity_id, receipt_id, deleted=False):
-        self.activity_id = activity_id
-        self.receipt_id = receipt_id
-        self.deleted = deleted
 
 
 class Membership(database.Model):
@@ -62,12 +51,6 @@ class Membership(database.Model):
     receipt = database.relationship("Receipt", back_populates="membership", uselist=False)
     membership_type = database.relationship("MembershipType", back_populates="memberships", uselist=False)
 
-    def __init__(self, membership_type_id, start_date, end_date, receipt_id):
-        self.membership_type_id = membership_type_id
-        self.start_date = start_date
-        self.end_date = end_date
-        self.receipt_id = receipt_id
-
 
 class MembershipType(database.Model):
     __tablename__ = 'MembershipTypes'
@@ -80,12 +63,6 @@ class MembershipType(database.Model):
     monthly_price = database.Column(database.Integer, database.CheckConstraint("monthly_price >= 0"), nullable=False)
 
     memberships = database.relationship("Membership", back_populates="membership_type")
-
-    def __init__(self, name, description, discount, monthly_price):
-        self.name = name.lower()
-        self.description = description.lower()
-        self.discount = discount
-        self.monthly_price = monthly_price
 
 
 class PaymentDetails(database.Model):
@@ -103,13 +80,3 @@ class PaymentDetails(database.Model):
 
     customer_id = database.Column(database.Integer, database.ForeignKey('Customers.customer_id'))
     #imaginary field "customer"
-
-    def __init__(self, card_number, start_date, expiration_date, street_and_number, town, city, postcode, customer_id):
-        self.card_number = card_number
-        self.start_date = start_date
-        self.expiration_date = expiration_date
-        self.street_and_number = street_and_number
-        self.town = town
-        self.city = city
-        self.postcode = postcode
-        self.customer_id = customer_id
