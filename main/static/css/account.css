@@ -1,7 +1,7 @@
 /* CSS Source - https://startbootstrap.com/templates/simple-sidebar/ */
 #sidebar-wrapper {
     min-height: 100%;
-    margin-left: -15rem;
+    margin-left: -18rem;
     -webkit-transition: margin .25s ease-out;
     -moz-transition: margin .25s ease-out;
     -o-transition: margin .25s ease-out;
@@ -14,7 +14,7 @@
 }
 
 #sidebar-wrapper .list-group {
-    width: 15rem
+    width: 18rem
 }
 
 #page-content-wrapper {
@@ -36,7 +36,7 @@
     }
 
     #wrapper.toggled #sidebar-wrapper {
-        margin-left: -15rem;
+        margin-left: -18rem;
     }
 }
 /* End of startbootstrap's code.*/
@@ -49,7 +49,7 @@
     min-width: 4vw;
     height: 8vh;
     float: left;
-    margin: 1vh 1vw 1vh 1vw;
+    margin: 1vh 1vw 1vh 0;
 }
 
 #title-bar h1 {
@@ -64,5 +64,9 @@
     height: 8vh;
     line-height: 7vh;
     float: right;
-    margin: 1vh 1vw 1vh 1vw;
+    margin: 1vh 0 1vh 1vw;
+}
+
+#page-title {
+    margin-bottom: 0vh;
 }

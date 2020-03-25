@@ -56,7 +56,7 @@ def login_post():
 
     # Implies that no error has occurred and the user is redirected to their account. A cookie is then set that
     # Verifies the customer ID and a verification hash
-    response = flask.redirect('/account/your_account')
+    response = flask.redirect('/account/home')
     cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
@@ -176,7 +176,7 @@ def view_account():
             membership_type_id = user_membership.membership_type_id
             membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
 
-    return flask.render_template("/account/account.html", User=user, membership_type=membership_type)
+    return flask.render_template("/account/account.html", User=user, membership_type=membership_type, page_title="Your Account")
 
 
 @blueprint.route("/account/receipts", methods=["GET"])
@@ -198,7 +198,7 @@ def view_account_receipts():
             membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
 
     return flask.render_template("/account/receipts.html", User=user,
-                                 returned_bookings=returned_receipts, membership_type=membership_type)
+                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
@@ -229,7 +229,7 @@ def view_account_bookings():
             membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
 
     return flask.render_template("/account/bookings.html", User=user,
-                                 returned_bookings=returned_bookings, membership_type=membership_type)
+                                 returned_bookings=returned_bookings, membership_type=membership_type, page_title="Your Upcoming Bookings")
 
 # Route for executing if the user wants to log out
 @blueprint.route("/account/log_out")

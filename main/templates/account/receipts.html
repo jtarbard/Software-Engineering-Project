@@ -1,56 +1,40 @@
 {% extends "account/account.html"%}
-
+{% block accounts_additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/receipts.css') }}">
+{% endblock %}
 {% block page_content %}
-    <h2>Welcome: {{ User.first_name }} ({{ User.__mapper_args__ ['polymorphic_identity'] }} account)</h2>
-    {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-
-    {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
-    <h3>Router:</h3>
-    {% else %}
-    {% if membership_type %}
-    <p>current membership : {{membership_type.name}}<p>
-    <a href="/info/memberships/cancel">cancel membership</a>
-    {% else %}
-    <p>you currently have no membership</p>
-    {% endif %}
     {% if returned_bookings %}
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr><td colspan="4"> Current bookings </td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Class Name</td>
-                            <td>Class Start Time </td>
-                            <td>Class End Time</td>
-                            <td>Facility</td>
-                            <td>Amount</td>
-                            <td>Refund</td>
-                        </tr>
-                        {% for activity, receipt_and_amount in returned_bookings.items() %}
-                            <tr>
-                                <td>{{ activity.activity_type.name }}</td>
-                                <td>{{ activity.start_time }}</td>
-                                <td>{{ activity.end_time }}</td>
-                                <td>{{ activity.facility.name }}</td>
-                                <td>{{ receipt_and_amount[1] }}</td>
-                                <td>
-                                    <form action="/transactions/refund" method="post">
-                                        <input type="submit" name="refund" value="Refund">
-                                        <input type="hidden" name="activity_id" value="{{activity.activity_id}}">
-                                        <input type="hidden" name="receipt_id" value="{{receipt_and_amount[0].receipt_id}}">
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-    {% endif %}
-    <form action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
-        <input type="file" name="file">
-        <input type="submit" value="Upload">
-    </form>
+    <div id="qr-search">
+        <form action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
+            <label for="file">Find Receipt by QR Code: </label>
+            <input id="file" type="file" name="file">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="4">
+                    <span id="table-title">Your Receipts</span>
+                </td></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Receipt ID</td>
+                    <td>Purchase Date</td>
+                    <td>Total Cost</td>
+                    <td>View Receipt</td>
+                </tr>
+                {% for receipt in returned_receipts %}
+                    <tr>
+                        <td>{{receipt.receipt_id}}</td>
+                        <td>{{receipt.creation_time}}</td>
+                        <td>{{receipt.total_cost}}</td>
+                        <td><a href="{{url_for('transaction.e_m_get', receipt_id=receipt.receipt_id)}}">View</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
     {% endif %}
 {% endblock %}

@@ -1,6 +1,8 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
+{% block accounts_additional_css %}
+{% endblock %}
 {% endblock %}
 
 {% block main_content %}
@@ -11,10 +13,8 @@
       <div class="sidebar-heading">Your Account</div>
       <div class="list-group list-group-flush">
         <a href="{{ url_for('account.view_account')}}" class="list-group-item list-group-item-action">Home</a>
-        <li href="#" class="list-group-item">Events and Purchases</li>
         <a href="{{ url_for('account.view_account_bookings')}}" class="list-group-item list-group-item-action">Bookings</a>
         <a href="{{ url_for('account.view_account_receipts')}}" class="list-group-item list-group-item-action">Receipts</a>
-        <li href="#" class="list-group-item">Account Management</li>
         <a href="#" class="list-group-item list-group-item-action">Membership</a>
         <a href="#" class="list-group-item list-group-item-action">Personal Details</a>
         <a href="#" class="list-group-item list-group-item-action">Card Details</a>
@@ -25,7 +25,7 @@
     <!-- /#sidebar-wrapper -->
 
     <!-- Page Content -->
-    <div id="page-content-wrapper">
+    <div class="container" id="page-content-wrapper">
         <div id="title-bar">
             <button class="btn btn-primary" id="menu-toggle">Menu</button>
             <h1>{{User.first_name.title()}}</h1>
