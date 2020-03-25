@@ -231,6 +231,26 @@ def view_account_bookings():
     return flask.render_template("/account/bookings.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type, page_title="Your Upcoming Bookings")
 
+
+@blueprint.route("/account/membership", methods=["GET"])
+def view_account_membership():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    returned_bookings = {}
+    membership_type = None
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+
+        if customer.current_membership is not None:
+            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
+            membership_type_id = user_membership.membership_type_id
+            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+
+    return flask.render_template("/account/membership.html", User=user,
+                                 membership_type=membership_type, page_title="Membership")
+
 # Route for executing if the user wants to log out
 @blueprint.route("/account/log_out")
 def log_out():

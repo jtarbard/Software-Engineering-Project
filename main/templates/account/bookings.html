@@ -1,53 +1,41 @@
 {% extends "account/account.html"%}
 
 {% block page_content %}
-    <h2>Welcome: {{ User.first_name }} ({{ User.__mapper_args__ ['polymorphic_identity'] }} account)</h2>
-    {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-
-    {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
-    <h3>Router:</h3>
-    {% else %}
-    {% if membership_type %}
-    <p>current membership : {{membership_type.name}}<p>
-    <a href="/info/memberships/cancel">cancel membership</a>
-    {% else %}
-    <p>you currently have no membership</p>
-    {% endif %}
-    {% if returned_bookings %}
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr><td colspan="4"> Current bookings </td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Class Name</td>
-                            <td>Class Start Time </td>
-                            <td>Class End Time</td>
-                            <td>Facility</td>
-                            <td>Amount</td>
-                            <td>Refund</td>
-                        </tr>
-                        {% for activity, receipt_and_amount in returned_bookings.items() %}
-                            <tr>
-                                <td>{{ activity.activity_type.name }}</td>
-                                <td>{{ activity.start_time }}</td>
-                                <td>{{ activity.end_time }}</td>
-                                <td>{{ activity.facility.name }}</td>
-                                <td>{{ receipt_and_amount[1] }}</td>
-                                <td>
-                                    <form action="/transactions/refund" method="post">
-                                        <input type="submit" name="refund" value="Refund">
-                                        <input type="hidden" name="activity_id" value="{{activity.activity_id}}">
-                                        <input type="hidden" name="receipt_id" value="{{receipt_and_amount[0].receipt_id}}">
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-    {% endif %}
-
-    {% endif %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="4"> Upcoming bookings </td></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Class Name</td>
+                    <td>Class Start Time </td>
+                    <td>Class End Time</td>
+                    <td>Facility</td>
+                    <td>Amount</td>
+                    {% if membership_type != 2 %}
+                    <td>Refund</td>
+                    {% else %}
+                    <td>Cancel</td>
+                    {% endif %}
+                </tr>
+                {% for activity, receipt_and_amount in returned_bookings.items() %}
+                    <tr>
+                        <td>{{ activity.activity_type.name }}</td>
+                        <td>{{ activity.start_time }}</td>
+                        <td>{{ activity.end_time }}</td>
+                        <td>{{ activity.facility.name }}</td>
+                        <td>{{ receipt_and_amount[1] }}</td>
+                        <td>
+                            <form action="/transactions/refund" method="post">
+                                <input type="submit" name="refund" value="Refund">
+                                <input type="hidden" name="activity_id" value="{{activity.activity_id}}">
+                                <input type="hidden" name="receipt_id" value="{{receipt_and_amount[0].receipt_id}}">
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
