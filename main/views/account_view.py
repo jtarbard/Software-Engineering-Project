@@ -155,13 +155,13 @@ def register_post():
                                        address=address, country=country)
 
     # Account cookie is checked
-    response = flask.redirect('/account/')
+    response = flask.redirect('/account/home')
     cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing if the user clicks to view their account
-@blueprint.route("/account", methods=["GET"])
+@blueprint.route("/account/home", methods=["GET"])
 def view_account():
     user, response = cl.return_user_response(flask.request, True)
     if response:

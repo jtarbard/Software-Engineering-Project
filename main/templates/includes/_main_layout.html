@@ -33,18 +33,17 @@ as the basic body -->
       <!-- navbar links -->
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav">
-{#            <li class="nav-item navbar-right"><a class="nav-link" base href="/info/facilities">Facilities</a></li>#}
-            <li class="nav-item"><a class="nav-link" base href="/activities/types">Activities</a></li>
-            <li class="nav-item"><a class="nav-link" base href="/info/facilities">Facilities</a></li>
-            <li class="nav-item"><a class="nav-link" base href="/info/memberships">Membership</a></li>
-            <li class="nav-item"><a class="nav-link" base href="/info/about">About</a></li>
+            <li class="nav-item"><a class="nav-link" base href="{{ url_for('activities.view_activity_types')}}">Activities</a></li>
+            <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.facilities_view')}}">Facilities</a></li>
+            <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.membership_view')}}">Membership</a></li>
+            <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.about_func')}}">About</a></li>
             {%  if not User %}
             <!--            <li class="nav-item"><a class="nav-link" base href="/account/log_out">Logout</a></li>-->
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base href="/account/register">Register</a></li>
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base href="/account/login">Login</a></li>
+            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base href="{{ url_for('account.register_get')}}">Register</a></li>
+            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base href="{{ url_for('account.login_get')}}">Login</a></li>
             {% else %}
-            <li class="nav-item"><a class="nav-link glyphicon glyphicon-user" base href="/account/">My Account</a></li>
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base href="/account/basket">View Basket</a></li>
+            <li class="nav-item"><a class="nav-link glyphicon glyphicon-user" base href="{{ url_for('account.view_account')}}">My Account</a></li>
+            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base href="{{ url_for('basket.basket_view')}}">View Basket</a></li>
             {% endif %}
         </ul>
       </div>

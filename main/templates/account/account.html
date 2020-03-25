@@ -10,16 +10,16 @@
     <div id="sidebar-wrapper">
       <div class="sidebar-heading">Your Account</div>
       <div class="list-group list-group-flush">
-        <a href="#" class="list-group-item list-group-item-action">Home</a>
+        <a href="{{ url_for('account.view_account')}}" class="list-group-item list-group-item-action">Home</a>
         <li href="#" class="list-group-item">Events and Purchases</li>
-        <a href="account/bookings" class="list-group-item list-group-item-action">Bookings</a>
-        <a href="/account/receipts" class="list-group-item list-group-item-action">Receipts</a>
+        <a href="{{ url_for('account.view_account_bookings')}}" class="list-group-item list-group-item-action">Bookings</a>
+        <a href="{{ url_for('account.view_account_receipts')}}" class="list-group-item list-group-item-action">Receipts</a>
         <li href="#" class="list-group-item">Account Management</li>
         <a href="#" class="list-group-item list-group-item-action">Membership</a>
         <a href="#" class="list-group-item list-group-item-action">Personal Details</a>
         <a href="#" class="list-group-item list-group-item-action">Card Details</a>
         <a href="#" class="list-group-item list-group-item-action">Account</a>
-        <a href="#" class="list-group-item list-group-item-action">Log Out</a>
+        <a href="{{ url_for('account.log_out')}}" class="list-group-item list-group-item-action">Log Out</a>
       </div>
     </div>
     <!-- /#sidebar-wrapper -->

@@ -1,13 +1,6 @@
-{% extends "includes/_main_layout.html"%}
-{% block additional_css %}
+{% extends "account/account.html"%}
 
-{% endblock %}
-
-{% block title %}
-{{User.first_name}}'s Account!
-{% endblock %}
-
-{% block main_content %}
+{% block page_content %}
     <h2>Welcome: {{ User.first_name }} ({{ User.__mapper_args__ ['polymorphic_identity'] }} account)</h2>
     {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
 
@@ -60,8 +53,4 @@
         <input type="submit" value="Upload">
     </form>
     {% endif %}
-{% endblock %}
-
-{% block additional_js %}
-
 {% endblock %}
