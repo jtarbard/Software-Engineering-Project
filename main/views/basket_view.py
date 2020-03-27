@@ -105,7 +105,7 @@ def basket_view():
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
         if customer and customer.current_membership:
-            customer_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
+            customer_membership = Membership.query.filter_by(membership_id=customer.current_membership_id).first()
 
             total_discounted_price = total_activity_price - \
                                      customer_membership.membership_type.discount / 100 * total_activity_price
