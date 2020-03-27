@@ -8,6 +8,7 @@ from flask_mail import Mail
 
 
 import main.view_lib.transaction_lib as tl
+import main.helper_functions.cryptography as crypt
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
@@ -84,9 +85,11 @@ def card_payment_post():
     check_box = flask.request.form.get("remember_card_details")
 
     if check_box == "on":
-        tdf.add_new_card_details(data_form.get('card_number'), data_form.get('start_date'),
-                                 data_form.get('expiration_date'), data_form.get('street_and_number'),
-                                 data_form.get('town'), data_form.get('city'), data_form.get('postcode'), customer)
+        tdf.add_new_card_details(customer, card_number=data_form.get('card_number'), start_date=data_form.get('start_date'),
+                                 expiration_date=data_form.get('expiration_date'),
+                                 street_and_number=data_form.get('street_and_number'),
+                                 town=data_form.get('town'), city=data_form.get('city'),
+                                 postcode=data_form.get('postcode'))
 
     elif customer.payment_detail:
         ds.delete_from_database(customer.payment_detail)
@@ -113,7 +116,7 @@ def card_payment_post():
         employee.receipt_assist.append(receipt)
         ds.add_to_database(employee)
 
-    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(user.user_id))
+    encrypted_receipt = crypt.hash_text(str(receipt_id) + "-" + str(user.user_id))
 
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         response = flask.redirect(f"/transactions/view_individual_receipts/{receipt_id}")
@@ -217,7 +220,7 @@ def e_m_get(receipt_id: int):
 
     customer_of_receipt = returned_receipt.customer_id
 
-    encrypted_receipt = udf.hash_text(str(receipt_id) + "-" + str(customer_of_receipt))
+    encrypted_receipt = crypt.hash_text(str(receipt_id) + "-" + str(customer_of_receipt))
 
     if user.__mapper_args__['polymorphic_identity'] == "Employee":
         employee: Employee = udf.return_employee_with_user_id(user.user_id)

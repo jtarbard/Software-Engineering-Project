@@ -10,16 +10,15 @@ blueprint = flask.Blueprint("info", __name__)
 
 
 @blueprint.route('/info/about', methods=["GET"])
-def about_view():
+def about_func():
     user, response = cl.return_user_response(flask.request, False)
-    return flask.render_template("/info/about.html", User=user)
+    return flask.render_template("/info/about.html", page_title="About", User=user)
 
 
 @blueprint.route('/info/contact_us', methods=["GET"])
 def contact_us_view():
     user, response = cl.return_user_response(flask.request, False)
     return flask.render_template("/info/contact_us.html", User=user)
-
 
 
 @blueprint.route('/info/facilities', methods=["GET"])

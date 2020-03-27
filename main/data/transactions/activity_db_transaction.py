@@ -145,17 +145,11 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
             log_transaction(f"Failed to add new activity type {name}: activity name already exists")
             return False
 
-    new_activity_type = ActivityType()
-    new_activity_type.name = name.lower()
-    new_activity_type.description = description
-    new_activity_type.category = category
-    new_activity_type.tags = tags
-    new_activity_type.minimum_age = miniumum_age
-    new_activity_type.maximum_activity_capacity = maximum_activity_capacity
-    new_activity_type.hourly_activity_cost = hourly_activity_cost
-    new_activity_type.hourly_activity_price = hourly_activity_price
-    new_activity_type.max_staff = max_staff
-    new_activity_type.min_staff = min_staff
+    new_activity_type = ActivityType(name=name, description=description, category=category, tags=tags,
+                                     minimum_age=miniumum_age, maximum_activity_capacity=maximum_activity_capacity,
+                                     hourly_activity_cost=hourly_activity_cost,
+                                     hourly_activity_price=hourly_activity_price,
+                                     max_staff=max_staff, min_staff=min_staff)
 
     add_to_database(new_activity_type)
     return True
@@ -224,11 +218,8 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
         log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity already exists")
         return False
 
-    new_activity = Activity()
-    new_activity.facility_id = facility.facility_id
-    new_activity.activity_type_id = activity_type_id
-    new_activity.start_time = start_time
-    new_activity.end_time = end_time
+    new_activity = Activity(facility_id=facility.facility_id, activity_type_id=activity_type_id,
+                            start_time=start_time, end_time=end_time)
 
     add_to_database(new_activity)
     log_transaction(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")

@@ -1,15 +1,16 @@
 # Holds all functions related to the users of the website and the transactions with the database
 import flask
 import datetime
-from main.data.db_session import add_to_database
+import main.helper_functions.cryptography as crypto
+import main.data.transactions.activity_db_transaction as adf
+import main.view_lib.basket_lib as bl
 from main.logger import log_transaction
+from main.data.db_session import add_to_database
 from main.data.db_classes.transaction_db_class import MembershipType, Receipt, Membership
 from main.data.db_classes.activity_db_class import Activity
-import main.data.transactions.activity_db_transaction as adf
-import main.data.transactions.user_db_transaction as udf
-from main.data.db_classes.transaction_db_class import Booking
-from main.data.db_classes.user_db_class import User, Customer, PaymentDetails
-import main.view_lib.basket_lib as bl
+from main.data.db_classes.transaction_db_class import Booking, PaymentDetails
+from main.data.db_classes.user_db_class import User, Customer
+
 
 #  A simple function that returns a list of all the membership types currently in the gym
 def return_all_membership_types():
@@ -43,11 +44,7 @@ def create_new_membership_type(name: str, description: str, discount: int, month
             log_transaction(f"Failed to add new membership {name}: membership name already exists")
             return False
 
-    new_membership = MembershipType()
-    new_membership.name = name.lower()
-    new_membership.description = description.lower()
-    new_membership.discount = discount
-    new_membership.monthly_price = monthly_price
+    new_membership = MembershipType(name=name, description=description, discount=discount, monthly_price=monthly_price)
 
     log_transaction(f"Adding new membership {name}")
     return add_to_database(new_membership)
@@ -99,8 +96,8 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
     basket_membership = None
     basket_membership_duration = None
 
-    #basket_instances = A:10;A:10;A:10
-    #A:10;M:1:3;A:10
+    # basket_instances = A:10;A:10;A:10
+    # A:10;M:1:3;A:10
     for basket_instance in basket_instances:
         split_instance = basket_instance.split(":")
 
@@ -138,10 +135,8 @@ def return_bookings_with_activity_id(activity_id):
 
 
 def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User, membership_duration: int):
-    new_receipt = Receipt()
     customer = Customer.query.filter(Customer.user_id == user.user_id).first()
-    new_receipt.creation_time = datetime.datetime.now()
-    new_receipt.customer_id = customer.customer_id
+    new_receipt = Receipt(customer_id=customer.customer_id, total_cost=0, creation_time=datetime.datetime.now())
     add_to_database(new_receipt)
 
     total_price = 0
@@ -149,9 +144,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
     activity_type_count = bl.return_activity_type_count_from_activity_list(basket_activities)
 
     for activity in basket_activities:
-        new_booking = Booking()
-        new_booking.activity_id = activity.activity_id
-        new_booking.receipt_id = new_receipt.receipt_id
+        new_booking = Booking(activity_id=activity.activity_id, receipt_id=new_receipt.receipt_id)
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
 
@@ -165,11 +158,10 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
 
         total_price += basket_membership.monthly_price * membership_duration
 
-        new_membership = Membership()
-        new_membership.membership_type_id = basket_membership.membership_type_id
-        new_membership.receipt_id = new_receipt.receipt_id
-        new_membership.start_date = datetime.date.today()
-        new_membership.end_date = datetime.date.today() + datetime.timedelta(days=30*membership_duration)
+        new_membership = Membership(membership_type_id=basket_membership.membership_type_id,
+                                    start_date=datetime.date.today(),
+                                    end_date=datetime.date.today() + datetime.timedelta(days=30*membership_duration),
+                                    receipt_id=new_receipt.receipt_id)
 
         new_membership.membership_type = basket_membership
 
@@ -179,7 +171,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         customer.current_membership = new_membership.membership_id
         add_to_database(customer)
 
-    new_receipt.total_cost = round(total_price,2)
+    new_receipt.total_cost = round(total_price, 2)
     add_to_database(new_receipt)
 
     return new_receipt.receipt_id
@@ -191,7 +183,7 @@ def check_encrypted_receipt(encrypted_receipt: str, user: User):
 
     for receipt in receipts:
         plain_text = str(receipt.receipt_id) + "-" + str(user.user_id)
-        if udf.verify_hash(encrypted_receipt, plain_text):
+        if crypto.verify_hash(encrypted_receipt, plain_text):
             return receipt
 
     return False
@@ -216,18 +208,10 @@ def set_deletion_for_receipt_bookings_with_activity(receipt, activity):
 
 # [Lewis S]
 # Adds a customers card details to the database as well as connecting to the customer table for an key relationship
-def add_new_card_details(card_number, start_date, expiration_date, street_and_number, town, city,
-                         postcode, customer_obj: Customer):
+def add_new_card_details(customer_obj: Customer, **card_details_kwargs):
 
-    payment_detail = PaymentDetails()
+    payment_detail = PaymentDetails(**card_details_kwargs)
 
-    payment_detail.card_number = card_number
-    payment_detail.start_date = start_date
-    payment_detail.expiration_date = expiration_date
-    payment_detail.street_and_number = street_and_number
-    payment_detail.town = town
-    payment_detail.city = city
-    payment_detail.postcode = postcode
     add_to_database(payment_detail)
 
     customer_obj.payment_detail = payment_detail

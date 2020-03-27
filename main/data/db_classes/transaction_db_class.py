@@ -63,3 +63,20 @@ class MembershipType(database.Model):
     monthly_price = database.Column(database.Integer, database.CheckConstraint("monthly_price >= 0"), nullable=False)
 
     memberships = database.relationship("Membership", back_populates="membership_type")
+
+
+class PaymentDetails(database.Model):
+    __tablename__ = 'PaymentDetails'
+
+    id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    card_number = database.Column(database.String)
+    start_date = database.Column(database.String)
+    expiration_date = database.Column(database.String)
+
+    street_and_number = database.Column(database.String)
+    town = database.Column(database.String)
+    city = database.Column(database.String)
+    postcode = database.Column(database.String)
+
+    customer_id = database.Column(database.Integer, database.ForeignKey('Customers.customer_id'))
+    #imaginary field "customer"
