@@ -10,77 +10,76 @@ The Vertex Receipt
 {% block main_content %}
     <h2>Receipt page</h2>
     {% if returned_receipt %}
-        {% if returned_receipt.bookings %}
-                <div class="table-responsive">
-                    <table class="table">
-                        <thead>
-                            <tr><td colspan="4"> Classes brought </td></tr>
-                        </thead>
-                        <tbody>
+            <div class="table-responsive">
+                <table class="table">
+                    {% if returned_receipt.bookings %}
+                    <thead>
+                        <tr><td colspan="4"> Classes brought </td></tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Class Name</strong></td>
+                            <td><strong>Class Start Time</strong></td>
+                            <td><strong>Class End Time</strong></td>
+                            <td><strong>Facility</strong></td>
+                        </tr>
+                        {% for booking in returned_receipt.bookings %}
                             <tr>
-                                <td><strong>Class Name</strong></td>
-                                <td><strong>Class Start Time</strong></td>
-                                <td><strong>Class End Time</strong></td>
-                                <td><strong>Facility</strong></td>
+                                <td>{{ booking.activity.activity_type.name }}</td>
+                                <td>{{ booking.activity.start_time }}</td>
+                                <td>{{ booking.activity.end_time }}</td>
+                                <td>{{ booking.activity.facility.name }}</td>
                             </tr>
-                            {% for booking in returned_receipt.bookings %}
-                                <tr>
-                                    <td>{{ booking.activity.activity_type.name }}</td>
-                                    <td>{{ booking.activity.start_time }}</td>
-                                    <td>{{ booking.activity.end_time }}</td>
-                                    <td>{{ booking.activity.facility.name }}</td>
-                                </tr>
-                            {% endfor %}
+                        {% endfor %}
+                        <tr>
+                            <td colspan="4" rowspan="1"></td>
+                        </tr>
+                        {% endif %}
+                        {% if returned_receipt.membership %}
+                        <tr>
+                            <td colspan="4">Membership</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Membership Name</strong></td>
+                            <td><strong>Start Time</strong></td>
+                            <td><strong>End Time</strong></td>
+                            <td><strong>Discount</strong></td>
+                        </tr>
                             <tr>
-                                <td colspan="4" rowspan="1"></td>
+                                <td>{{returned_receipt.membership.membership_type.name}}</td>
+                                <td>{{returned_receipt.membership.start_date}}</td>
+                                <td>{{returned_receipt.membership.start_date}}</td>
+                                <td>{{returned_receipt.membership.membership_type.discount}}</td>
                             </tr>
-                            {% if returned_receipt.membership %}
-                            <tr>
-                                <td colspan="4">Membership</td>
-                            </tr>
-                            <tr>
-                                <td><strong>Membership Name</strong></td>
-                                <td><strong>Start Time</strong></td>
-                                <td><strong>End Time</strong></td>
-                                <td><strong>Discount</strong></td>
-                            </tr>
-                                <tr>
-                                    <td>{{returned_receipt.membership.membership_type.name}}</td>
-                                    <td>{{returned_receipt.membership.start_date}}</td>
-                                    <td>{{returned_receipt.membership.start_date}}</td>
-                                    <td>{{returned_receipt.membership.membership_type.discount}}</td>
-                                </tr>
-                            {% endif %}
-                            <tr>
-                                <td colspan="2"></td>
-                                <td>Total Price:</td>
-                                <td>{{returned_receipt.total_cost}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-            <form>
-                <input type="button" value="Print receipt" onclick="window.print()" class="no-print">
-            </form>
-            <!-- Temporary css - to be moved into stylesheet -->
-            <style>
-                @media print
-                {
-                    .no-print
-                    {
-                        display: none;
-                    }
-                }
-            </style>
-            <br>
-{#            Temporarily disabled. This worked on the stable branch#}
-{#            <div>#}
-{#                <img src="{{qrcode(encrypted_receipt)}}">#}
-{#            </div>#}
-        {% endif %}
-            <div>
-                <h3>Total Price: £{{returned_receipt.total_cost}}</h3>
+                        {% endif %}
+                        <tr>
+                            <td colspan="2"></td>
+                            <td>Total Price:</td>
+                            <td>{{returned_receipt.total_cost}}</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
+        <form>
+            <input type="button" value="Print receipt" onclick="window.print()" class="no-print">
+        </form>
+        <!-- Temporary css - to be moved into stylesheet -->
+        <style>
+            @media print
+            {
+                .no-print
+                {
+                    display: none;
+                }
+            }
+        </style>
+        <br>
+        <div>
+            <img src="{{qrcode(encrypted_receipt)}}">
+        </div>
+        <div>
+            <h3>Total Price: £{{returned_receipt.total_cost}}</h3>
+        </div>
     {% endif %}
 {% endblock %}

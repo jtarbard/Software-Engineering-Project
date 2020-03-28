@@ -184,7 +184,7 @@ def view_account():
                     returned_bookings[booking.activity][1] += 1
 
         if customer.current_membership is not None:
-            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
+            user_membership = Membership.query.filter_by(membership_id=customer.current_membership_id).first()
             membership_type_id = user_membership.membership_type_id
             membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
 

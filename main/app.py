@@ -61,6 +61,10 @@ def configure(app):
     app.register_error_handler(405, ml.page_not_found)
     app.register_error_handler(500, ml.page_error)
 
+    print("Defining QRCode integration:")
+
+    QRcode(app)
+
     print("Starting application:")
 
 
@@ -75,8 +79,6 @@ def create_app(config_filename=None):
 
 flask_app = create_app()
 
-
 if __name__ == '__main__':
     flask_app.run(debug=True)
-    QRcode(flask_app)
 

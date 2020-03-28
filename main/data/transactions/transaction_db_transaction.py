@@ -168,7 +168,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
         add_to_database(new_membership)
 
         customer = Customer.query.filter_by(user_id=user.user_id).first()
-        customer.current_membership = new_membership.membership_id
+        customer.current_membership_id = new_membership.membership_id
         add_to_database(customer)
 
     new_receipt.total_cost = round(total_price, 2)
