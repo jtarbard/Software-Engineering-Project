@@ -1,11 +1,7 @@
 h3 {
-    font-size: inherit;
+    font-size: 1.2rem;
     padding: 0;
     margin: 0;
-}
-
-#opening-hours ol {
-    /*padding-left: 3vw;*/
 }
 
 #fixed-container {
@@ -17,3 +13,41 @@ h3 {
     margin-bottom: 3vh;
 }
 
+#faq h3{
+    margin: 1vh 0 1.8vh 0;
+    padding: 1vh 0.5vw;
+    color: #F2F2F2;
+    background-color: #5BBDC8;
+}
+
+.faq-q {
+    margin-bottom: 0.3vw;
+    font-weight: bold;
+}
+
+.faq-a {
+    margin-left: 2vw;
+    padding-left: 1vw;
+    border-left: 1vw solid #5BBDC8;
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    .faq-a {
+        padding-left: 0.5vw;
+        border-left: 0.5vw solid #5BBDC8;
+    }
+}
+
+#contact-container {
+    margin: 3vh 0 3vh 0;
+}
+
+#contact-container .col-md-4, #contact-container .col-md-8 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.contact-title {
+    font-weight: bold;
+}
