@@ -12,21 +12,55 @@ About the Vertex
     <div class="row">
         <!--  About Navigational Sidebar  -->
         <div class="col-md-3" id="sidebar">
-            <ul class="list-group">
-                <a href="#about-us" class="list-group-item">About the Vertex</a>
-                <a class="list-group-item">How to Find Us</a>
-                <a class="list-group-item">Frequently Asked Questions</a>
-                <a class="list-group-item">Contact Us</a>
-            </ul>
+            <div id="fixed-container">
+                <ul class="list-group">
+                    <a href="#about-us" class="list-group-item">About the Vertex</a>
+                    <a class="list-group-item">How to Find Us</a>
+                    <a class="list-group-item">Frequently Asked Questions</a>
+                    <a class="list-group-item">Contact Us</a>
+                </ul>
+            </div>
         </div>
         <div class="col-md-9" id="page-content">
             <!--  About Page Content  -->
             <div id="about-us">
                 <h2>About the Vertex</h2>
-                <p></p>
+                <p>
+                    The Vertex is a large sports centre based in north-west Leeds.
+                    Founded in 2000 to meet the needs of Leeds' ever-growing population the centre began with a medium
+                    sized gym, pool and outside grounds and has since undergone multiple refurbishments and extensions.
+                    The Vertex is now home to a state of the art gym, olympic sized swimming pool, large studio, two
+                    sports halls, a tennis court, a climbing wall, and an extensive outside playing field making the
+                    Vertex one of the best equipped sports centres in the north of England.
+                </p>
             </div>
             <div id="find-us">
                 <h2>How to Find the Vertex</h2>
+                <div class="row">
+                    <div class="col-md-3" id="find-us-address">
+                        <h3>Address</h3>
+                        <ol>
+                            <li>The Vertex Sports Centre</li>
+                            <li>Willow Terrace Road</li>
+                            <li>Leeds</li>
+                            <li>LS2 9JT</li>
+                        </ol>
+                    </div>
+                    <div class="col-md-9" id="find-us-info">
+                        <h3>Accessibility & Parking</h3>
+                        <p>
+                            Located just off the A660, next to the University of Leeds, the Vertex Sports Centre is
+                            accessible by car, bicycle and foot.
+                            We have our own free to use car park and are in close proximity to the university
+                            car park.
+                            There are a number of bike locking stations around the sports centre and more can be found
+                            around the university campus.
+                        </p>
+                    </div>
+                </div>
+                <div id="google-map">
+                    <div id="googleMap" style="width:100%;height:400px;"></div>
+                </div>
             </div>
             <div id="faq">
                 <h2>Frequently Asked Questions</h2>
@@ -37,4 +71,25 @@ About the Vertex
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    function myMap() {
+      var VertexPosit = new google.maps.LatLng(53.804217, -1.553213);
+      var Canvas = document.getElementById("googleMap");
+      var Options = {
+          center: VertexPosit,
+          zoom: 14,
+          zoomControl: true,
+          disableDefaultUI: true,
+          streetViewControl: true
+      };
+      var map = new google.maps.Map(Canvas, Options);
+      var marker = new google.maps.Marker({position:VertexPosit});
+      marker.setMap(map); /*Marker is set to the map*/
+    }
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyD72JPJnUXswP3-mH6S4o78XTUYVrsW2ig&callback=myMap"></script>
+
 {% endblock %}
