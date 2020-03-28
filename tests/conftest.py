@@ -5,6 +5,9 @@ from main.app import create_app
 
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
+# What are the proper uses of conftest.py
+# https://stackoverflow.com/questions/34466027/in-pytest-what-is-the-use-of-conftest-py-files
+
 
 # TODO: Investigate what a hook is... https://pytest.org/en/latest/reference.html#hook-reference
 def pytest_runtest_setup(item):
@@ -31,20 +34,19 @@ def new_user():
     return _create_user
 
 
-import tempfile
 # www.patricksoftwareblog.com/testing-a-flask-application-using-pytest
 @pytest.fixture(scope='module')
 def test_client():
     flask_app = create_app()  # NOTE: "Test Configuration" missing
     # db_fd, flask_app.config['DATABASE'] = tempfile.mkstemp()
-    # flask_app.config['TESTING'] = True
+    flask_app.config['TESTING'] = True
 
     # Flask provides a way to test your application by exposing the Werkzeug test Client
     # and handling the context locals for you.
     testing_client = flask_app.test_client()
 
     # Establish an application context before running the tests.
-    ctx = flask_app.app_context()
+    ctx = flask_app.test_request_context()  # Note the change from app_context() to test_request_context()
     ctx.push()
 
     yield testing_client  # this is where the testing happens!
