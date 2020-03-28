@@ -22,7 +22,7 @@ blueprint = flask.Blueprint("transaction", __name__)
 
 @blueprint.route("/transactions/pay-card", methods=["POST"])
 def card_payment_post():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -53,7 +53,7 @@ def card_payment_post():
                 payment_dictionary = vars(customer.payment_detail)
 
             return flask.render_template("/transactions/pay_card.html",
-                                     total_price=total_price, User=user, customer=customer,
+                                     total_price=total_price, User=user, customer=customer, has_cookie=has_cookie,
                                      payment_dictionary=payment_dictionary, error=error, type=type, checkout=True)
 
         elif type == "cash":
@@ -67,7 +67,7 @@ def card_payment_post():
                 else:
                     customer = None
 
-            return flask.render_template("/transactions/pay_card.html",
+            return flask.render_template("/transactions/pay_card.html", has_cookie=has_cookie,
                                          total_price=total_price, User=user, customer=customer,
                                          error=error, type=type, checkout=True)
 
@@ -160,7 +160,7 @@ def card_payment_post():
 
 @blueprint.route("/transactions/receipts/check_receipt_input", methods=["POST"])
 def check_receipt_qr_code():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -194,7 +194,7 @@ def check_receipt_qr_code():
 
 @blueprint.route("/transactions/receipts/<path:encrypted_receipt>", methods=["GET"])
 def receipt_get(encrypted_receipt: str):
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -204,12 +204,12 @@ def receipt_get(encrypted_receipt: str):
         return flask.abort(404)
     else:
         return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
-                                     encrypted_receipt=encrypted_receipt, User=user)
+                                     encrypted_receipt=encrypted_receipt, User=user, has_cookie=has_cookie)
 
 
 @blueprint.route("/transactions/view_individual_receipts/<int:receipt_id>", methods=["GET"])
 def e_m_get(receipt_id: int):
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -227,18 +227,18 @@ def e_m_get(receipt_id: int):
         print(employee.receipt_assist)
         if returned_receipt in employee.receipt_assist:
             return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
-                                         User=customer_of_receipt, encrypted_receipt=encrypted_receipt)
+                                         User=customer_of_receipt, encrypted_receipt=encrypted_receipt, has_cookie=has_cookie)
 
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
         return flask.render_template("/transactions/receipt.html", returned_receipt=returned_receipt,
-                                     User=customer_of_receipt, encrypted_receipt=encrypted_receipt)
+                                     User=customer_of_receipt, encrypted_receipt=encrypted_receipt, has_cookie=has_cookie)
 
     return flask.abort(404)
 
 
 @blueprint.route("/transactions/refund", methods=["POST"])
 def refund_booking():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 

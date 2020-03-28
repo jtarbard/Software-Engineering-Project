@@ -12,7 +12,7 @@ blueprint = flask.Blueprint("account", __name__)
 # Route for executing when the customer clicks a link to the login page
 @blueprint.route("/account/login", methods=["GET"])
 def login_get():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
 
@@ -21,7 +21,7 @@ def login_get():
         response.set_cookie("vertex_basket_cookie", "", expires=0)
         return response
 
-    return flask.render_template("/account/login_register.html", page_type="login")
+    return flask.render_template("/account/login_register.html", page_type="login", has_cookie=has_cookie)
 
 
 # Route for executing when the customer submits login data from the login page
@@ -64,7 +64,7 @@ def login_post():
 # Route for executing when the customer clicks a link to the register page
 @blueprint.route("/account/register", methods=["GET"])
 def register_get():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
 
@@ -74,7 +74,7 @@ def register_get():
         return response
 
 
-    return flask.render_template("/account/login_register.html", page_type="register")
+    return flask.render_template("/account/login_register.html", page_type="register", has_cookie=has_cookie)
 
 
 # Route for executing when the customer submits register data from the register page
@@ -163,7 +163,7 @@ def register_post():
 # Route for executing if the user clicks to view their account
 @blueprint.route("/account/your_account")
 def view_account():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 

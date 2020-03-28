@@ -24,7 +24,11 @@ def return_user_response(request: flask.request, needs_login: bool):
     elif needs_login:
         response = flask.redirect('/account/login')
 
-    return user, response
+    has_cookie = False
+    if "cookie_accept" in flask.request.cookies:
+        has_cookie = True
+
+    return user, response, has_cookie
 
 
 # Sets a valid account cookie consisting of the user id and a verification hash, the hash must be valid

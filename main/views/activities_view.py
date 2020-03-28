@@ -14,7 +14,7 @@ blueprint = flask.Blueprint("activities", __name__)
 
 @blueprint.route("/activities/types", methods=["POST", "GET"])
 def view_classes_types():
-    user, response = cl.return_user_response(flask.request, False)
+    user, response, has_cookie = cl.return_user_response(flask.request, False)
     if response:
         return response
 
@@ -31,7 +31,7 @@ def view_classes_types():
         facilities = adf.return_facilities("Any")
         activity_types = adf.return_all_activity_types()
 
-        return flask.render_template("/activities/activity_types.html", User=user,
+        return flask.render_template("/activities/activity_types.html", User=user, has_cookie=has_cookie,
                                      activity_types=activity_types, facilities=facilities, page_title="Activities")
 
 
@@ -40,7 +40,7 @@ def view_classes_types():
 def view_classes(multiple, sent_activity: int):
     sent_activity = int(sent_activity)
 
-    user, response = cl.return_user_response(flask.request, False)
+    user, response, has_cookie = cl.return_user_response(flask.request, False)
     if response:
         return response
 
@@ -59,7 +59,7 @@ def view_classes(multiple, sent_activity: int):
         if basket_activities:
             if (basket_membership and len(basket_activities) > 14) or len(
                     basket_activities) > 15:
-                return flask.render_template("/misc/general_error.html", error="Basket full", User=user)
+                return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
 
         try:
             activity_type = adf.return_activity_with_id(bulk_activities[0]).activity_type
@@ -84,7 +84,7 @@ def view_classes(multiple, sent_activity: int):
 
             if spaces_left <= 0:
                 return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
-                                             User=user)
+                                             User=user, has_cookie=has_cookie)
 
         response = cl.add_activities(added_activities, flask.request)
 
@@ -167,13 +167,13 @@ def view_classes(multiple, sent_activity: int):
     search_field_data["activity"] = activity_type_id
 
     return flask.render_template("/activities/activities.html", User=user, activity_dict=activity_dict,
-                                 activity_types=activity_types, facilities=facilities,
+                                 activity_types=activity_types, facilities=facilities, has_cookie=has_cookie,
                                  search_field_data=search_field_data, multiple=multiple, sent_activity=sent_activity)
 
 
 @blueprint.route("/activities/view_activity/<int:activity_id>", methods=["GET"])
 def view_class(activity_id: int):
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -188,7 +188,7 @@ def view_class(activity_id: int):
         membership = None
     else:
         customer = udf.return_customer_with_user_id(user.user_id)
-        membership = customer.current_membership
+        membership: Membership = customer.current_membership
 
     if activity.start_time < datetime.datetime.now() and type(user) is Customer:
         return flask.abort(404)
@@ -198,9 +198,9 @@ def view_class(activity_id: int):
 
     final_price = session_price
     if membership:
-        membership = Membership.query.filter_by(membership_id=membership).first().membership_type
+        membership = Membership.query.filter_by(membership_id=membership.membership_id).first().membership_type
         final_price = session_price * (1 - membership.discount / float(100))
 
     return flask.render_template("/activities/activity.html", activity=activity, session_price=round(session_price, 2),
-                                 spaces_left=spaces_left, membership=membership,
+                                 spaces_left=spaces_left, membership=membership, has_cookie=has_cookie,
                                  final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8))
