@@ -1,11 +1,40 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/about.css') }}">
 {% endblock %}
 
 {% block title %}
-The Vertex about!
+About the Vertex
 {% endblock %}
 
 {% block main_content %}
+<div class="container">
+    <div class="row">
+        <!--  About Navigational Sidebar  -->
+        <div class="col-md-3" id="sidebar">
+            <ul class="list-group">
+                <a href="#about-us" class="list-group-item">About the Vertex</a>
+                <a class="list-group-item">How to Find Us</a>
+                <a class="list-group-item">Frequently Asked Questions</a>
+                <a class="list-group-item">Contact Us</a>
+            </ul>
+        </div>
+        <div class="col-md-9" id="page-content">
+            <!--  About Page Content  -->
+            <div id="about-us">
+                <h2>About the Vertex</h2>
+                <p></p>
+            </div>
+            <div id="find-us">
+                <h2>How to Find the Vertex</h2>
+            </div>
+            <div id="faq">
+                <h2>Frequently Asked Questions</h2>
+            </div>
+            <div id="contact-us">
+                <h2>Contact the Vertex</h2>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

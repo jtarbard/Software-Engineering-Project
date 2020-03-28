@@ -1,0 +1,22 @@
+#page-description {
+    margin-bottom: 0;
+}
+
+#sidebar {
+    padding: 0;
+}
+
+.list-group {
+    border-radius: 0;
+    width: 100%;
+}
+
+.list-group-item {
+    border-radius: 0;
+    width: 100%;
+}
+
+#page-content {
+    margin-top: 7vh;
+}
+

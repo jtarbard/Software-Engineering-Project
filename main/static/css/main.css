@@ -14,10 +14,15 @@ body {
     color: white;
 }
 
+#page-title h1 {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
 #page-description {
   padding-bottom: 1.5vh;
   margin-top: -2.5vh;
-  margin-bottom: 7.5vh;
+  margin-bottom: 7vh;
   background-color: #5BBDC8;
   color: white;
 }
