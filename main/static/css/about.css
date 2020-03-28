@@ -1,30 +1,16 @@
-#sidebar {
-}
-
-/* Medium devices (tablets, 768px and up)*/
-@media (min-width: 768px) {
-
-    #fixed-container {
-        position: sticky;
-        top: 7vh;
-    }
-
-}
-
-.list-group {
-    border-radius: 0;
-    width: 100%;
-}
-
-.list-group-item {
-    border-radius: 0;
-    width: 100%;
-}
-
-#find-us h3 {
+h3 {
     font-size: inherit;
     padding: 0;
     margin: 0;
+}
+
+#opening-hours ol {
+    /*padding-left: 3vw;*/
+}
+
+#fixed-container {
+    position: sticky;
+    top: 7vh;
 }
 
 #google-map {
