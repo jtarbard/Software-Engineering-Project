@@ -15,9 +15,9 @@ h3 {
 
 #faq h3{
     margin: 1vh 0 1.8vh 0;
-    padding: 1vh 0.5vw;
-    color: #F2F2F2;
-    background-color: #5BBDC8;
+    padding: 0.5vh;
+    border-bottom: #5BBDC8 solid 2px;
+    /*background-color: #5BBDC8;*/
 }
 
 .faq-q {
@@ -26,14 +26,19 @@ h3 {
 }
 
 .faq-a {
-    margin-left: 2vw;
-    padding-left: 1vw;
+    padding-left: 2vw;
     border-left: 1vw solid #5BBDC8;
 }
 
 /*Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
+
+    .faq-q {
+        margin-left: 2vw;
+    }
+
     .faq-a {
+        margin-left: 3vw;
         padding-left: 0.5vw;
         border-left: 0.5vw solid #5BBDC8;
     }
