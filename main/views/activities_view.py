@@ -91,7 +91,7 @@ def view_classes(multiple, sent_activity: int):
         if not response:
             return flask.abort(500)
 
-        bulk_activity_type = adf.return_activity_type_name_with_activity_type_id(activity_id)
+        bulk_activity_type = adf.return_activity_type_name_with_activity_type_id(bulk_activities[0])
         flask.flash(bulk_activity_type.title() + " sessions have been added to your basket.", category="success")
         return response
 
