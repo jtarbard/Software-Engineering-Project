@@ -15,3 +15,12 @@ html {
   padding: 1vh 0 1vh;
   line-height: 6vh;
 }
+
+.alert {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100%;
+  z-index: 10;
+  margin: 0 0 0 0;
+}

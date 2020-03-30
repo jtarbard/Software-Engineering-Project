@@ -74,6 +74,7 @@ def create_app(config_filename=None):
 
 
 flask_app = create_app()
+flask_app.secret_key = "england is my city"
 
 
 if __name__ == '__main__':
