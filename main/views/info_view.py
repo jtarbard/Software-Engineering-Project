@@ -62,6 +62,9 @@ def buy_membership():
     new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
     response = cl.add_activity_or_membership_to_basket(
         new_membership_type, flask.request, duration = membership_duration)
+
+    membership_type = MembershipType.query.filter_by(membership_type_id=membership_id).first().name
+    flask.flash(membership_type.title() + " Membership has been added to your basket.", category="success")
     return response
 
 
