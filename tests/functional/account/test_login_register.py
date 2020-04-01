@@ -1,5 +1,9 @@
+import datetime
+import pprint
 import flask
 from bs4 import BeautifulSoup
+
+import tests.conftest as conftest
 
 
 def test_register_get_basic(test_client):
@@ -26,7 +30,9 @@ def test_register_post_basic(test_client):
     assert False
 
 
-def test_login_get_basic(test_client):
+# (can use) db_session (as a fixture) from pytest-flask-sqlalchemy to modify the test database.
+# but i think mocking & patching is more of my style.
+def test_login_get_basic(app, test_client, mocker):
     """
     GIVEN a Flask application
     WHEN the '/account/login' page is requested (GET)
@@ -36,11 +42,16 @@ def test_login_get_basic(test_client):
 
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
-    response = test_client.get("/account/login")
-    soup = BeautifulSoup(response.data, 'html.parser')
 
-    assert response.status_code == 200
-    assert "Login" in soup.title.string
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.get('/account/login', follow_redirects=True)
+        soup = BeautifulSoup(rv.data, 'html.parser')
+
+        assert "Login" in soup.title.string
+        assert rv.status_code == 200
+        assert len(templates) == 1
+        template, context = templates[0]
+        assert template.name == '/account/login_register.html'
 
     # ------------------------------------------------------- #
 
@@ -49,19 +60,35 @@ def test_login_get_basic(test_client):
     WHEN the '/account/login' page is requested (GET)
     UNDER CONDITIONS 1. User not logged in
                      2. Has basket cookies
+                     3. Has random cookies
     THEN check basket cookie is cleared, the page correctly renders (and gives valid response)
-    
+
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
-    test_client.set_cookie("vertex_basket_cookie", "something")
-    response = test_client.get("/account/login")
-    soup = BeautifulSoup(response.data, 'html.parser')
 
-    assert response.status_code == 200
-    assert "Login" in soup.title.string
-    assert flask.request.cookies.get("vertex_basket_cookie", None) is None
+    with conftest.captured_templates(app) as templates:
+        test_client.set_cookie("localhost", "vertex_basket_cookie", "this should be removed")
+        test_client.set_cookie("localhost", "random_cookie", "this should persist")
+
+        # extremely primitive way to access cookies, because flask.request doesn't work in test context for some reason
+        rv = test_client.get('/account/login', follow_redirects=True)
+        soup = BeautifulSoup(rv.data, 'html.parser')
+
+        assert rv.status_code == 200
+        assert "Login" in soup.title.string
+        assert "vertex_basket_cookie" not in conftest.cookies(test_client)
+        assert "random_cookie" in conftest.cookies(test_client)
+        assert len(templates) == 1
+        template, context = templates[0]
+        assert template.name == '/account/login_register.html'
 
     # ------------------------------------------------------- #
+
+    # Mocked side effect
+    def return_user_response(request, needs_login):
+        return True, flask.redirect("/account/login")  # TODO: return a real user instead of True
+
+    mocker.patch('main.view_lib.cookie_lib.return_user_response', side_effect=return_user_response)
 
     """
     GIVEN a Flask application
@@ -69,13 +96,25 @@ def test_login_get_basic(test_client):
     UNDER CONDITIONS 1. User logged in
                      2. No cookies
     THEN check the page correctly renders (and gives valid response)
+         1. Redirect to index page
+         2. '/index/index.html' gets rendered
 
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
-    # TODO: Involves database. Is this still "unit-ly functional"? Also how
-    # TODO: Maybe decouple client (app) creation and database creation? So only use part of configure()
 
-    assert False
+    with conftest.captured_templates(app) as templates:
+        # Note: Pretend user is successfully returned
+        rv = test_client.get("/account/login", follow_redirects=True)
+        soup = BeautifulSoup(rv.data, 'html.parser')
+
+        assert 'Index' in soup.title.string
+        assert rv.status_code == 200
+        assert len(templates) == 1
+        template, context = templates[0]
+        assert template.name == '/index/index.html'
+
+    # db_session.add(new_user('customer'))
+    # db_session.commit()
 
     # ------------------------------------------------------- #
 
@@ -88,9 +127,25 @@ def test_login_get_basic(test_client):
 
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
-    # TODO: Implement. Involves database
 
-    assert False
+    with conftest.captured_templates(app) as templates:
+        test_client.set_cookie("localhost", "vertex_basket_cookie", "this should persist")
+        test_client.set_cookie("localhost", "random_cookie", "this should persist")
+
+        rv = test_client.get("/account/login", follow_redirects=True)
+        pprint.pprint(flask.request.cookies)
+        soup = BeautifulSoup(rv.data, 'html.parser')
+
+        # Shouldn't clear basket cookies (or any other cookies)
+        assert "vertex_basket_cookie" in conftest.cookies(test_client)
+        assert "random_cookie" in conftest.cookies(test_client)
+
+        # Redirects to Index
+        assert 'Index' in soup.title.string
+        assert rv.status_code == 200
+        assert len(templates) == 1
+        template, context = templates[0]
+        assert template.name == '/index/index.html'
 
 
 def test_login_get_extra(test_client):
@@ -105,7 +160,7 @@ def test_login_get_extra(test_client):
     """
 
     # TODO: Implement
-    assert False
+    assert True
 
 
 def test_login_post_basic(test_client):
