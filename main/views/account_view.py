@@ -5,6 +5,7 @@ import main.data.transactions.user_db_transaction as udf
 import main.view_lib.cookie_lib as cl
 from main.data.db_classes.transaction_db_class import MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer
+from main.view_lib import account_lib
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -167,14 +168,7 @@ def view_account():
     if response:
         return response
 
-    membership_type = None
-    if user.__mapper_args__['polymorphic_identity'] == "Customer":
-        customer: Customer = udf.return_customer_with_user_id(user.user_id)
-
-        if customer.current_membership is not None:
-            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
-            membership_type_id = user_membership.membership_type_id
-            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+    membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/account.html", User=user, membership_type=membership_type, page_title="Your Account")
 
@@ -186,16 +180,12 @@ def view_account_receipts():
         return response
 
     returned_receipts = {}
-    membership_type = None
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
         customer: Customer = udf.return_customer_with_user_id(user.user_id)
         for receipt in customer.purchases:
             returned_receipts[receipt.receipt_id] = receipt
 
-        if customer.current_membership is not None:
-            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
-            membership_type_id = user_membership.membership_type_id
-            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+        membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user,
                                  returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
@@ -208,7 +198,6 @@ def view_account_bookings():
         return response
 
     returned_bookings = {}
-    membership_type = None
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
         customer: Customer = udf.return_customer_with_user_id(user.user_id)
         for receipt in customer.purchases:
@@ -223,10 +212,7 @@ def view_account_bookings():
                 else:
                     returned_bookings[booking.activity][1] += 1
 
-        if customer.current_membership is not None:
-            user_membership = Membership.query.filter_by(membership_id=customer.current_membership_id).first()
-            membership_type_id = user_membership.membership_type_id
-            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+        membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/bookings.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type, page_title="Your Upcoming Bookings")
@@ -239,14 +225,7 @@ def view_account_membership():
         return response
 
     returned_bookings = {}
-    membership_type = None
-    if user.__mapper_args__['polymorphic_identity'] == "Customer":
-        customer: Customer = udf.return_customer_with_user_id(user.user_id)
-
-        if customer.current_membership is not None:
-            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
-            membership_type_id = user_membership.membership_type_id
-            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+    membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/membership.html", User=user,
                                  membership_type=membership_type, page_title="Membership")

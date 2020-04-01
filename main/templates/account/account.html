@@ -30,7 +30,7 @@
             <button class="btn btn-primary" id="menu-toggle">Menu</button>
             <h1>{{User.first_name.title()}}</h1>
             {% if membership_type %}
-            <span class="badge badge-secondary">{{membership_type.name}}</span>
+            <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
             {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
             <span class="badge badge-secondary">Manager</span>
             {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
