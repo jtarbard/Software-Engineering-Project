@@ -82,9 +82,10 @@ def app():
     ctx.pop()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='module')
 def test_client(app):
-    return app.test_client(use_cookies=True)
+    with app.test_client(use_cookies=True) as tc:  # THIS WAS THE PROBLEM ALL ALONG OH MY GOD
+        yield tc
 
 
 @pytest.yield_fixture(scope='session')
@@ -221,5 +222,7 @@ def page_title_dict():
     return dictionary
 
 
-def cookies(test_client_obj):
-    return vars(vars(test_client_obj).get("cookie_jar")).get("_cookies").get("localhost.local").get("/").keys()
+# Deprecated. But I would really like to still keep this as a backup solution
+# def cookies(test_client_obj):
+#     return vars(vars(test_client_obj).get("cookie_jar")).get("_cookies").get("localhost.local").get("/").keys()
+
