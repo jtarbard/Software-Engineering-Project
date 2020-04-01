@@ -1,30 +1,34 @@
 {% extends "includes/_main_layout.html"%}
-{% block additional_css %}
-
-{% endblock %}
 
 {% block title %}
 The Vertex {{page_type.capitalize()}}
 {% endblock %} <!--Sets the page title to be the page type (either login or register)-->
 
 {% block main_content %}
-    <form id="TaskForm" method="post">
-        <div class="container">
+    <body background="/static/imgs/barbell.jpg">
+        <form id="TaskForm" method="post">
+
+            <div class="container">
                 {% if page_type == "login" %} <!-- Shown if this is the login page -->
-                    <div class="row" id="login_row">
+                    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+                    <center>
+                    <div class="column" id="login_column">
+                        <h1>Welcome</h1>
+                        <img src="/static/imgs/login.png" alt="login" height="70" width="70">
+
                         <div class="form-group col-lg-6 col-sml-12">
-                            <label for="email" class="form-control">Email:</label>
-                            <input type="email" name="email" required value="{{ email }}">
+                            <input type="email" placeholder="Enter Email" name="email" required value="{{ email }}">
                         </div>
                         <div class="form-group col-lg-6 col-sml-12">
-                            <label for="password" class="form-control">Password:</label>
-                            <input type="password" name="password" required value="{{ password }}">
+                            <input type="password" placeholder="Enter Password" name="password" required value="{{ password }}">
                         </div>
                     </div>
                     <input type="submit" id="submit" value="Login" class="btn-success">
                     <p>Don't have an account? <br><a href="/account/register">Register now</a></p>
                     <div id="break"></div>
+                    </center>
                 {% else %} <!-- Shown if this is the register page -->
+                    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/register.css') }}">
                     <div class="row">
                         <div class="col-lg-6 col-sml-12">
                             <div class="form-group">
@@ -324,11 +328,13 @@ The Vertex {{page_type.capitalize()}}
                         </div>
                     <input type="submit" value="Register" class="btn-success">
                 {% endif %}
-        </div>
-    </form>
-    <div class="container" id="ErrorDiv" {% if ServerError%} style="visibility: visible" {% endif %}>
-        <p>
-            {{ ServerError }} <!-- Outputs a server error if there is one -->
-        </p>
-    </divclass>
+            </div>
+
+        </form>
+        <div class="container" id="ErrorDiv" {% if ServerError%} style="visibility: visible" {% endif %}>
+            <p>
+                {{ ServerError }} <!-- Outputs a server error if there is one -->
+            </p>
+        </divclass>
+    </body>
 {% endblock %}

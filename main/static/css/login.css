@@ -1,0 +1,16 @@
+.container {
+    width: 700px;
+    height: 500px;
+    color: white;
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    transform: translate(-50%,-50%);
+}
+h1 {
+    color: white;
+}
+body{
+    background-size: cover;
+    background-position: center;
+}
