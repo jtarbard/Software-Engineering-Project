@@ -1,0 +1,57 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
+{% block accounts_additional_css %}
+{% endblock %}
+{% endblock %}
+
+{% block main_content %}
+  <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div id="sidebar-wrapper">
+      <div class="sidebar-heading">Your Account</div>
+      <div class="list-group list-group-flush">
+        <a href="{{ url_for('account.view_account')}}" class="list-group-item list-group-item-action">Home</a>
+        <a href="{{ url_for('account.view_account_bookings')}}" class="list-group-item list-group-item-action">Bookings</a>
+        <a href="{{ url_for('account.view_account_receipts')}}" class="list-group-item list-group-item-action">Receipts</a>
+        <a href="{{ url_for('account.view_account_membership')}}" class="list-group-item list-group-item-action">Membership</a>
+        <a href="#" class="list-group-item list-group-item-action">Personal Details</a>
+        <a href="#" class="list-group-item list-group-item-action">Card Details</a>
+        <a href="#" class="list-group-item list-group-item-action">Account</a>
+        <a href="{{ url_for('account.log_out')}}" class="list-group-item list-group-item-action">Log Out</a>
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <div class="container" id="page-content-wrapper">
+        <div id="title-bar">
+            <button class="btn btn-primary" id="menu-toggle">Menu</button>
+            <h1>{{User.first_name.title()}}</h1>
+            {% if membership_type %}
+            <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
+            {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+            <span class="badge badge-secondary">Manager</span>
+            {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+            <span class="badge badge-secondary">Employee</span>
+            {% else %}
+            <span class="badge badge-secondary">Non-Member</span>
+            {% endif %}
+        </div>
+        <div id="page-content">
+            {% block page_content %}
+            {% endblock %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block additional_js %}
+<!--   Javascript from https://startbootstrap.com/templates/simple-sidebar/   -->
+<script>
+$("#menu-toggle").click(function(e) {
+  e.preventDefault();
+  $("#wrapper").toggleClass("toggled");
+});
+</script>
+{% endblock %}

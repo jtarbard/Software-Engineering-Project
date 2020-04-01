@@ -13,7 +13,7 @@ blueprint = flask.Blueprint("activities", __name__)
 
 
 @blueprint.route("/activities/types", methods=["POST", "GET"])
-def view_classes_types():
+def view_activity_types():
     user, response = cl.return_user_response(flask.request, False)
     if response:
         return response
@@ -24,9 +24,9 @@ def view_classes_types():
         amount = data_form.get("amount")
 
         if amount == "single":
-            return flask.redirect(flask.url_for("activities.view_classes", _method='GET', multiple=False, sent_activity=activity))
+            return flask.redirect(flask.url_for("activities.view_activities", _method='GET', multiple=False, sent_activity=activity))
         elif amount == "multiple":
-            return flask.redirect(flask.url_for("activities.view_classes", _method='GET', multiple=True, sent_activity=activity))
+            return flask.redirect(flask.url_for("activities.view_activities", _method='GET', multiple=True, sent_activity=activity))
     else:
         facilities = adf.return_facilities("Any")
         activity_types = adf.return_all_activity_types()
@@ -37,7 +37,7 @@ def view_classes_types():
 
 @blueprint.route('/activities/view_activities', methods=["POST", "GET"], defaults={'multiple': False, 'sent_activity': 0})
 @blueprint.route('/activities/<sent_activity>_<multiple>', methods=["POST", "GET"])
-def view_classes(multiple, sent_activity: int):
+def view_activities(multiple, sent_activity: int):
     sent_activity = int(sent_activity)
 
     user, response = cl.return_user_response(flask.request, False)
@@ -173,7 +173,7 @@ def view_classes(multiple, sent_activity: int):
 
 
 @blueprint.route("/activities/view_activity/<int:activity_id>", methods=["GET"])
-def view_class(activity_id: int):
+def view_activity(activity_id: int):
     user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
@@ -199,7 +199,7 @@ def view_class(activity_id: int):
 
     final_price = session_price
     if membership:
-        membership = Membership.query.filter_by(membership_id=membership).first().membership_type
+        membership = Membership.query.filter_by(membership_id=membership.membership_id).first().membership_type
         final_price = session_price * (1 - membership.discount / float(100))
 
     return flask.render_template("/activities/activity.html", activity=activity, session_price=round(session_price, 2),

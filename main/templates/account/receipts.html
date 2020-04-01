@@ -1,0 +1,40 @@
+{% extends "account/account.html"%}
+{% block accounts_additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/receipts.css') }}">
+{% endblock %}
+{% block page_content %}
+    {% if returned_bookings %}
+    <div id="qr-search">
+        <form action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
+            <label for="file">Find Receipt by QR Code: </label>
+            <input id="file" type="file" name="file">
+            <input type="submit" value="Upload">
+        </form>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="4">
+                    <span id="table-title">Your Receipts</span>
+                </td></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Receipt ID</td>
+                    <td>Purchase Date</td>
+                    <td>Total Cost</td>
+                    <td>View Receipt</td>
+                </tr>
+                {% for receipt in returned_receipts %}
+                    <tr>
+                        <td>{{receipt.receipt_id}}</td>
+                        <td>{{receipt.creation_time}}</td>
+                        <td>{{receipt.total_cost}}</td>
+                        <td><a href="{{url_for('transaction.e_m_get', receipt_id=receipt.receipt_id)}}">View</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+{% endblock %}

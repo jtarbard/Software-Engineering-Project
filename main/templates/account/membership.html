@@ -1,0 +1,9 @@
+{% extends "account/account.html"%}
+{% block page_content %}
+{% if membership_type %}
+<p>current membership : {{membership_type.name}}<p>
+<a href="/info/memberships/cancel">cancel membership</a>
+{% else %}
+<p>you currently have no membership</p>
+{% endif %}
+{% endblock %}
