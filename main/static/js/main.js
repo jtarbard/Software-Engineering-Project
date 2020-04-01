@@ -1,2 +1,10 @@
-//Loads the cookie box if the user has not accepted cookies
 
+
+$(document).ready(function() {
+
+    $('.alert').alert();
+
+    setTimeout(function() {
+        $(".alert").alert('close');
+    }, 5000);
+});

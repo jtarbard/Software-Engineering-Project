@@ -57,8 +57,7 @@ def view_classes(multiple, sent_activity: int):
             return cl.destroy_account_cookie(flask.redirect("/"))
 
         if basket_activities:
-            if (basket_membership and len(basket_activities) > 14) or len(
-                    basket_activities) > 15:
+            if (basket_membership and len(basket_activities) > 14) or len(basket_activities) > 15:
                 return flask.render_template("/misc/general_error.html", error="Basket full", User=user)
 
         try:
@@ -91,6 +90,8 @@ def view_classes(multiple, sent_activity: int):
         if not response:
             return flask.abort(500)
 
+        bulk_activity_type = adf.return_activity_type_name_with_activity_type_id(sent_activity)
+        flask.flash(bulk_activity_type.title() + " sessions have been added to your basket.", category="success")
         return response
 
     start_time = data_form.get("start_time")

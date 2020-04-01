@@ -20,12 +20,12 @@ def return_activity_type_with_id(activity_type_id: int):
 # [Lewis S]
 def return_activity_type_name_with_activity_type_id(activity_type_id):
     activity_type: ActivityType = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
-    """
-    if not activity_type:
-        log_transaction(f"Failed to return activity type name with activity type ID: {activity_type_id} from DB")
-    else:
-        log_transaction(f"Successfully returned activity type name with activity type ID: {activity_type_id} from DB")
-    """
+
+    # if not activity_type:
+    #     log_transaction(f"Failed to return activity type name with activity type ID: {activity_type_id} from DB")
+    # else:
+    #     log_transaction(f"Successfully returned activity type name with activity type ID: {activity_type_id} from DB")
+
     return str(activity_type.name)
 
 

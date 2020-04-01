@@ -69,6 +69,25 @@ as the basic body -->
 {% endif %}
 
 {% block main_content %} {% endblock %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if message[0] == ("success") %}
+            <div class="alert alert-success fade show" role="alert">
+            {% elif message[0] == ("error") %}
+            <div class="alert alert-danger fade show" role="alert">
+            {% else %}
+            <div class="alert alert-primary fade show" role="alert">
+            {% endif %}
+                {{ message[1] }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                  </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 </div>
 
 {% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->
@@ -80,9 +99,7 @@ as the basic body -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="../../static/js/main.js">
-
-</script>
+<script src="../../static/js/main.js"></script>
 {% block additional_js %} {% endblock %} <!--Lets the user input additional JavaScript -->
 </body>
 </html>

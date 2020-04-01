@@ -1,0 +1,58 @@
+h3 {
+    font-size: 1.2rem;
+    padding: 0;
+    margin: 0;
+}
+
+#fixed-container {
+    position: sticky;
+    top: 7vh;
+}
+
+#google-map {
+    margin-bottom: 3vh;
+}
+
+#faq h3{
+    margin: 1vh 0 1.8vh 0;
+    padding: 0.5vh;
+    border-bottom: #5BBDC8 solid 2px;
+    /*background-color: #5BBDC8;*/
+}
+
+.faq-q {
+    margin-bottom: 0.3vw;
+    font-weight: bold;
+}
+
+.faq-a {
+    padding-left: 2vw;
+    border-left: 1vw solid #5BBDC8;
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+
+    .faq-q {
+        margin-left: 2vw;
+    }
+
+    .faq-a {
+        margin-left: 3vw;
+        padding-left: 0.5vw;
+        border-left: 0.5vw solid #5BBDC8;
+    }
+}
+
+#contact-container {
+    margin: 3vh 0 3vh 0;
+}
+
+#contact-container .col-md-4, #contact-container .col-md-8 {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.contact-title {
+    font-weight: bold;
+}

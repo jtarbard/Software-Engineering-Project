@@ -45,6 +45,8 @@ def view_classes_post():
     if not response:
         return flask.abort(500)
 
+    activity_type = adf.return_activity_type_name_with_activity_type_id(activity.activity_type_id)
+    flask.flash(activity_type.title()+" session has been added to your basket.", category="success")
     return response
 
 
