@@ -42,6 +42,7 @@
 /* End of startbootstrap's code.*/
 
 #title-bar {
+    margin-top: 2vh;
     height: 10vh;
 }
 
@@ -56,7 +57,7 @@
     min-width: 20vw;
     height: 8vh;
     float: left;
-    margin: 1vh 1vw 1vh 1vw;
+    margin: 1vh 0 1vh 0;
 }
 
 #title-bar span {
@@ -64,7 +65,7 @@
     height: 8vh;
     line-height: 7vh;
     float: right;
-    margin: 1vh 0 1vh 1vw;
+    margin: 1vh 0 1vh 0;
 }
 
 #page-title {

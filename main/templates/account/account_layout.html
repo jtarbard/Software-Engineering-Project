@@ -1,13 +1,15 @@
 {% extends "includes/_main_layout.html"%}
+
 {% block additional_css %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
 {% block accounts_additional_css %}
 {% endblock %}
+
 {% endblock %}
 
 {% block main_content %}
+{% if not sidebar_off %}
   <div class="d-flex" id="wrapper">
-
     <!-- Sidebar -->
     <div id="sidebar-wrapper">
       <div class="sidebar-heading">Your Account</div>
@@ -21,13 +23,14 @@
         <a href="#" class="list-group-item list-group-item-action">Account</a>
         <a href="{{ url_for('account.log_out')}}" class="list-group-item list-group-item-action">Log Out</a>
       </div>
+        <button class="btn btn-primary" id="menu-toggle">Menu</button>
     </div>
     <!-- /#sidebar-wrapper -->
+{% endif %}
 
     <!-- Page Content -->
     <div class="container" id="page-content-wrapper">
         <div id="title-bar">
-            <button class="btn btn-primary" id="menu-toggle">Menu</button>
             <h1>{{User.first_name.title()}}</h1>
             {% if membership_type %}
             <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>

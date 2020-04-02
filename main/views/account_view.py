@@ -170,7 +170,7 @@ def view_account():
 
     membership_type = account_lib.get_membership_type(user)
 
-    return flask.render_template("/account/account.html", User=user, membership_type=membership_type, page_title="Your Account")
+    return flask.render_template("/account/account_home.html", User=user, membership_type=membership_type, page_title="Your Account", sidebar_off=True)
 
 
 @blueprint.route("/account/receipts", methods=["GET"])
