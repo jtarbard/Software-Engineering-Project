@@ -67,6 +67,11 @@ The Vertex Statistics!
         </table>
     </div>
 <br>
+<div id="charts">
+    <canvas id="booking-chart" width="800" height="450"></canvas>
+    <!--<canvas id="profit-chart" width="800" height="450"></canvas>-->
+    <canvas id="activity-chart" width="800" height="450"></canvas>
+</div>
 <div class="table-responsive">
         <table class="table">
             <thead>
@@ -100,7 +105,7 @@ The Vertex Statistics!
                         <td>Profit</td>
                     </tr>
                 {% for activity_type in weekly_activities[week_num].keys()%}
-                    {% if not activity_type in [-1,-2] %}
+                    {% if not activity_type in [-1,-2,-3,-4] %}
                         {% for activity_data in weekly_activities[week_num][activity_type] %}
                             <tr>
                                 <td><a href="/activities/view_activity/{{ activity_data[0].activity_id }}">{{activity_data[0].activity_id}}</a></td>
@@ -137,5 +142,65 @@ The Vertex Statistics!
             </table>
         </div>
     {% endfor %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
+        new Chart(document.getElementById("booking-chart"), {
+            type: 'bar',
+            data: {
+              labels: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}"{{week_num}}"
+                        {% endfor %}],
+              datasets: [
+                {
+                  label: "Number of bookings",
+                  backgroundColor: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}"#{{weekly_activities[week_num][-4]}}"
+                        {% endfor %}],
+                  data: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}{{weekly_activities[week_num][-3]}}
+                        {% endfor %}]
+                }
+              ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                legend: { display: false },
+              title: {
+                    display: true,
+                    text: 'Number of bookings per week'
+              }
+
+            }
+        });
+
+        /*new Chart(document.getElementById("activity-chart"), {
+            type: 'bar',
+            data: {
+              labels: [{% for activity in total_activity_type_bookings.keys() %} %}
+                            {%if list(total_activity_type_bookings.keys()).index(activity) != 0 %},{% endif %}"{{activity}}"
+                        {% endfor %}],
+              datasets: [
+                {
+                  label: "Number of bookings per activity type",
+                  data: [{% for activity, booking in total_activity_type_bookings.items() %}
+                            {%if list(total_activity_type_bookings.keys()).index(activity) != 0 %},{% endif %}{{booking}}
+                        {% endfor %}]
+                }
+              ]
+            },
+            options: {
+              title: {
+                    display: true,
+                    text: 'Number of bookings per week'
+              }
+            }
+        });*/
+    </script>
 {% endif %}
 {% endblock %}

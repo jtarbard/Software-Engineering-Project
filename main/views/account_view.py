@@ -1,9 +1,11 @@
 import re
 import flask
 import datetime
+import random
+import string
+
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.activity_db_transaction as adf
-import main.data.transactions.transaction_db_transaction as tdf
 import main.view_lib.cookie_lib as cl
 from main.data.db_classes.activity_db_class import ActivityType
 from main.data.db_classes.transaction_db_class import MembershipType, Membership
@@ -251,7 +253,6 @@ def view_usages():
     end_date_monday = end_search - datetime.timedelta(days=end_search.weekday())
 
     number_of_weeks = (end_date_monday-start_date_monday).days // 7
-    print(number_of_weeks)
 
     for activity in activities:
         activity_type: ActivityType = activity.activity_type
@@ -279,6 +280,18 @@ def view_usages():
         else:
             weekly_activities[activity_week][-2] += activity_cost
 
+        if -3 not in weekly_activities[activity_week]:
+            weekly_activities[activity_week][-3] = num_activity_bookings
+        else:
+            weekly_activities[activity_week][-3] += num_activity_bookings
+
+        if -4 not in weekly_activities[activity_week]:
+            color = ""
+            for i in range(6):
+                color += random.choice("abcdef" + string.digits)
+            weekly_activities[activity_week][-4] = color
+            print(color)
+
         total_cash_in += activity_income
         total_cash_out += activity_cost
         total_bookings += num_activity_bookings
@@ -289,6 +302,8 @@ def view_usages():
     search_field_data["end_date"] = end_date.strftime("%Y-%m-%d")
     search_field_data["max_date"] = datetime.date.today()
     search_field_data["activity_type"] = activity_type_id
+
+
 
     return flask.render_template("/account/statistics.html", User=user, number_of_weeks=number_of_weeks+1,
                                  weekly_activities=weekly_activities, search_field_data=search_field_data,
