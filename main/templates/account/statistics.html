@@ -109,7 +109,7 @@ The Vertex Statistics!
                         {% for activity_data in weekly_activities[week_num][activity_type] %}
                             <tr>
                                 <td><a href="/activities/view_activity/{{ activity_data[0].activity_id }}">{{activity_data[0].activity_id}}</a></td>
-                                <td>{{activity_data[0].activity_type.name}}</td>
+                                <td>{{activity_data[0].activity_type.name.capitalize()}}</td>
                                 <td>{{activity_data[0].start_time}}</td>
                                 <td>{{activity_data[3]}}</td>
                                 <td>{{activity_data[1]}}</td>
