@@ -139,7 +139,7 @@ def create_activity_types():
 
     minimum_age = [12, 12, 12, 16, 16, 16, 14, 12, 8, 0, 16, 12, 8, 14, 16]
 
-    hourly_activity_cost = [random.randint(3, 1000) / 100 for i in range(activity_num)]
+    hourly_activity_cost = [random.randint(3, 250) / 100 for i in range(activity_num)]
 
     hourly_activity_price = [random.randint(5, 1500) / 100 for i in range(activity_num)]
 

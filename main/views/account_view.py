@@ -211,6 +211,8 @@ def view_usages():
     start_date = data_form.get("start_date")
     end_date = data_form.get("end_date")
 
+    fixed_cost = 11500
+
     if type(start_date) is str:
         start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
     if type(end_date) is str:
@@ -301,7 +303,10 @@ def view_usages():
 
     total_activity_type_bookings = {k: v for k, v in sorted(total_activity_type_bookings.items(), key=lambda item: item[1][0], reverse=True)}
     activity_types = list(total_activity_type_bookings.keys())
-    print(activity_types)
+
+    for week_num in weekly_activities.keys():
+        weekly_activities[week_num][-2] += fixed_cost
+        total_cash_out += fixed_cost
 
     search_field_data = {}
     search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
