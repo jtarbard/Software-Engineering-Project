@@ -4,7 +4,7 @@ import main.data.transactions.activity_db_transaction as adf
 def return_activity_type_count_from_activity_list(basket_activities):
     activity_type_count = [0 for activity in adf.return_all_activity_types()]
     for activity in list(dict.fromkeys(basket_activities)):
-        activity_type_count[activity.activity_type_id] += 1
+        activity_type_count[activity.activity_type_id-1] += 1
     return activity_type_count
 
 
@@ -15,7 +15,7 @@ def return_bulk_discount(activity, activity_type_count=None, basket_activities=N
     if not activity_type_count and basket_activities:
         activity_type_count = return_activity_type_count_from_activity_list(basket_activities)
 
-    num_activity_type = activity_type_count[activity.activity_type_id]
+    num_activity_type = activity_type_count[activity.activity_type_id-1]
     if num_activity_type >= 10:
         bulk_discount = 0.5
     elif num_activity_type >= 5:

@@ -4,7 +4,7 @@ import datetime
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
-from main.data.db_classes.activity_db_class import Activity, ActivityType
+from main.data.db_classes.activity_db_class import Activity
 from main.data.db_classes.transaction_db_class import Membership
 from main.data.db_classes.user_db_class import Customer
 import main.view_lib.cookie_lib as cl
@@ -181,8 +181,12 @@ def view_class(activity_id: int):
     if not activity:
         return flask.abort(404)
 
-    spaces_left = activity.activity_type.maximum_activity_capacity - len(
-        tdf.return_bookings_with_activity_id(activity.activity_id))
+    total_bookings = len(tdf.return_bookings_with_activity_id(activity.activity_id))
+    spaces_left = activity.activity_type.maximum_activity_capacity - total_bookings
+    activity_income = total_bookings * activity.activity_type.hourly_activity_price * (
+                activity.end_time - activity.start_time).seconds // 3600
+    activity_cost = total_bookings * activity.activity_type.hourly_activity_cost * (
+                activity.end_time - activity.start_time).seconds // 3600
 
     if type(user) is not Customer or spaces_left <= 0:
         membership = None
@@ -202,5 +206,6 @@ def view_class(activity_id: int):
         final_price = session_price * (1 - membership.discount / float(100))
 
     return flask.render_template("/activities/activity.html", activity=activity, session_price=round(session_price, 2),
-                                 spaces_left=spaces_left, membership=membership,
-                                 final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8))
+                                 spaces_left=spaces_left, membership=membership, total_bookings=total_bookings,
+                                 final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8),
+                                 activity_cost=activity_cost, activity_income=activity_income)

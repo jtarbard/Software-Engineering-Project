@@ -1,0 +1,141 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+
+{% endblock %}
+
+{% block title %}
+The Vertex Statistics!
+{% endblock %}
+
+{% block main_content %}
+<h1>View Statistics</h1>
+<form class="form-inline" method="post">
+    <label for="start_date">Start search date:</label>
+    <input type="date" name="start_date" required value="{{search_field_data["start_date"]}}"
+        max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">
+    <label for="start_date">End search date:</label>
+    <input type="date" name="end_date" required value="{{search_field_data["end_date"]}}"
+        max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">
+
+    <label for="activity_type">Activity type:</label>
+    <select name="activity_type">
+        <option value="Any" {% if search_field_data["activity"] == "Any" %} selected {% endif %} >Any</option>
+        {% for actvitiy_type in activity_types %}
+            {% if actvitiy_type.activity_type_id == search_field_data["activity"] or actvitiy_type.activity_type_id == sent_activity %}
+                <option value="{{actvitiy_type.activity_type_id}}" selected="selected">{{actvitiy_type.name.capitalize()}}</option>
+            {% else %}
+                <option value="{{actvitiy_type.activity_type_id}}" >{{actvitiy_type.name.capitalize()}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <input type="submit" name="reload_search" value="Refresh results">
+</form>
+{% if not weekly_activities %}
+    <p>No activity data returned, please change the search options</p>
+{% else %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="2">Basic Stats</td></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Start date:</td>
+                    <td>{{search_field_data["start_date"]}}</td>
+                </tr>
+                <tr>
+                    <td>End date:</td>
+                    <td>{{search_field_data["end_date"]}}</td>
+                </tr>
+                <tr>
+                    <td>Total bookings:</td>
+                    <td>{{total_bookings}}</td>
+                </tr>
+                <tr>
+                    <td>Total income:</td>
+                    <td>{{total_cash_in}}</td>
+                </tr>
+                <tr>
+                    <td>Total outflow:</td>
+                    <td>{{total_cash_out}}</td>
+                </tr>
+                <tr>
+                    <td>Total profit:</td>
+                    <td>{{total_cash_in-total_cash_out}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<br>
+<div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="2">Total Bookings</td></tr>
+            </thead>
+            <tbody>
+                {% for activity, num_bookings in total_activity_type_bookings.items() %}
+                <tr>
+                    <td>{{activity.name.capitalize()}}</td>
+                    <td>{{num_bookings}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+<br>
+    {% for week_num in weekly_activities.keys()%}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><td colspan="7">Week {{week_num+1}}</td></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Activity number</td>
+                        <td>Activity Name</td>
+                        <td>Activity Time </td>
+                        <td>Number of bookings</td>
+                        <td>Income</td>
+                        <td>Cost</td>
+                        <td>Profit</td>
+                    </tr>
+                {% for activity_type in weekly_activities[week_num].keys()%}
+                    {% if not activity_type in [-1,-2] %}
+                        {% for activity_data in weekly_activities[week_num][activity_type] %}
+                            <tr>
+                                <td><a href="/activities/view_activity/{{ activity_data[0].activity_id }}">{{activity_data[0].activity_id}}</a></td>
+                                <td>{{activity_data[0].activity_type.name}}</td>
+                                <td>{{activity_data[0].start_time}}</td>
+                                <td>{{activity_data[3]}}</td>
+                                <td>{{activity_data[1]}}</td>
+                                <td>{{activity_data[2]}}</td>
+                                <td>{{activity_data[1]-activity_data[2]}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                 </tbody>
+                <tr><td colspan="7"></td></tr>
+                <tfoot>
+                <tr>
+                    <td colspan="5"></td>
+                    <td>Total Income</td>
+                    <td>£{{weekly_activities[week_num][-1]}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td>Total Cost</td>
+                    <td>£{{weekly_activities[week_num][-2]}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td>Total Profit</td>
+                    <td>£{{weekly_activities[week_num][-1]-weekly_activities[week_num][-2]}}</td>
+                </tr>
+
+                </tfoot>
+            </table>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

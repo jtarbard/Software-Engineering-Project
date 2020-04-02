@@ -166,6 +166,9 @@ def return_activity_instances_between_dates(activity_type_id: int, start_time: d
     start_time = start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute // 30)
     end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute // 30)
 
+    if activity_type_id == "Any":
+        return Activity.query.filter(Activity.start_time <= start_time, Activity.end_time >= end_time).all()
+
     if type(activity_type_id) is not int:
         log_transaction(
             f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
@@ -223,7 +226,7 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
 
     add_to_database(new_activity)
     log_transaction(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
-    return True
+    return new_activity
 
 
 # Simply returns all activity instances between two datetimes

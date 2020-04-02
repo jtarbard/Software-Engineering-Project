@@ -209,57 +209,62 @@ def create_base_account_types():
 
 
 # Populates the activity table with semi-random activities, creates a timetable for the website
-def create_pseudorandom_activity_instances(end_date: timedelta):
-    log_transaction(f"Creating timetable between dates: {datetime.today()} and {datetime.today() + end_date}")
+def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: timedelta,
+                                           populate_with_random_bookings: bool):
+    log_transaction(f"Creating timetable between dates: {start_date} and {start_date + end_date}")
     days_between_dates = end_date.days
 
-    current_date = datetime.today()
+    current_date = start_date
 
     activity_types = ActivityType.query.all()
+
+    if populate_with_random_bookings:
+        global customer_account
+        customer_account = udf.return_customer_with_email(EMAIL_TYPES["customer"])
 
     for day_amount in range(days_between_dates):
         for activity_type in activity_types:
             if activity_type.name == "general swim":
                 if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
                     week_day_times = [6, 7, 8, 13, 14, 15, 16, 17, 20, 21]
-                    add_activities_with_times(week_day_times, day_amount, activity_type)
+                    add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
                 else:
                     amount_today = random.randint(8, 16)
                     returned_times = return_random_times(amount_today)
-                    add_activities_with_times(returned_times, day_amount, activity_type)
+                    add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
             elif activity_type.name == "swimming classes":
                 if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
                     week_day_times = [9, 10, 11, 19]
-                    add_activities_with_times(week_day_times, day_amount, activity_type)
+                    add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
             elif activity_type.name == "aqua":
                 if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
                     week_day_times = [18]
-                    add_activities_with_times(week_day_times, day_amount, activity_type)
+                    add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
                 else:
                     amount_today = random.randint(4, 6)
                     returned_times = return_random_times(amount_today)
-                    add_activities_with_times(returned_times, day_amount, activity_type)
+                    add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
             elif activity_type.name == "gym":
                 week_day_times = [6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]
-                add_activities_with_times(week_day_times, day_amount, activity_type)
+                add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
             elif activity_type.name in ["badminton", "yoga"]:
                 amount_today = random.randint(3, 6)
                 returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type)
+                add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
             elif activity_type.name in ["tennis", "football", "basketball", "rugby"]:
                 amount_today = random.randint(2, 4)
                 returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type)
+                add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
             else:
                 amount_today = random.choice([1, 1, 1, 2, 2, 3])
                 returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type)
+                add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
 
 # Returns random times that activities are assigned to
@@ -271,22 +276,35 @@ def return_random_times(amount_today: int):
 
 
 # Traverses the times an activity takes place and adds it to the database
-def add_activities_with_times(returned_times: list, day_amount: int, activity_type):
+def add_activities_with_times(returned_times: list, day_amount: int, activity_type,
+                              start_date: datetime.date, populate_with_random_bookings):
     for time in returned_times:
         end_time = time + 1
         if time - 1 in returned_times:
             continue
         while end_time in returned_times:
             end_time += 1
-        midnight_today = datetime.combine(datetime.today(), datetime.min.time())
+        midnight_start_date = datetime.combine(start_date, datetime.min.time())
 
         facilities_total = len(activity_type.available_facilities)
         random_facility = random.randint(0, facilities_total - 1)
 
-        adf.create_new_activity(activity_type.activity_type_id,
+        new_activity = adf.create_new_activity(activity_type.activity_type_id,
                                 activity_type.available_facilities[random_facility].name,
-                                midnight_today + timedelta(days=day_amount) + timedelta(hours=time),
-                                midnight_today + timedelta(days=day_amount) + timedelta(hours=end_time))
+                                midnight_start_date + timedelta(days=day_amount) + timedelta(hours=time),
+                                midnight_start_date + timedelta(days=day_amount) + timedelta(hours=end_time))
+
+        if populate_with_random_bookings and new_activity:
+            create_random_bookings(new_activity)
+
+
+def create_random_bookings(activity: Activity):
+    num_bookings = random.randint(2, activity.activity_type.maximum_activity_capacity)
+    activities_to_add = []
+    for i in range(num_bookings):
+        activities_to_add.append(activity)
+    tdf.create_new_receipt(basket_activities=activities_to_add, user=customer_account,
+                           basket_membership=None, membership_duration=None)
 
 
 def create_activity_facility_relation():
@@ -322,7 +340,7 @@ def create_activity_facility_relation():
 
 
 # Executes all the functions for populating the database
-def populate_db(create_timetable):
+def populate_db(create_timetable, populate_with_random_bookings):
     # if the manager account exists
     if udf.check_user_is_in_database_and_password_valid(EMAIL_TYPES["manager"], PASSWORD):
         # assume the database has already been populated
@@ -343,5 +361,7 @@ def populate_db(create_timetable):
             raise Exception(function_list[1])
 
     if create_timetable:
-        create_pseudorandom_activity_instances(end_date=timedelta(weeks=1))
+        create_pseudorandom_activity_instances(start_date=datetime.today()-timedelta(weeks=2),
+                                               end_date=timedelta(weeks=4),
+                                               populate_with_random_bookings=populate_with_random_bookings)
     return True
