@@ -29,10 +29,10 @@ def setup_db(app):
 
 
 # Error logging is created so all errors are recorded
-def create_logging(app):
+def create_logging(app, transaction_filename="transactions.log", server_error_filename="server_error.log"):
     import main.logger as logger
-    logger.create_transaction_logger()
-    logger.create_flask_logger(app)
+    logger.create_transaction_logger(transaction_filename)
+    logger.create_flask_logger(app, server_error_filename)
 
 
 # App is configured
