@@ -45,13 +45,13 @@ def login_post():
         server_error = "Input Error: Password not in valid format"
 
     if server_error:  # Returns login page if an error is found
-        return flask.render_template("account/login_register.html", page_type="login", ServerError=server_error,
+        return flask.render_template("/account/login_register.html", page_type="login", ServerError=server_error,
                                      email=email, has_cookie=True, page_title="Login")
 
     # Checks that the customer exists in the database, if not then the login page returned with an error
     user = udf.check_user_is_in_database_and_password_valid(email, password_first)
     if not user:  # Checks if the user actually exists
-        return flask.render_template("account/login_register.html", page_type="login",
+        return flask.render_template("/account/login_register.html", page_type="login",
                                      ServerError="Input error: Incorrect email or password",
                                      email=email, has_cookie=True, page_title="Login")
 
@@ -145,7 +145,7 @@ def register_post():
     if server_error:  # If there was an error then the normal register page is loaded with all the values that the user
                       # entered inserted into the fields
 
-        return flask.render_template("account/login_register.html", page_type="register",
+        return flask.render_template("/account/login_register.html", page_type="register",
                                      ServerError=server_error, email=email, date_of_birth=str(dob), first_name=first_name,
                                      last_name=last_name, postcode=postcode, address=address, title=title,
                                      tel_number=tel_number, page_title="Register")
