@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 import flask
 from flask_sqlalchemy import SQLAlchemy
-from main.app import register_blueprints
+from main.app import register_blueprints, create_logging
 from main.data.db_session import test_init
 
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
@@ -65,6 +65,8 @@ def new_user():
 def app():
     local_app = flask.Flask("main.app", instance_relative_config=True)
     # configure
+    # TODO: Change actual persisting file to tempfiles
+    create_logging(local_app, transaction_filename="test_transactions.log", server_error_filename="test_server_error.log")
     register_blueprints(local_app)
     import main.view_lib.misc_lib as ml
     local_app.register_error_handler(404, ml.page_not_found)
@@ -139,35 +141,35 @@ def captured_templates(app):
         template_rendered.disconnect(record, app)
 
 
-@pytest.fixture(scope='session')
-def page_title_dict():
-    # Current working directory = main/..
-    dictionary = {}
+# Deprecated but would still like to keep it here... Perhaps move to snippets?
+# @pytest.fixture(scope='session')
+# def page_title_dict():
+#     # Current working directory = main/..
+#     dictionary = {}
+#
+#     for root, dirs, files in os.walk(os.getcwd()):
+#         for file in [f for f in files if f.endswith(".html")]:
+#             with open(root + "\\" + file, "r", encoding='utf-8') as content:
+#                 title = ""
+#                 is_title_portion = False  # this doesn't matter
+#                 for line in content.readlines():
+#                     # Remove ALL white space and new line
+#                     cleansed_line = line.replace("\n", "").replace(" ", "")
+#                     # Remove comments
+#                     cleansed_line = re.sub("(<!--.*?-->)", "", cleansed_line, flags=re.DOTALL)
+#
+#                     if cleansed_line == "{%blocktitle%}":
+#                         is_title_portion = True
+#                     elif cleansed_line == "{%endblock%}" and is_title_portion:
+#                         dictionary[file] = title
+#                         break  # finish reading title. Read the next file
+#                     elif is_title_portion:
+#                         title += line + ("\n" if title != "" else "")
+#                 if not dictionary.get(file, False):
+#                     dictionary[file] = "No Title"
+#     return dictionary
 
-    for root, dirs, files in os.walk(os.getcwd()):
-        for file in [f for f in files if f.endswith(".html")]:
-            with open(root + "\\" + file, "r", encoding='utf-8') as content:
-                title = ""
-                is_title_portion = False  # this doesn't matter
-                for line in content.readlines():
-                    # Remove ALL white space and new line
-                    cleansed_line = line.replace("\n", "").replace(" ", "")
-                    # Remove comments
-                    cleansed_line = re.sub("(<!--.*?-->)", "", cleansed_line, flags=re.DOTALL)
 
-                    if cleansed_line == "{%blocktitle%}":
-                        is_title_portion = True
-                    elif cleansed_line == "{%endblock%}" and is_title_portion:
-                        dictionary[file] = title
-                        break  # finish reading title. Read the next file
-                    elif is_title_portion:
-                        title += line + ("\n" if title != "" else "")
-                if not dictionary.get(file, False):
-                    dictionary[file] = "No Title"
-    return dictionary
-
-
-# TODO: Maybe use parametrize from pytest?
 @pytest.fixture(scope="function")
 def template_checker():
 
@@ -175,20 +177,28 @@ def template_checker():
         response = kwargs.get("response", None)
         request = kwargs.get("request", None)
         templates = kwargs.get("templates", None)
+        exp_status_code = kwargs.get("exp_status_code", 200)
         exp_title = kwargs.get("exp_title", None)
+        exp_url = kwargs.get("exp_url", None)
         exp_template_path = kwargs.get("exp_template_path", None)
-        exp_in_cookies: list = kwargs.get("exp_in_cookies", None)
-        exp_out_cookies: list = kwargs.get("exp_out_cookies", None)
+        exp_template_context: dict = kwargs.get("exp_template_context", {})
+        exp_exist_cookies: list = kwargs.get("exp_exist_cookies", [])
+        exp_non_exist_cookies: list = kwargs.get("exp_non_exist_cookies", [])
 
         soup = BeautifulSoup(response.data, 'html.parser')
 
-        # assert rv.status_code == 200
-        # assert "/account/login" == flask.request.path
-        # assert len(templates) == 1
-        # template, context = templates[0]
-        # assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        # assert template.name == '/account/login_register.html'
-        # assert len(flask.request.cookies) == 0
+        assert response.status_code == exp_status_code, "Invalid status code"
+        assert request.path == exp_url, "Mismatching url"
+        assert len(templates) == 1, "Returned not enough / too many templates. Expected 1 (This should never happen in theory)"
+        template, context = templates[0]
+        assert exp_title in soup.title.string or exp_title in context.get("page_title", ""), "Expected title not found"
+        assert template.name == exp_template_path, "Rendered wrong template"
+        # pythonic :)
+        assert all([ any([ context.get(exp_key, "") == val for val in exp_val ]) if type(exp_val) == list else context.get(exp_key, "") == exp_val for (exp_key, exp_val) in exp_template_context.items() ]), "Template rendered with wrong parameters"
+        assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist"
+        assert all([ (out_cookie not in request.cookies) for out_cookie in exp_non_exist_cookies ]), "Expected non-existent cookies exist"
+
+    return _template_checker
 
 
 # Deprecated. But I would really like to still keep this as a backup solution
