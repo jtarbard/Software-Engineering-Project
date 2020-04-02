@@ -2,6 +2,7 @@ import flask
 from flask_qrcode import QRcode
 from flask_mail import Mail
 
+
 # All app blueprints are added
 def register_blueprints(app):
     from main.views import index_view
