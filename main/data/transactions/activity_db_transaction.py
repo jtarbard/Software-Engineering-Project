@@ -157,14 +157,17 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
 
 #  Takes two datetime variables and searches the activity table for a given activity ID that is between the two datetimes.
 #  This function will return false if:
-#       - The activity type is not an integer
+#       - The activity type is not an integer, or "Any"
 #       - The start and end datetimes are more than 6 hours apart, or are less than an hour apart
 #       - The activity type for the given ID could not be returned
 #  If these are valid then the table is searched and a list of activity istances are returned
 # [Lewis S]
-def return_activity_instances_between_dates(activity_type_id: int, start_time: datetime.datetime, end_time: datetime.datetime):
+def return_activity_instances_between_dates(activity_type_id, start_time: datetime.datetime, end_time: datetime.datetime):
     start_time = start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute // 30)
     end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute // 30)
+
+    if activity_type_id == "Any":
+        return Activity.query.filter(Activity.start_time <= start_time, Activity.end_time >= end_time).all()
 
     if type(activity_type_id) is not int:
         log_transaction(
@@ -223,7 +226,7 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
 
     add_to_database(new_activity)
     log_transaction(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
-    return True
+    return new_activity
 
 
 # Simply returns all activity instances between two datetimes

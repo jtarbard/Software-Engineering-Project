@@ -4,7 +4,7 @@
 {% endblock %}
 
 {% block title %}
-Class!
+Class {{activity.activity_type.name.capitalize()}}!
 {% endblock %}
 
 {% block main_content %}
@@ -16,6 +16,13 @@ Class!
         <li>Minimum age: {{ activity.activity_type.minimum_age }} </li>
         <li>Spaces left: {{ spaces_left }}</li>
         <li>Total price: £{{ session_price }}</li>
+        {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+            <br>
+            <li>Total bookings: {{total_bookings}}</li>
+            <li>Income: {{activity_income}}</li>
+            <li>Cost: {{activity_cost}}</li>
+        {% endif %}
+
         {% if membership %}
             <li>You have {{ membership.name }} membership. {{ membership.discount }}% OFF!</li>
             <li>Final price: £{{ final_price }}</li>

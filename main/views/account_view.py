@@ -1,10 +1,15 @@
 import re
 import flask
 import datetime
+import random
+import string
+
 import main.data.transactions.user_db_transaction as udf
+import main.data.transactions.activity_db_transaction as adf
 import main.view_lib.cookie_lib as cl
+from main.data.db_classes.activity_db_class import ActivityType
 from main.data.db_classes.transaction_db_class import MembershipType, Membership
-from main.data.db_classes.user_db_class import Customer
+from main.data.db_classes.user_db_class import Customer, Manager
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -190,6 +195,130 @@ def view_account():
 
     return flask.render_template("/account/your_account.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type)
+
+
+@blueprint.route("/account/view_statistics", methods=["POST", "GET"])
+def view_usages():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    if type(user) != Manager:
+        return flask.redirect("/account/your_account")
+
+    data_form = flask.request.form
+
+    start_date = data_form.get("start_date")
+    end_date = data_form.get("end_date")
+
+    fixed_cost = 11500  # fixed cost per week the sports centre needs to pay for (For realism)
+
+    if type(start_date) is str:
+        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    if type(end_date) is str:
+        end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
+
+    activity_type_id = data_form.get("activity_type_id")
+
+    if not start_date:
+        start_date = datetime.date.today() - datetime.timedelta(hours=24*7)
+    if not end_date:
+        end_date = datetime.date.today()
+
+    if not activity_type_id:
+        activity_type_id = "Any"
+    elif activity_type_id != "Any":
+        activity_type_id = int(activity_type_id)
+
+    start_search = datetime.datetime.combine(start_date, datetime.datetime.min.time())
+    end_search = datetime.datetime.combine(end_date, datetime.datetime.min.time())
+
+    activities = adf.return_activity_instances_between_dates(activity_type_id, end_search, start_search)
+
+    activity_types = adf.return_all_activity_types()
+
+    if not activities:
+        weekly_activities = None
+        total_activity_type_bookings = None
+    else:
+        weekly_activities = {}
+        total_activity_type_bookings = {}
+
+        for activity_type in activity_types:
+            color = ""
+            for i in range(6):
+                color += random.choice("abcdef" + string.digits)
+            total_activity_type_bookings[activity_type] = [0, color]
+
+    total_cash_in = 0
+    total_cash_out = 0
+    total_bookings = 0
+
+    start_date_monday = start_search - datetime.timedelta(days=start_search.weekday())
+    end_date_monday = end_search - datetime.timedelta(days=end_search.weekday())
+
+    number_of_weeks = (end_date_monday-start_date_monday).days // 7
+
+    for activity in activities:
+        activity_type: ActivityType = activity.activity_type
+        num_activity_bookings = len(activity.bookings)
+
+        activity_income = num_activity_bookings * activity_type.hourly_activity_price * (activity.end_time - activity.start_time).seconds//3600
+        activity_cost = num_activity_bookings * activity_type.hourly_activity_cost * (activity.end_time - activity.start_time).seconds//3600
+        activity_week = ((activity.end_time - datetime.timedelta(days=activity.end_time.weekday()))-start_date_monday).days // 7
+
+        if activity_week not in weekly_activities:
+            weekly_activities[activity_week] = {}
+
+        if activity_type not in weekly_activities[activity_week]:
+            weekly_activities[activity_week][activity_type] = [[activity, activity_income, activity_cost, num_activity_bookings]]
+        else:
+            weekly_activities[activity_week][activity_type].append([activity, activity_income, activity_cost, num_activity_bookings])
+
+        if "income" not in weekly_activities[activity_week]:
+            weekly_activities[activity_week]["income"] = activity_income
+        else:
+            weekly_activities[activity_week]["income"] += activity_income
+
+        if "cost" not in weekly_activities[activity_week]:
+            weekly_activities[activity_week]["cost"] = activity_cost
+        else:
+            weekly_activities[activity_week]["cost"] += activity_cost
+
+        if "num_bookings" not in weekly_activities[activity_week]:
+            weekly_activities[activity_week]["num_bookings"] = num_activity_bookings
+        else:
+            weekly_activities[activity_week]["num_bookings"] += num_activity_bookings
+
+        if "color" not in weekly_activities[activity_week]:
+            color = ""
+            for i in range(6):
+                color += random.choice("abcdef" + string.digits)
+            weekly_activities[activity_week]["color"] = color
+
+        total_cash_in += activity_income
+        total_cash_out += activity_cost
+        total_bookings += num_activity_bookings
+        total_activity_type_bookings[activity_type][0] += num_activity_bookings
+
+    total_activity_type_bookings = {k: v for k, v in sorted(total_activity_type_bookings.items(), key=lambda item: item[1][0], reverse=True)}
+    activity_types = list(total_activity_type_bookings.keys())
+
+    for week_num in weekly_activities.keys():
+        weekly_activities[week_num]["cost"] += fixed_cost
+        total_cash_out += fixed_cost
+
+    search_field_data = {}
+    search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
+    search_field_data["end_date"] = end_date.strftime("%Y-%m-%d")
+    search_field_data["max_date"] = datetime.date.today()
+    search_field_data["activity_type"] = activity_type_id
+
+    return flask.render_template("/account/statistics.html", User=user, number_of_weeks=number_of_weeks+1,
+                                 weekly_activities=weekly_activities, search_field_data=search_field_data,
+                                 activity_types=activity_types, total_cash_in=total_cash_in,
+                                 total_cash_out=total_cash_out, total_bookings=total_bookings,
+                                 total_activity_type_bookings=total_activity_type_bookings)
 
 
 # Route for executing if the user wants to log out
