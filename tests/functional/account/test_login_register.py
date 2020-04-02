@@ -8,16 +8,140 @@ from bs4 import BeautifulSoup
 import tests.conftest as conftest
 
 
-def test_register_get_basic(test_client):
+def test_register_get_basic(app, test_client, mocker, template_checker):
+
+    # Mocked side effect
+    def return_logged_in_user_response(request, needs_login):
+        return True, flask.redirect("/account/login")  # TODO: return a real user instead of True
+
+    def return_not_logged_in_user_response(request, needs_login):
+        return False, flask.redirect("/account/login")
+
+    # ------------------------------------------------------- #
+
+    # Pretend user not logged in
+    mocker.patch('main.view_lib.cookie_lib.return_user_response', side_effect=return_not_logged_in_user_response)
+
+    # ------------------------------------------------------- #
+
     """
+    Register_Get_Basic_Test_1
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
-    UNDER CONDITIONS ... TBA
-    THEN check the page correctly renders (and gives valid response)
+    UNDER CONDITIONS 1. User not logged in
+                     2. No cookies
+    THEN check 1. Valid status code (200)
+               2. The redirected url is "/account/register"
+               3. page_title (rendered template parameter) or actual page title has "Register"
+               4. '/account/login_register.html' is rendered
+               5. No cookies are created
 
     TESTING FOR <Rule '/account/register' (OPTIONS, HEAD, GET) -> account.register_get>
     """
-    assert False
+
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.get('/account/register', follow_redirects=True)
+
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Register",
+                         exp_url="/account/register", exp_template_path='/account/login_register.html',
+                         exp_exist_cookies=[])
+
+    # ------------------------------------------------------- #
+
+    """
+    Login_Get_Basic_Test_2
+    GIVEN a Flask application
+    WHEN the '/account/register' page is requested (GET)
+    UNDER CONDITIONS 1. User not logged in
+                     2. Has basket cookies
+                     3. Has random cookies
+    THEN check 1. Valid status code (200)
+               2. The redirected url is "/account/register"
+               3. page_title (rendered template parameter) or actual page title has "Register"
+               4. '/account/login_register.html' is rendered
+               5. Basket cookie is deleted
+               6. Other random cookies are retained
+
+    TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
+    """
+
+    with conftest.captured_templates(app) as templates:
+        test_client.set_cookie("localhost", "vertex_basket_cookie", "this should be removed")
+        test_client.set_cookie("localhost", "random_cookie7", "this should persist")
+        test_client.set_cookie("localhost", "random_cookie11", "this should persist")
+
+        # extremely primitive way to access cookies, because flask.request doesn't work in test context for some reason
+        rv = test_client.get('/account/register', follow_redirects=True)
+
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Register",
+                         exp_url="/account/register", exp_template_path='/account/login_register.html',
+                         exp_exist_cookies=["random_cookie7", "random_cookie11"],
+                         exp_non_exist_cookies=["vertex_basket_cookie"])
+
+    # remove cookies so test_client is clean again
+    test_client.delete_cookie("localhost", "random_cookie7")
+    test_client.delete_cookie("localhost", "random_cookie11")
+
+    # ------------------------------------------------------- #
+
+    # Note: Pretend user is successfully returned
+    mocker.patch('main.view_lib.cookie_lib.return_user_response', side_effect=return_logged_in_user_response)
+
+    # ------------------------------------------------------- #
+
+    """
+    Login_Get_Basic_Test_3
+    GIVEN a Flask application
+    WHEN the '/account/register' page is requested (GET)
+    UNDER CONDITIONS 1. User logged in
+                     2. No cookies
+    THEN check 1. Valid status code (200)
+               2. The redirected url is "/" (homepage)
+               3. page_title (rendered template parameter) or actual page title has "Index"
+               4. '/index/index.html' is rendered
+               5. No cookies are created
+
+    TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
+    """
+
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.get("/account/register", follow_redirects=True)
+
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
+                         exp_url="/", exp_template_path='/index/index.html',
+                         exp_exist_cookies=[])
+
+    # ------------------------------------------------------- #
+
+    """
+    Login_Get_Basic_Test_4
+    GIVEN a Flask application
+    WHEN the '/account/register' page is requested (GET)
+    UNDER CONDITIONS 1. User logged in
+                     2. Basket cookies exist
+                     3. Has random cookies
+    THEN check 1. Valid status code (200)
+               2. The redirected url is "/" (homepage)
+               3. page_title (rendered template parameter) or actual page title has "Index"
+               4. '/index/index.html' is rendered
+               5. All cookies are retained
+
+    TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
+    """
+
+    with conftest.captured_templates(app) as templates:
+        test_client.set_cookie("localhost", "vertex_basket_cookie", "this should persist")
+        test_client.set_cookie("localhost", "random_cookie13", "this should persist")
+        test_client.set_cookie("localhost", "random_cookie17", "this should persist")
+
+        rv = test_client.get("/account/register", follow_redirects=True)
+
+        # Shouldn't clear basket cookies (or any other cookies)
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
+                         exp_url="/", exp_template_path='/index/index.html',
+                         exp_exist_cookies=["vertex_basket_cookie", "random_cookie13", "random_cookie17"])
+
+    # --------------------------------- END OF THIS TEST: test_register_get_basic --------------------------------- #
 
 
 def test_register_post_basic(test_client):
@@ -32,9 +156,7 @@ def test_register_post_basic(test_client):
     assert False
 
 
-# (can use) db_session (as a fixture) from pytest-flask-sqlalchemy to modify the test database.
-# but i think mocking & patching is more of my style.
-def test_login_get_basic(app, test_client, mocker):
+def test_login_get_basic(app, test_client, mocker, template_checker):
 
     # Mocked side effect
     def return_logged_in_user_response(request, needs_login):
@@ -64,17 +186,10 @@ def test_login_get_basic(app, test_client, mocker):
 
     with conftest.captured_templates(app) as templates:
         rv = test_client.get('/account/login', follow_redirects=True)
-        soup = BeautifulSoup(rv.data, 'html.parser')
 
-        exp_title = "Login"
-
-        assert rv.status_code == 200
-        assert "/account/login" == flask.request.path
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        assert template.name == '/account/login_register.html'
-        assert len(flask.request.cookies) == 0
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_exist_cookies=[])
 
     # ------------------------------------------------------- #
 
@@ -102,19 +217,11 @@ def test_login_get_basic(app, test_client, mocker):
 
         # extremely primitive way to access cookies, because flask.request doesn't work in test context for some reason
         rv = test_client.get('/account/login', follow_redirects=True)
-        soup = BeautifulSoup(rv.data, 'html.parser')
 
-        exp_title = "Login"
-
-        assert rv.status_code == 200
-        assert "/account/login" == flask.request.path
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        assert template.name == '/account/login_register.html'
-        assert "vertex_basket_cookie" not in flask.request.cookies
-        assert "random_cookie7" in flask.request.cookies
-        assert "random_cookie11" in flask.request.cookies
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_exist_cookies=["random_cookie7", "random_cookie11"],
+                         exp_non_exist_cookies=["vertex_basket_cookie"])
 
     # remove cookies so test_client is clean again
     test_client.delete_cookie("localhost", "random_cookie7")
@@ -122,6 +229,7 @@ def test_login_get_basic(app, test_client, mocker):
 
     # ------------------------------------------------------- #
 
+    # Note: Pretend user is successfully returned
     mocker.patch('main.view_lib.cookie_lib.return_user_response', side_effect=return_logged_in_user_response)
 
     """
@@ -140,19 +248,11 @@ def test_login_get_basic(app, test_client, mocker):
     """
 
     with conftest.captured_templates(app) as templates:
-        # Note: Pretend user is successfully returned
         rv = test_client.get("/account/login", follow_redirects=True)
-        soup = BeautifulSoup(rv.data, 'html.parser')
 
-        exp_title = "Index"
-
-        assert rv.status_code == 200
-        assert "/" == flask.request.path
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        assert template.name == '/index/index.html'
-        assert len(flask.request.cookies) == 0
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
+                         exp_url="/", exp_template_path='/index/index.html',
+                         exp_exist_cookies=[])
 
     # ------------------------------------------------------- #
 
@@ -178,25 +278,16 @@ def test_login_get_basic(app, test_client, mocker):
         test_client.set_cookie("localhost", "random_cookie17", "this should persist")
 
         rv = test_client.get("/account/login", follow_redirects=True)
-        soup = BeautifulSoup(rv.data, 'html.parser')
 
-        exp_title = "Index"
-
-        assert rv.status_code == 200
-        assert "/" == flask.request.path
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        assert template.name == '/index/index.html'
         # Shouldn't clear basket cookies (or any other cookies)
-        assert "vertex_basket_cookie" in flask.request.cookies
-        assert "random_cookie13" in flask.request.cookies
-        assert "random_cookie17" in flask.request.cookies
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
+                         exp_url="/", exp_template_path='/index/index.html',
+                         exp_exist_cookies=["vertex_basket_cookie", "random_cookie13", "random_cookie17"])
 
     # --------------------------------- END OF THIS TEST: test_login_get_basic --------------------------------- #
 
 
-def test_login_post_basic(app, test_client, mocker, new_user):
+def test_login_post_basic(app, test_client, mocker, new_user, template_checker):
 
     """
     PRELIMINARY DATABASE CONDITIONS:
@@ -224,6 +315,7 @@ def test_login_post_basic(app, test_client, mocker, new_user):
                2. Redirected route is "account.view_account" (the function called is view_account())
                3. page_title or _main_layout title has "Your Account"
                4. "account/account.html" is rendered
+               5. vertex_account_cookie is created
 
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
@@ -235,12 +327,11 @@ def test_login_post_basic(app, test_client, mocker, new_user):
 
         exp_title = "Your Account"
 
-        assert rv.status_code == 200
-        assert flask.url_for("account.view_account") == flask.request.path
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        assert template.name == '/account/account.html'
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Your Account",
+                         exp_url=flask.url_for("account.view_account"), exp_template_path='/account/account.html',
+                         exp_exist_cookies=["vertex_account_cookie"])
+
+    test_client.delete_cookie("localhost", "vertex_account_cookie")
 
     # ------------------------------------------------------- #
 
@@ -266,19 +357,11 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     with conftest.captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password="Admin666"), follow_redirects=True)
-        soup = BeautifulSoup(rv.data, 'html.parser')
 
-        exp_title = "Login"
-
-        assert rv.status_code == 200
-        assert "/account/login" == flask.request.path
-        assert len(templates) == 1
-        template, context = templates[0]
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", "")
-        assert template.name == '/account/login_register.html'
-
-        assert "johndoe@thevertex.com" == context.get("email", "")
-        assert "Input error: Incorrect email or password" == context.get("ServerError", "")
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "johndoe@thevertex.com",
+                                               "ServerError": "Input error: Incorrect email or password"})
 
     # ------------------------------------------------------- #
 
@@ -301,7 +384,14 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
+                                                          password="Admin667"), follow_redirects=True)
 
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "johndoe@thevertex.com",
+                                               "ServerError": "Input error: Incorrect email or password"})
 
     # ------------------------------------------------------- #
 
@@ -324,7 +414,14 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.post('/account/login', data=dict(email="doesnotexist@vertex.com",
+                                                          password="Admin666"), follow_redirects=True)
 
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "doesnotexist@vertex.com",
+                                               "ServerError": "Input error: Incorrect email or password"})
 
     # ------------------------------------------------------- #
 
@@ -347,7 +444,14 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.post('/account/login', data=dict(email="doesnotexist@vertex.com",
+                                                          password="Admin667"), follow_redirects=True)
 
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "doesnotexist@vertex.com",
+                                               "ServerError": "Input error: Incorrect email or password"})
 
     # ------------------------------------------------------- #
 
@@ -371,7 +475,14 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
+                                                          password=""), follow_redirects=True)
 
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "johndoe@thevertex.com",
+                                               "ServerError": "Input error: password is not of correct size (8-15)"})
 
     # ------------------------------------------------------- #
 
@@ -395,7 +506,14 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
+                                                          password="password@"), follow_redirects=True)
 
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "johndoe@thevertex.com",
+                                               "ServerError": "Input Error: Password not in valid format"})
 
     # ------------------------------------------------------- #
 
@@ -420,9 +538,23 @@ def test_login_post_basic(app, test_client, mocker, new_user):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
+    with conftest.captured_templates(app) as templates:
+        rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
+                                                          password="password@"), follow_redirects=True)
 
+        template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
+                         exp_url="/account/login", exp_template_path='/account/login_register.html',
+                         exp_template_context={"email": "johndoe@thevertex.com",
+                                               "ServerError": ["Input error: password is not of correct size (8-15)", "Input Error: Password not in valid format"]})
 
-    # TODO: Add 3 more tests: Non-Existent email, invalid password format -> should throw error says invalid password without connecting to database.
+    # TODO: Potentially add 3 more tests: Non-Existent email, invalid password format -> should throw error says invalid password "without connecting to database".
+
+    # ------------------------------------------------------- #
+
+    # Cleaning test database. TODO: Perhaps can use SAVEPOINT and rollback?
+    delete_from_database(new_user("customer"))
+    delete_from_database(new_user("employee"))
+    delete_from_database(new_user("manager"))
 
     # --------------------------------- END OF THIS TEST: test_login_post_basic --------------------------------- #
 
