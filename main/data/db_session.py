@@ -6,17 +6,24 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import SQLAlchemyError
 from main.logger import log_server_error
 
-database = None
-session = None
+database = SQLAlchemy()
+
+
+def test_init(flask_app):
+    global database
+
+    database.init_app(flask_app)
+
+    import main.data.__all_models
+    database.create_all()
 
 
 # Takes a connection string and sets up a SQLite connection
 def global_init(flask_app):
-    global database, session
+    global database
 
     flask_app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db/TheVertex.sqlite'
     database = SQLAlchemy(flask_app)
-    session = database.session
 
     import main.data.__all_models
     database.create_all()
@@ -24,8 +31,8 @@ def global_init(flask_app):
 
 def add_to_database(database_class):
     try:
-        session.add(database_class)
-        session.commit()
+        database.session.add(database_class)
+        database.session.commit()
         return True
     except SQLAlchemyError as e:
         log_server_error(str(e))
@@ -34,8 +41,8 @@ def add_to_database(database_class):
 
 def delete_from_database(database_class):
     try:
-        session.delete(database_class)
-        session.commit()
+        database.session.delete(database_class)
+        database.session.commit()
         return True
     except SQLAlchemyError as e:
         log_server_error(str(e))
