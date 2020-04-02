@@ -243,7 +243,10 @@ def view_usages():
         total_activity_type_bookings = {}
 
         for activity_type in activity_types:
-            total_activity_type_bookings[activity_type] = 0
+            color = ""
+            for i in range(6):
+                color += random.choice("abcdef" + string.digits)
+            total_activity_type_bookings[activity_type] = [0, color]
 
     total_cash_in = 0
     total_cash_out = 0
@@ -290,20 +293,21 @@ def view_usages():
             for i in range(6):
                 color += random.choice("abcdef" + string.digits)
             weekly_activities[activity_week][-4] = color
-            print(color)
 
         total_cash_in += activity_income
         total_cash_out += activity_cost
         total_bookings += num_activity_bookings
-        total_activity_type_bookings[activity_type] += num_activity_bookings
+        total_activity_type_bookings[activity_type][0] += num_activity_bookings
+
+    total_activity_type_bookings = {k: v for k, v in sorted(total_activity_type_bookings.items(), key=lambda item: item[1][0], reverse=True)}
+    activity_types = list(total_activity_type_bookings.keys())
+    print(activity_types)
 
     search_field_data = {}
     search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
     search_field_data["end_date"] = end_date.strftime("%Y-%m-%d")
     search_field_data["max_date"] = datetime.date.today()
     search_field_data["activity_type"] = activity_type_id
-
-
 
     return flask.render_template("/account/statistics.html", User=user, number_of_weeks=number_of_weeks+1,
                                  weekly_activities=weekly_activities, search_field_data=search_field_data,
