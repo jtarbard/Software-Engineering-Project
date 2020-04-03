@@ -22,6 +22,17 @@ as the basic body -->
 </head>
 <body>
 
+{% if has_cookie == False %}
+    <div id="cookies"> <!-- Defines the div for displaying cookie information-->
+        <h2>We love cookies!</h2>
+        <p>Our website uses cookies; these are vital for storing your account details and making
+        sure that you can use the website as intended. Don't worry- we're not out to get you!
+        Please accept below:</p>
+        <a class="btn-success" id="CookieAccept">Accept!</a>
+    </div>
+    <div id="invisible"></div>
+{% endif %}
+
 {% if not nav %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
     <nav class="navbar navbar-expand-lg bg-black navbar-dark ">
       <!-- brand text -->
@@ -73,13 +84,13 @@ as the basic body -->
                                 the content is situated-->
 {% if page_title is defined %} <!-- Page title is not empty -->
 <div
-{% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-    class="fluid-container customer"
-{% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
-    class="fluid-container employee"
-{% elif User.__mapper_args__['polymorphic_identity'] == "Manager"%}
-    class="fluid-container manager"
-{% endif%}
+    {% if not User or User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+        class="fluid-container customer"
+    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+        class="fluid-container employee"
+    {% elif User.__mapper_args__['polymorphic_identity'] == "Manager"%}
+        class="fluid-container manager"
+    {% endif %}
 id="page-title"
 >
   <div class="container">

@@ -18,7 +18,7 @@ blueprint = flask.Blueprint("account", __name__)
 # Route for executing when the customer clicks a link to the login page
 @blueprint.route("/account/login", methods=["GET"])
 def login_get():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
 
@@ -27,7 +27,7 @@ def login_get():
         response.set_cookie("vertex_basket_cookie", "", expires=0)
         return response
 
-    return flask.render_template("/account/login_register.html", page_type="login")
+    return flask.render_template("/account/login_register.html", page_type="login", has_cookie=has_cookie)
 
 
 # Route for executing when the customer submits login data from the login page
@@ -70,7 +70,7 @@ def login_post():
 # Route for executing when the customer clicks a link to the register page
 @blueprint.route("/account/register", methods=["GET"])
 def register_get():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if user:
         return flask.redirect("/")
 
@@ -80,7 +80,7 @@ def register_get():
         return response
 
 
-    return flask.render_template("/account/login_register.html", page_type="register")
+    return flask.render_template("/account/login_register.html", page_type="register", has_cookie=has_cookie)
 
 
 # Route for executing when the customer submits register data from the register page
@@ -169,7 +169,7 @@ def register_post():
 # Route for executing if the user clicks to view their account
 @blueprint.route("/account/home", methods=["GET"])
 def view_account():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -180,7 +180,7 @@ def view_account():
 
 @blueprint.route("/account/receipts", methods=["GET"])
 def view_account_receipts(returned_receipts=None):
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -198,13 +198,13 @@ def view_account_receipts(returned_receipts=None):
 
     membership_type = account_lib.get_membership_type(user)
 
-    return flask.render_template("/account/receipts.html", User=user,
-                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+    return flask.render_template("/account/receipts.html", User=user, has_cookie=has_cookie,
+                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
 def view_account_bookings():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -214,7 +214,7 @@ def view_account_bookings():
             customer: Customer = udf.return_customer_with_user_id(user.user_id)
             for receipt in customer.purchases:
                 for booking in receipt.bookings:
-                    if booking.activity.start_time > datetime.datetime.now() or booking.deleted == False:
+                    if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
                         if booking.activity not in returned_bookings:
                             returned_bookings[booking.activity] = [receipt, 1]
                         else:
@@ -230,12 +230,13 @@ def view_account_bookings():
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/bookings.html", User=user,
-                                 returned_bookings=returned_bookings, membership_type=membership_type, page_title="Your Upcoming Bookings")
+                                 returned_bookings=returned_bookings, membership_type=membership_type,
+                                 page_title="Your Upcoming Bookings", has_cookie=has_cookie)
 
 
 @blueprint.route("/account/membership", methods=["GET"])
 def view_account_membership():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -248,18 +249,14 @@ def view_account_membership():
             break
 
     membership_type = account_lib.get_membership_type(user)
-    dates = [
-        membership.start_date.strftime(" %d %B %Y"),
-        membership.end_date.strftime(" %d %B %Y")
-    ]
 
     return flask.render_template("/account/membership.html", User=user,
-                                 membership_type=membership_type, membership=membership, dates=dates, page_title="Membership")
+                                 membership_type=membership_type, membership=membership, page_title="Membership", has_cookie=has_cookie)
 
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
 def view_usages():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -378,7 +375,8 @@ def view_usages():
                                  weekly_activities=weekly_activities, search_field_data=search_field_data,
                                  activity_types=activity_types, total_cash_in=total_cash_in,
                                  total_cash_out=total_cash_out, total_bookings=total_bookings,
-                                 total_activity_type_bookings=total_activity_type_bookings, page_title="Statistics")
+                                 total_activity_type_bookings=total_activity_type_bookings, page_title="Statistics",
+                                 has_cookie=has_cookie)
 
 
 # Route for executing if the user wants to log out
