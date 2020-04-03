@@ -78,9 +78,8 @@ def create_app(config_filename=None):
     return app
 
 
-flask_app = create_app()
-flask_app.secret_key = "england is my city"
-
 if __name__ == '__main__':
+    flask_app = create_app()
+    flask_app.secret_key = "england is my city"
     flask_app.run(debug=True)
 
