@@ -8,32 +8,28 @@
 {% endblock %}
 
 {% block main_content %}
+<div class="container-fluid">
 {% if not sidebar_off %}
-  <div class="d-flex" id="wrapper">
-    <!-- Sidebar -->
-    <div id="sidebar-overlay">
-        <div id="sidebar-wrapper">
-          <div class="sidebar-heading">Your Account</div>
-          <div class="list-group list-group-flush">
-            <a href="{{ url_for('account.view_account')}}" class="list-group-item list-group-item-action">Home</a>
-            <a href="{{ url_for('account.view_account_bookings')}}" class="list-group-item list-group-item-action">Bookings</a>
-            <a href="{{ url_for('account.view_account_receipts')}}" class="list-group-item list-group-item-action">Receipts</a>
-            <a href="{{ url_for('account.view_account_membership')}}" class="list-group-item list-group-item-action">Membership</a>
-            <a href="#" class="list-group-item list-group-item-action">Personal Details</a>
-            <a href="#" class="list-group-item list-group-item-action">Card Details</a>
-            <a href="#" class="list-group-item list-group-item-action">Account</a>
-            <a href="{{ url_for('account.log_out')}}" class="list-group-item list-group-item-action">Log Out</a>
-          </div>
-        </div>
-    </div>
-    <!-- /#sidebar-wrapper -->
-    <div id="sidebar-toggle" onclick="toggle()">
-       <p id="toggle">Toggle Sidebar</p>
-    </div>
+  <div class="row no-gutters">
+        <aside class="col-12 col-md-3 col-lg-2">
+            <nav class="navbar navbar-expand">
+                <div class="collapse navbar-collapse ">
+                    <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between col-12 p-0">
+                        <li id="list-title" class="col-12"><p>Account Settings</p></li>
+                        <li><a href="{{ url_for('account.view_account')}}" class="nav-link pl-0"><i class="fas fa-home fa-2x"></i><p>Home</p></a></li>
+                        <li><a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0"><i class="fas fa-calendar-alt fa-2x"></i><p>Bookings</p></a></li>
+                        <li><a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0"><i class="fas fa-file-invoice fa-2x"></i><p>Receipts</p></a></li>
+                        <li><a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0"><i class="fas fa-id-card-alt fa-2x"></i><p>Membership</p></a></li>
+                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-user fa-2x"></i><p>Account</p></a></li>
+                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-credit-card fa-2x"></i><p>Card Details</p></a></li>
+                        <li><a href="{{ url_for('account.log_out')}}" class="nav-link pl-0"><i class="fas fa-sign-out-alt fa-2x"></i><p>Log Out</p></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
 {% endif %}
-
     <!-- Page Content -->
-    <div class="container">
+      <div class="col-md-9 col-lg-10">
         <div id="page-content-wrapper">
             <div id="title-bar">
                 <h1>{{User.first_name.title()}}</h1>
@@ -53,22 +49,6 @@
             </div>
         </div>
     </div>
-{% endblock %}
-
-{% block additional_js %}
-<!--   Javascript from https://startbootstrap.com/templates/simple-sidebar/   -->
-<script>
-    function toggle() {
-        const sidebar = document.getElementById("sidebar-wrapper");
-        const overlay = document.getElementById("sidebar-overlay");
-        if (sidebar.style.display === "none") {
-            sidebar.style.display = "block";
-            overlay.style.display = "block";
-        }
-        else {
-            sidebar.style.display = "none";
-            overlay.style.display = "none";
-        }
-    }
-</script>
+  </div>
+</div>
 {% endblock %}

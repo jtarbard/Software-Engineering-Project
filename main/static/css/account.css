@@ -1,56 +1,69 @@
-/*Sidebar*/
-#sidebar-overlay {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    background-color: rgba(222,222,222,0.5);
-    z-index: 2;
+.container-fluid {
+    padding: 0;
 }
 
-#sidebar-wrapper {
-    display: none;
-    position: fixed;
-    width: 18vw;
+#sidebar {
     min-width: 200px;
-    height: 75%;
-    background-color: #F2F2F2;
-    z-index: 3;
+    width: 30%;
+}
+#page-title {
+    margin-bottom: 0;
 }
 
-#sidebar-toggle {
-    height: 75%;
-    width: 3vw;
+#page-content-wrapper {
+    padding: 0 2.5%;
+}
+
+aside {
+    padding: 0;
+    margin: 0;
     color: #F2F2F2;
     background-color: #1E1E1E;
+    overflow-x: scroll;
 }
 
-#toggle {
-    width: inherit;
-    height: inherit;
-    writing-mode: vertical-rl;
-    text-orientation: mixed;
-    text-align: center;
-    line-height: 3vw;
+aside p {
+    display: none;
 }
 
-/* Large devices (desktops, 992px and up)*/
-@media (min-width: 992px) {
-    #sidebar-wrapper {
-        display: block;
-        position: relative;
+#list-title {
+    display: none;
+}
+
+/*Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+    aside {
+        height: 75vh;
+        overflow-x: auto;
     }
 
-    #sidebar-overlay {
-    display: none;
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    background-color: rgba(222,222,222,0.5);
-    z-index: 2;
-}
+    aside p {
+        display: inline;
+    }
+
+    aside ul {
+        margin:0;
+        padding: 0;
+        text-indent: 0;
+        list-style-type: 0;
+    }
+
+    aside li i {
+        width: 30%;
+        padding-right: 1vw;
+        text-align: center;
+    }
+
+    #list-title {
+        display: inline;
+        padding: 2vh 0;
+    }
 }
 
-/*End of sidebar*/
+aside a, aside a:hover {
+    color: #F2F2F2;
+    text-decoration: none;
+}
 
 #title-bar {
     margin-top: 2vh;
@@ -77,14 +90,4 @@
     line-height: 7vh;
     float: right;
     margin: 1vh 0 1vh 0;
-}
-
-#page-title {
-    margin-bottom: 0vh;
-}
-
-#menu-toggle {
-    float: left;
-    min-height: 100%;
-    width: 5%;
 }

@@ -1,82 +1,99 @@
-{% extends "account/account_layout.html"%}
+{% extends "includes/_main_layout.html"%}
 
-{% block accounts_additional_css %}
+{% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account_home.css') }}">
 {% endblock %}
 
-{% block page_content %}
-<div class="row">
-    <!-- Bookings -->
-    <div class="col-md-6 col-lg-4">
-        <div class="media">
-            <div class="img media-left">
-                <i class="fas fa-calendar-alt fa-5x"></i>
-            </div>
-            <div class="content media-content">
-                <h2><a href="{{ url_for('account.view_account_bookings')}}" class="stretched-link">Bookings</a></h2>
-                <p>View your upcoming bookings.</p>
-            </div>
+{% block main_content %}
+<div class="container">
+    <div id="page-content-wrapper">
+        <div id="title-bar">
+            <h1>{{User.first_name.title()}}</h1>
+            {% if membership_type %}
+            <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
+            {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+            <span class="badge badge-secondary">Manager</span>
+            {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+            <span class="badge badge-secondary">Employee</span>
+            {% else %}
+            <span class="badge badge-secondary">Non-Member</span>
+            {% endif %}
         </div>
-    </div>
-    <!-- Receipts -->
-    <div class="col-md-6 col-lg-4">
-        <div class="media">
-            <div class="img media-left">
-                <span class="align-middle">
-                    <i class="fas fa-file-invoice fa-5x"></i>
-                </span>
+        <div class="row">
+            <!-- Bookings -->
+            <div class="col-md-6 col-lg-4">
+                <div class="media">
+                    <div class="img media-left">
+                        <i class="fas fa-calendar-alt fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="{{ url_for('account.view_account_bookings')}}" class="stretched-link">Bookings</a></h2>
+                        <p>View your upcoming bookings.</p>
+                    </div>
+                </div>
             </div>
-            <div class="content media-content">
-                <h2><a href="{{ url_for('account.view_account_receipts')}}" class="stretched-link">Receipts</a></h2>
-                <p>View your past purchase receipts.</p>
+            <!-- Receipts -->
+            <div class="col-md-6 col-lg-4">
+                <div class="media">
+                    <div class="img media-left">
+                        <span class="align-middle">
+                            <i class="fas fa-file-invoice fa-3x"></i>
+                        </span>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="{{ url_for('account.view_account_receipts')}}" class="stretched-link">Receipts</a></h2>
+                        <p>View your past purchase receipts.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <!--Membership-->
-    <div class="col-md-6 col-lg-4">
-        <div class="media ">
-            <div class="img media-left">
-                <i class="fas fa-id-card-alt fa-5x"></i>
+            <!--Membership-->
+            <div class="col-md-6 col-lg-4">
+                <div class="media ">
+                    <div class="img media-left">
+                        <i class="fas fa-id-card-alt fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="{{ url_for('account.view_account_membership')}}" class="stretched-link">Membership</a></h2>
+                        <p>View and edit your membership.</p>
+                    </div>
+                </div>
             </div>
-            <div class="content media-content">
-                <h2><a href="{{ url_for('account.view_account_membership')}}" class="stretched-link">Membership</a></h2>
-                <p>View and edit your membership.</p>
+            <!--Manage Account-->
+            <div class="col-md-6 col-lg-4">
+                <div class="media">
+                    <div class="img media-left">
+                        <i class="fas fa-user fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="" class="stretched-link">Manage Account</a></h2>
+                        <p>View and edit your account details.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <!--Personal Details-->
-    <div class="col-md-6 col-lg-4">
-        <div class="media">
-            <div class="img media-left">
-                <i class="fas fa-user fa-5x"></i>
+            <!--Card Details-->
+            <div class="col-md-6 col-lg-4">
+                <div class="media">
+                    <div class="img media-left">
+                        <i class="fas fa-credit-card fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="" class="stretched-link">Card Details</a></h2>
+                        <p>View and edit your card details.</p>
+                    </div>
+                </div>
             </div>
-            <div class="content media-content">
-                <h2><a href="" class="stretched-link">Manage Account</a></h2>
-                <p>View and edit your account details.</p>
-            </div>
-        </div>
-    </div>
-    <!--Card Details-->
-    <div class="col-md-6 col-lg-4">
-        <div class="media">
-            <div class="img media-left">
-                <i class="fas fa-credit-card fa-5x"></i>
-            </div>
-            <div class="content media-content">
-                <h2><a href="" class="stretched-link">Card Details</a></h2>
-                <p>View and edit your card details.</p>
-            </div>
-        </div>
-    </div>
-    <!--Card Details-->
-    <div class="col-md-6 col-lg-4">
-        <div class="media">
-            <div class="img media-left">
-                <i class="fas fa-sign-out-alt fa-5x"></i>
-            </div>
-            <div class="content media-content">
-                <h2><a href="{{ url_for('account.log_out')}}" class="stretched-link">Logout</a></h2>
-                <p>Logout of your account.</p>
+            <!--Logout-->
+            <div class="col-md-6 col-lg-4">
+                <div class="media">
+                    <div class="img media-left">
+                        <i class="fas fa-sign-out-alt fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="{{ url_for('account.log_out')}}" class="stretched-link">Logout</a></h2>
+                        <p>Logout of your account.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
