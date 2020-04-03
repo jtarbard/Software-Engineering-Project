@@ -79,7 +79,6 @@ def register_get():
         response.set_cookie("vertex_basket_cookie", "", expires=0)
         return response
 
-
     return flask.render_template("/account/login_register.html", page_type="register", has_cookie=has_cookie)
 
 
@@ -193,7 +192,7 @@ def view_account_receipts(returned_receipts=None):
         employee: Employee = udf.return_employee_with_user_id(user.user_id)
         returned_receipts = employee.receipt_assist
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
-    #     TODO: add manager functionality: returning all receipts between certain dates.
+        # TODO: add manager functionality: returning all receipts between certain dates.
         returned_receipts = []
     else:
         return flask.abort(500)
@@ -224,7 +223,7 @@ def view_account_bookings():
     elif user.__mapper_args__['polymorphic_identity'] == "Employee":
         returned_bookings = {}
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
-    #     TODO: add manager functionality: returning booking stats.
+        # TODO: add manager functionality: returning booking stats.
         returned_receipts = {}
     else:
         return flask.abort(500)
@@ -372,7 +371,6 @@ def view_usages():
                                  total_cash_out=total_cash_out, total_bookings=total_bookings,
                                  total_activity_type_bookings=total_activity_type_bookings, page_title="Statistics",
                                  has_cookie=has_cookie)
-
 
 
 # Route for executing if the user wants to log out
