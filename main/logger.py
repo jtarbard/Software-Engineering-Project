@@ -7,8 +7,8 @@ transaction_logger = None
 server_logger = None
 
 
-def create_transaction_logger():
-    transaction_handler = logging.FileHandler(LOGS_DIRECTORY+"transactions.log")
+def create_transaction_logger(filename="transactions.log"):
+    transaction_handler = logging.FileHandler(LOGS_DIRECTORY+filename)
     transaction_handler.setFormatter(logging.Formatter(LOG_FORMAT))
 
     global transaction_logger
@@ -17,8 +17,8 @@ def create_transaction_logger():
     transaction_logger.addHandler(transaction_handler)
 
 
-def create_flask_logger(flask_app):
-    server_error_handler = logging.FileHandler(LOGS_DIRECTORY+"server_error.log")
+def create_flask_logger(flask_app, filename="server_error.log"):
+    server_error_handler = logging.FileHandler(LOGS_DIRECTORY+filename)
     server_error_handler.setFormatter(logging.Formatter(LOG_FORMAT))
     server_error_handler.setLevel(logging.WARNING)
 

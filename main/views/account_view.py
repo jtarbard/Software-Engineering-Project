@@ -50,13 +50,13 @@ def login_post():
         server_error = "Input Error: Password not in valid format"
 
     if server_error:  # Returns login page if an error is found
-        return flask.render_template("account/login_register.html", page_type="login", ServerError=server_error,
+        return flask.render_template("/account/login_register.html", page_type="login", ServerError=server_error,
                                      email=email, has_cookie=True, page_title="Login")
 
     # Checks that the customer exists in the database, if not then the login page returned with an error
     user = udf.check_user_is_in_database_and_password_valid(email, password_first)
     if not user:  # Checks if the user actually exists
-        return flask.render_template("account/login_register.html", page_type="login",
+        return flask.render_template("/account/login_register.html", page_type="login",
                                      ServerError="Input error: Incorrect email or password",
                                      email=email, has_cookie=True, page_title="Login")
 
@@ -134,7 +134,9 @@ def register_post():
             r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})",
             postcode):
         server_error = "Input Error: Post code not in valid format"
-    elif not tel_number.isnumeric(): # Telephone can only contain numbers
+    elif not first_name.isalpha() or not last_name.isalpha():  # First name / last name can only be alphabets
+        server_error = "Input Error: First name or last name can only contain english alphabets"
+    elif not tel_number.isnumeric():  # Telephone can only contain numbers
         server_error = "Input Error: telephone not in valid format"
     elif udf.check_if_email_exists(email):  # Checks if email exists in database
         server_error = "Input Error: Email already exists"
@@ -144,15 +146,15 @@ def register_post():
         server_error = "Input Error: Password cannot contain spaces"
     elif not any(num in password_first for num in ["0","1","2","3","4","5","6","7","8","9"]): # Checks password has a number
         server_error = "Input Error: Password must contain a number"
-    elif formatted_dob > current_date - datetime.timedelta(days=365 * 16):  # Checks that user is over 16
+    elif formatted_dob > current_date - datetime.timedelta(days=365 * 16 + 4):  # Checks that user is over 16 (takes account into leap years)
         server_error = "Input Error: Incorrect date of birth entered (must be over 16)"
 
     if server_error:  # If there was an error then the normal register page is loaded with all the values that the user
                       # entered inserted into the fields
 
-        return flask.render_template("account/login_register.html", page_type="register",
+        return flask.render_template("/account/login_register.html", page_type="register",
                                      ServerError=server_error, email=email, date_of_birth=str(dob), first_name=first_name,
-                                     last_name=last_name, postcode=postcode, address=address, title=title,
+                                     last_name=last_name, postcode=postcode, address=address, title=title, dob=dob, country=country,
                                      tel_number=tel_number, page_title="Register")
 
     # user is created and returned
@@ -370,6 +372,7 @@ def view_usages():
                                  total_cash_out=total_cash_out, total_bookings=total_bookings,
                                  total_activity_type_bookings=total_activity_type_bookings, page_title="Statistics",
                                  has_cookie=has_cookie)
+
 
 
 # Route for executing if the user wants to log out
