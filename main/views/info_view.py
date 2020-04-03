@@ -11,39 +11,39 @@ blueprint = flask.Blueprint("info", __name__)
 
 @blueprint.route('/info/about', methods=["GET"])
 def about_func():
-    user, response = cl.return_user_response(flask.request, False)
-    return flask.render_template("/info/about.html", page_title="About", User=user)
+    user, response, has_cookie = cl.return_user_response(flask.request, False)
+    return flask.render_template("/info/about.html", page_title="About", User=user, has_cookie=has_cookie)
 
 
 @blueprint.route('/info/contact_us', methods=["GET"])
 def contact_us_view():
-    user, response = cl.return_user_response(flask.request, False)
-    return flask.render_template("/info/contact_us.html", User=user)
+    user, response, has_cookie = cl.return_user_response(flask.request, False)
+    return flask.render_template("/info/contact_us.html", User=user, has_cookie=has_cookie)
 
 
 @blueprint.route('/info/facilities', methods=["GET"])
 def facilities_view():
-    user, response = cl.return_user_response(flask.request, False)
-    return flask.render_template("info/facilities.html",
+    user, response, has_cookie = cl.return_user_response(flask.request, False)
+    return flask.render_template("info/facilities.html", has_cookie=has_cookie,
                                  facilities=Facility.query.all(), page_title="Facilities", User=user)
 
 
 @blueprint.route('/info/memberships', methods=["GET"])
 def membership_view():
-    user, response = cl.return_user_response(flask.request, False)
+    user, response, has_cookie = cl.return_user_response(flask.request, False)
     standard_id = 1
     premium_id = 2
     standard_price = MembershipType.query.filter_by(membership_type_id=standard_id).first().monthly_price
     premium_price = MembershipType.query.filter_by(membership_type_id=premium_id).first().monthly_price
 
-    return flask.render_template("info/memberships.html", page_title="Memberships",
-                                 User=user,premium_price=premium_price,standard_price=standard_price,
-                                 standard_id=standard_id,premium_id=premium_id)
+    return flask.render_template("info/memberships.html", page_title="Memberships", has_cookie=has_cookie,
+                                 User=user, premium_price=premium_price, standard_price=standard_price,
+                                 standard_id=standard_id, premium_id=premium_id)
 
 
 @blueprint.route("/info/memberships/buy", methods=["POST"])
 def buy_membership():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -60,7 +60,7 @@ def buy_membership():
 
     new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
     response = cl.add_activity_or_membership_to_basket(
-        new_membership_type, flask.request, duration = membership_duration)
+        new_membership_type, flask.request, duration=membership_duration)
 
     membership_type = MembershipType.query.filter_by(membership_type_id=membership_id).first().name
     flask.flash(membership_type.title() + " Membership has been added to your basket.", category="success")
@@ -69,7 +69,7 @@ def buy_membership():
 
 @blueprint.route("/info/memberships/cancel", methods=["GET"])
 def cancel_membership():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 

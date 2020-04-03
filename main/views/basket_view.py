@@ -13,7 +13,7 @@ blueprint = flask.Blueprint("basket", __name__)
 
 @blueprint.route("/misc/add_booking_to_basket", methods=["POST"])
 def view_classes_post():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -22,7 +22,7 @@ def view_classes_post():
     booking_amount: int = int(data_form.get("amount_of_people"))
 
     if not activity or not booking_amount:
-        return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity")
+        return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity", has_cookie=has_cookie)
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
@@ -33,12 +33,13 @@ def view_classes_post():
     if basket_activities:
         if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(
                 basket_activities) + booking_amount > 15:
-            return flask.render_template("/misc/general_error.html", error="Basket full", User=user)
+            return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
 
     spaces_left = activity.activity_type.maximum_activity_capacity - len(
         tdf.return_bookings_with_activity_id(activity.activity_id))
     if spaces_left <= 0:
-        return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity", User=user)
+        return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
+                                     User=user, has_cookie=has_cookie)
 
     response = cl.add_activity_or_membership_to_basket(activity, flask.request, num_people=booking_amount)
 
@@ -52,7 +53,7 @@ def view_classes_post():
 
 @blueprint.route("/account/basket", methods=["GET"])
 def basket_view():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
@@ -63,7 +64,7 @@ def basket_view():
         return cl.destroy_account_cookie(flask.redirect("/account/basket"))
 
     if not (basket_activities or basket_membership):
-        return flask.render_template("/account/basket.html", User=user)
+        return flask.render_template("/account/basket.html", User=user, has_cookie=has_cookie)
 
     new_activities_basket = ""
     redirect = False
@@ -118,7 +119,7 @@ def basket_view():
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
                                  basket_membership=basket_membership, User=user,
-                                 total_activity_price=total_activity_price,
+                                 total_activity_price=total_activity_price, has_cookie=has_cookie,
                                  activity_and_price=activity_and_price, final_price=round(final_price, 2),
                                  basket_membership_duration=basket_membership_duration,
                                  total_discounted_price=round(total_discounted_price, 2),
@@ -127,7 +128,7 @@ def basket_view():
 
 @blueprint.route("/account/basket", methods=["POST"])
 def basket_delete_activity():
-    user, response = cl.return_user_response(flask.request, True)
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
 
