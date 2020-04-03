@@ -7,9 +7,20 @@ body {
     color: #1E1E1E;
 }
 
+.customer {
+    background-color: #5BBDC8;
+}
+
+.employee {
+    background-color: #77b953;
+}
+
+.manager {
+    background-color: #E1234B;
+}
+
 #page-title {
     height: 15vh;
-    background-color:#5BBDC8;
     padding-top: 0.5vh;
     color: white;
 }

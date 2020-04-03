@@ -64,7 +64,16 @@ as the basic body -->
 <div class="main_content"> <!--Defines the main content for the webpages, this is where all
                                 the content is situated-->
 {% if page_title is defined %} <!-- Page title is not empty -->
-<div class="fluid-container" id="page-title">
+<div
+    {% if not User or User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+        class="fluid-container customer"
+    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+        class="fluid-container employee"
+    {% elif User.__mapper_args__['polymorphic_identity'] == "Manager"%}
+        class="fluid-container manager"
+    {% endif %}
+id="page-title"
+>
   <div class="container">
     <h1>{{ page_title }}</h1>
     {% block page_description %} {% endblock %}
@@ -103,7 +112,10 @@ as the basic body -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="../../static/js/main.js"></script>
+<script src="https://kit.fontawesome.com/c8eac23e18.js" crossorigin="anonymous"></script>
+<script src="../../static/js/main.js">
+
+</script>
 {% block additional_js %} {% endblock %} <!--Lets the user input additional JavaScript -->
 </body>
 </html>

@@ -1,0 +1,63 @@
+{% extends "includes/_main_layout.html"%}
+
+{% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
+{% block accounts_additional_css %}
+{% endblock %}
+
+{% endblock %}
+
+{% block main_content %}
+<div class="container-fluid">
+{% if not sidebar_off %}
+  <div class="row no-gutters equal">
+        <aside class="col-12 col-md-3 col-lg-2">
+            <nav class="navbar navbar-expand">
+                <div class="collapse navbar-collapse ">
+                    <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between col-12 p-0">
+                        <li id="list-title" class="col-12"><p>Account Settings</p></li>
+                        <li><a href="{{ url_for('account.view_account')}}" class="nav-link pl-0"><i class="fas fa-home fa-2x"></i><p>Home</p></a></li>
+                        <li><a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0"><i class="fas fa-calendar-alt fa-2x"></i><p>Bookings</p></a></li>
+                        <li><a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0"><i class="fas fa-file-invoice fa-2x"></i><p>Receipts</p></a></li>
+                        {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+                        <li><a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0"><i class="fas fa-id-card-alt fa-2x"></i><p>Membership</p></a></li>
+                        {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+                        {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                        <li><a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-2x"></i><p>Statistics</p></a></li>
+                        {% endif %}
+                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-user fa-2x"></i><p>Account</p></a></li>
+                        {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-credit-card fa-2x"></i><p>Card Details</p></a></li>
+                        {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-table fa-2x"></i><p>Rota</p></a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('account.log_out')}}" class="nav-link pl-0"><i class="fas fa-sign-out-alt fa-2x"></i><p>Log Out</p></a></li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
+{% endif %}
+    <!-- Page Content -->
+      <div class="col-md-9 col-lg-10">
+        <div id="page-content-wrapper">
+            <div id="title-bar">
+                <h1>{{User.first_name.title()}}</h1>
+                {% if membership_type %}
+                <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
+                {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                <span class="badge badge-secondary">Manager</span>
+                {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+                <span class="badge badge-secondary">Employee</span>
+                {% else %}
+                <span class="badge badge-secondary">Non-Member</span>
+                {% endif %}
+            </div>
+            <div id="page-content">
+                {% block page_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

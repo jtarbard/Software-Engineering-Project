@@ -1,9 +1,9 @@
-{% extends "account/account.html"%}
+{% extends "account/account_layout.html"%}
+
 {% block accounts_additional_css %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/receipts.css') }}">
 {% endblock %}
 {% block page_content %}
-    {% if returned_bookings %}
     <div id="qr-search">
         <form action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
             <label for="file">Find Receipt by QR Code: </label>
@@ -30,11 +30,10 @@
                         <td>{{receipt.receipt_id}}</td>
                         <td>{{receipt.creation_time}}</td>
                         <td>{{receipt.total_cost}}</td>
-                        <td><a href="{{url_for('transaction.e_m_get', receipt_id=receipt.receipt_id)}}">View</a></td>
+                        <td><a class="btn" href="{{url_for('transaction.e_m_get', receipt_id=receipt.receipt_id)}}">View</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-    {% endif %}
 {% endblock %}

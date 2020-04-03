@@ -78,4 +78,4 @@ def cancel_membership():
         customer.current_membership = None
         add_to_database(customer)
 
-    return flask.redirect("/account/your_account")
+    return flask.redirect("/account/membership")
