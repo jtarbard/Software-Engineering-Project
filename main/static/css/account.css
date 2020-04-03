@@ -36,6 +36,7 @@ aside p {
 /*Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
     aside {
+        min-height: 74.5vh;
         height: inherit;
         overflow-x: auto;
     }
