@@ -151,10 +151,9 @@ def card_payment_post():
         os.remove(file_direct)
 
     response = cl.destroy_basket_cookie(response)
-    response.headers["Last-Modified"] = datetime.datetime.now()
-    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "-1"
+
+    import pprint
+    pprint.pprint(response.data)
     return response
 
 

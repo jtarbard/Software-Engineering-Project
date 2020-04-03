@@ -10,6 +10,7 @@ import main.view_lib.cookie_lib as cl
 from main.data.db_classes.activity_db_class import ActivityType
 from main.data.db_classes.transaction_db_class import MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer, Manager
+from main.view_lib import account_lib
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -61,7 +62,7 @@ def login_post():
 
     # Implies that no error has occurred and the user is redirected to their account. A cookie is then set that
     # Verifies the customer ID and a verification hash
-    response = flask.redirect('/account/your_account')
+    response = flask.redirect('/account/home')
     cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
@@ -160,20 +161,48 @@ def register_post():
                                        address=address, country=country)
 
     # Account cookie is checked
-    response = flask.redirect('/account/your_account')
+    response = flask.redirect('/account/home')
     cl.set_auth(response, user.user_id)  # Creates user cookie
     return response
 
 
 # Route for executing if the user clicks to view their account
-@blueprint.route("/account/your_account")
+@blueprint.route("/account/home", methods=["GET"])
 def view_account():
     user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
+    membership_type = account_lib.get_membership_type(user)
+
+    return flask.render_template("/account/account.html", User=user, membership_type=membership_type, page_title="Your Account")
+
+
+@blueprint.route("/account/receipts", methods=["GET"])
+def view_account_receipts():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    returned_receipts = {}
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            returned_receipts[receipt.receipt_id] = receipt
+
+        membership_type = account_lib.get_membership_type(user)
+
+    return flask.render_template("/account/receipts.html", User=user,
+                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+
+
+@blueprint.route("/account/bookings", methods=["GET"])
+def view_account_bookings():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
     returned_bookings = {}
-    membership_type = None
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
         customer: Customer = udf.return_customer_with_user_id(user.user_id)
         for receipt in customer.purchases:
@@ -188,13 +217,23 @@ def view_account():
                 else:
                     returned_bookings[booking.activity][1] += 1
 
-        if customer.current_membership is not None:
-            user_membership = Membership.query.filter_by(membership_id=customer.current_membership).first()
-            membership_type_id = user_membership.membership_type_id
-            membership_type = MembershipType.query.filter_by(membership_type_id=membership_type_id).first()
+        membership_type = account_lib.get_membership_type(user)
 
-    return flask.render_template("/account/your_account.html", User=user,
-                                 returned_bookings=returned_bookings, membership_type=membership_type)
+    return flask.render_template("/account/bookings.html", User=user,
+                                 returned_bookings=returned_bookings, membership_type=membership_type, page_title="Your Upcoming Bookings")
+
+
+@blueprint.route("/account/membership", methods=["GET"])
+def view_account_membership():
+    user, response = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    returned_bookings = {}
+    membership_type = account_lib.get_membership_type(user)
+
+    return flask.render_template("/account/membership.html", User=user,
+                                 membership_type=membership_type, page_title="Membership")
 
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
