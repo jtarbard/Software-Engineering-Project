@@ -47,6 +47,7 @@
                     </div>
                 </div>
             </div>
+            {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
             <!--Membership-->
             <div class="col-md-6 col-lg-4">
                 <div class="media ">
@@ -59,6 +60,31 @@
                     </div>
                 </div>
             </div>
+            {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+            <div class="col-md-6 col-lg-4">
+                <div class="media ">
+                    <div class="img media-left">
+                        <i class="fas fa-question fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="" class="stretched-link">Placeholder</a></h2>
+                    </div>
+                </div>
+            </div>
+            {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+            <!--Statistics-->
+            <div class="col-md-6 col-lg-4">
+                <div class="media ">
+                    <div class="img media-left">
+                        <i class="far fa-chart-bar fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="{{ url_for('account.view_usages')}}" class="stretched-link">Statistics</a></h2>
+                        <p>View weekly statistics for the Vertex.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             <!--Manage Account-->
             <div class="col-md-6 col-lg-4">
                 <div class="media">
@@ -71,6 +97,7 @@
                     </div>
                 </div>
             </div>
+            {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
             <!--Card Details-->
             <div class="col-md-6 col-lg-4">
                 <div class="media">
@@ -83,6 +110,19 @@
                     </div>
                 </div>
             </div>
+            {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+            <div class="col-md-6 col-lg-4">
+                <div class="media">
+                    <div class="img media-left">
+                        <i class="fas fa-table fa-3x"></i>
+                    </div>
+                    <div class="content media-content">
+                        <h2><a href="" class="stretched-link">Rota</a></h2>
+                        <p>View and edit your card details.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
             <!--Logout-->
             <div class="col-md-6 col-lg-4">
                 <div class="media">
@@ -95,6 +135,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

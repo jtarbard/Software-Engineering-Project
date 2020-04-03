@@ -2,10 +2,10 @@
     padding: 0;
 }
 
-#sidebar {
-    min-width: 200px;
-    width: 30%;
+aside {
+    height: inherit;
 }
+
 #page-title {
     margin-bottom: 0;
 }

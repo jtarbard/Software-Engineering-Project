@@ -62,6 +62,25 @@ as the basic body -->
 {% endif %}
 
 {% block main_content %} {% endblock %}
+
+{% with messages = get_flashed_messages(with_categories=True) %}
+    {% if messages %}
+        {% for message in messages %}
+            {% if message[0] == ("success") %}
+            <div class="alert alert-success fade show" role="alert">
+            {% elif message[0] == ("error") %}
+            <div class="alert alert-danger fade show" role="alert">
+            {% else %}
+            <div class="alert alert-primary fade show" role="alert">
+            {% endif %}
+                {{ message[1] }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                  </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
 </div>
 
 {% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->

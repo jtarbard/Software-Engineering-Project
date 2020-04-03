@@ -9,7 +9,7 @@ import main.data.transactions.activity_db_transaction as adf
 import main.view_lib.cookie_lib as cl
 from main.data.db_classes.activity_db_class import ActivityType
 from main.data.db_classes.transaction_db_class import MembershipType, Membership
-from main.data.db_classes.user_db_class import Customer, Manager
+from main.data.db_classes.user_db_class import Customer, Manager, Employee
 from main.view_lib import account_lib
 
 blueprint = flask.Blueprint("account", __name__)
@@ -179,21 +179,27 @@ def view_account():
 
 
 @blueprint.route("/account/receipts", methods=["GET"])
-def view_account_receipts():
+def view_account_receipts(returned_receipts=None):
     user, response = cl.return_user_response(flask.request, True)
     if response:
         return response
 
-    returned_receipts = {}
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
         customer: Customer = udf.return_customer_with_user_id(user.user_id)
-        for receipt in customer.purchases:
-            returned_receipts[receipt.receipt_id] = receipt
+        returned_receipts = customer.purchases
+    elif user.__mapper_args__['polymorphic_identity'] == "Employee":
+        employee: Employee = udf.return_employee_with_user_id(user.user_id)
+        returned_receipts = employee.receipt_assist
+    elif user.__mapper_args__['polymorphic_identity'] == "Manager":
+    #     TODO: add manager functionality: returning all receipts between certain dates.
+        returned_receipts = []
+    else:
+        return flask.abort(500)
 
-        membership_type = account_lib.get_membership_type(user)
+    membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user,
-                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
@@ -204,20 +210,24 @@ def view_account_bookings():
 
     returned_bookings = {}
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
-        customer: Customer = udf.return_customer_with_user_id(user.user_id)
-        for receipt in customer.purchases:
-            if receipt.membership:
-                continue
-            for booking in receipt.bookings:
-                if booking.activity.start_time < datetime.datetime.now() or booking.deleted == True:
-                    continue
+        if user.__mapper_args__['polymorphic_identity'] == "Customer":
+            customer: Customer = udf.return_customer_with_user_id(user.user_id)
+            for receipt in customer.purchases:
+                for booking in receipt.bookings:
+                    if booking.activity.start_time > datetime.datetime.now() or booking.deleted == False:
+                        if booking.activity not in returned_bookings:
+                            returned_bookings[booking.activity] = [receipt, 1]
+                        else:
+                            returned_bookings[booking.activity][1] += 1
+    elif user.__mapper_args__['polymorphic_identity'] == "Employee":
+        returned_bookings = {}
+    elif user.__mapper_args__['polymorphic_identity'] == "Manager":
+    #     TODO: add manager functionality: returning booking stats.
+        returned_receipts = {}
+    else:
+        return flask.abort(500)
 
-                if booking.activity not in returned_bookings:
-                    returned_bookings[booking.activity] = [receipt, 1]
-                else:
-                    returned_bookings[booking.activity][1] += 1
-
-        membership_type = account_lib.get_membership_type(user)
+    membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/bookings.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type, page_title="Your Upcoming Bookings")
