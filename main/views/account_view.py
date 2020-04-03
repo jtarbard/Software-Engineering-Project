@@ -239,11 +239,22 @@ def view_account_membership():
     if response:
         return response
 
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+
     returned_bookings = {}
+    for receipt in customer.purchases:
+        if receipt.membership:
+            membership = receipt.membership
+            break
+
     membership_type = account_lib.get_membership_type(user)
+    dates = [
+        membership.start_date.strftime(" %d %B %Y"),
+        membership.end_date.strftime(" %d %B %Y")
+    ]
 
     return flask.render_template("/account/membership.html", User=user,
-                                 membership_type=membership_type, page_title="Membership")
+                                 membership_type=membership_type, membership=membership, dates=dates, page_title="Membership")
 
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
