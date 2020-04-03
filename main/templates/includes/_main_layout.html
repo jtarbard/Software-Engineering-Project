@@ -42,7 +42,26 @@ as the basic body -->
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base href="{{ url_for('account.register_get')}}">Register</a></li>
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base href="{{ url_for('account.login_get')}}">Login</a></li>
             {% else %}
-            <li class="nav-item"><a class="nav-link glyphicon glyphicon-user" base href="{{ url_for('account.view_account')}}">My Account</a></li>
+            <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="{{ url_for('account.view_account')}}" class="nav-link pl-0"><i class="fas fa-home fa-1x"></i><p>Home</p></a>
+                    <a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0"><i class="fas fa-calendar-alt fa-1x"></i><p>Bookings</p></a>
+                    <a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0"><i class="fas fa-file-invoice fa-1x"></i><p>Receipts</p></a>
+                    {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+                    <a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0"><i class="fas fa-id-card-alt fa-1x"></i><p>Membership</p></a>
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                    <a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-1x"></i><p>Statistics</p></a>
+                    {% endif %}
+                    <a href="#" class="nav-link pl-0"><i class="fas fa-user fa-1x"></i><p>Account</p></a>
+                    {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+                    <a href="#" class="nav-link pl-0"><i class="fas fa-credit-card fa-1x"></i><p>Card Details</p></a>
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                    <a href="#" class="nav-link pl-0"><i class="fas fa-table fa-1x"></i><p>Rota</p></a>
+                    {% endif %}
+                    <a href="{{ url_for('account.log_out')}}" class="nav-link pl-0"><i class="fas fa-sign-out-alt fa-1x"></i><p>Log Out</p></a>
+                </div>
+            </li>
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base href="{{ url_for('basket.basket_view')}}">View Basket</a></li>
             {% endif %}
         </ul>
