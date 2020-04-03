@@ -1,0 +1,245 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+
+{% endblock %}
+
+{% block title %}
+The Vertex Statistics!
+{% endblock %}
+
+{% block main_content %}
+<h1>View Statistics</h1>
+<form class="form-inline" method="post">
+    <label for="start_date">Start search date:</label>
+    <input type="date" name="start_date" required value="{{search_field_data["start_date"]}}"
+        max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">
+    <label for="start_date">End search date:</label>
+    <input type="date" name="end_date" required value="{{search_field_data["end_date"]}}"
+        max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">
+
+    <label for="activity_type">Activity type:</label>
+    <select name="activity_type">
+        <option value="Any" {% if search_field_data["activity"] == "Any" %} selected {% endif %} >Any</option>
+        {% for actvitiy_type in activity_types %}
+            {% if actvitiy_type.activity_type_id == search_field_data["activity"] or actvitiy_type.activity_type_id == sent_activity %}
+                <option value="{{actvitiy_type.activity_type_id}}" selected="selected">{{actvitiy_type.name.title()}}</option>
+            {% else %}
+                <option value="{{actvitiy_type.activity_type_id}}" >{{actvitiy_type.name.title()}}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
+    <input type="submit" name="reload_search" value="Refresh results">
+</form>
+{% if not weekly_activities %}
+    <p>No activity data returned, please change the search options</p>
+{% else %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="2">Basic Stats</td></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Start date:</td>
+                    <td>{{search_field_data["start_date"]}}</td>
+                </tr>
+                <tr>
+                    <td>End date:</td>
+                    <td>{{search_field_data["end_date"]}}</td>
+                </tr>
+                <tr>
+                    <td>Total bookings:</td>
+                    <td>{{total_bookings}}</td>
+                </tr>
+                <tr>
+                    <td>Total income:</td>
+                    <td>{{total_cash_in}}</td>
+                </tr>
+                <tr>
+                    <td>Total outflow:</td>
+                    <td>{{total_cash_out}}</td>
+                </tr>
+                <tr>
+                    <td>Total profit:</td>
+                    <td>{{total_cash_in-total_cash_out}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+<br>
+<div id="charts">
+    <canvas id="booking-chart" width="800" height="450"></canvas>
+    <canvas id="profit-chart" width="800" height="450"></canvas>
+    <canvas id="activity-chart" width="800" height="450"></canvas>
+</div>
+<div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr><td colspan="2">Total Bookings</td></tr>
+            </thead>
+            <tbody>
+                {% for activity, num_bookings in total_activity_type_bookings.items() %}
+                <tr>
+                    <td>{{activity.name.title()}}</td>
+                    <td>{{num_bookings[0]}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+<br>
+    {% for week_num in weekly_activities.keys()%}
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr><td colspan="7">Week {{week_num+1}}</td></tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Activity number</td>
+                        <td>Activity Name</td>
+                        <td>Activity Time </td>
+                        <td>Number of bookings</td>
+                        <td>Income</td>
+                        <td>Cost</td>
+                        <td>Profit</td>
+                    </tr>
+                {% for activity_type in weekly_activities[week_num].keys()%}
+                    {% if not activity_type in ["income","cost","num_bookings","color"] %}
+                        {% for activity_data in weekly_activities[week_num][activity_type] %}
+                            <tr>
+                                <td><a href="/activities/view_activity/{{ activity_data[0].activity_id }}">{{activity_data[0].activity_id}}</a></td>
+                                <td>{{activity_data[0].activity_type.name.title()}}</td>
+                                <td>{{activity_data[0].start_time}}</td>
+                                <td>{{activity_data[3]}}</td>
+                                <td>{{activity_data[1]}}</td>
+                                <td>{{activity_data[2]}}</td>
+                                <td>{{activity_data[1]-activity_data[2]}}</td>
+                            </tr>
+                        {% endfor %}
+                    {% endif %}
+                {% endfor %}
+                 </tbody>
+                <tr><td colspan="7"></td></tr>
+                <tfoot>
+                <tr>
+                    <td colspan="5"></td>
+                    <td>Total Income</td>
+                    <td>£{{weekly_activities[week_num]["income"]}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td>Total Cost</td>
+                    <td>£{{weekly_activities[week_num]["cost"]}}</td>
+                </tr>
+                <tr>
+                    <td colspan="5"></td>
+                    <td>Total Profit</td>
+                    <td>£{{weekly_activities[week_num]["income"]-weekly_activities[week_num]["cost"]}}</td>
+                </tr>
+
+                </tfoot>
+            </table>
+        </div>
+    {% endfor %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
+    <script>
+        new Chart(document.getElementById("booking-chart"), {
+            type: 'bar',
+            data: {
+              labels: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}"Week: {{week_num}}"
+                        {% endfor %}],
+              datasets: [
+                {
+                  label: "Number of bookings",
+                  backgroundColor: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}"#{{weekly_activities[week_num]["color"]}}"
+                        {% endfor %}],
+                  data: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}{{weekly_activities[week_num]["num_bookings"]}}
+                        {% endfor %}]
+                }
+              ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                },
+                legend: { display: false },
+              title: {
+                    display: true,
+                    text: 'Number of bookings per week'
+              }
+
+            }
+        });
+
+        new Chart(document.getElementById("activity-chart"), {
+            type: 'pie',
+            data: {
+              labels: [{% for activity in activity_types %}
+                            {%if activity_types.index(activity) != 0 %},{% endif %}"{{activity.name.title()}}"
+                        {% endfor %}],
+              datasets: [{
+                label: "Number of bookings per activity type",
+                backgroundColor: [{% for activity, booking in total_activity_type_bookings.items() %}
+                            {%if activity_types.index(activity) != 0 %},{% endif %}"#{{booking[1]}}"
+                        {% endfor %}],
+                data: [{% for activity, booking in total_activity_type_bookings.items() %}
+                            {%if activity_types.index(activity) != 0 %},{% endif %}{{booking[0]}}
+                        {% endfor %}]
+              }]
+            },
+            options: {
+              title: {
+                display: true,
+                text: 'Number of bookings per activity type'
+              }
+            }
+        });
+
+        new Chart(document.getElementById("profit-chart"), {
+          type: 'line',
+          data: {
+            labels: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}"Week: {{week_num}}"
+                        {% endfor %}],
+            datasets: [{
+                data: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}{{weekly_activities[week_num]["income"]}}
+                        {% endfor %}],
+                label: "Income",
+                borderColor: "#3e95cd",
+                fill: false
+              }, {
+                data: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}{{weekly_activities[week_num]["cost"]}}
+                        {% endfor %}],
+                label: "Cost",
+                borderColor: "#8e5ea2",
+                fill: false
+              }, {
+                data: [{% for week_num in weekly_activities.keys() %}
+                            {%if week_num != 0 %},{% endif %}{{weekly_activities[week_num]["income"]-weekly_activities[week_num]["cost"]}}
+                        {% endfor %}],
+                label: "Profit",
+                borderColor: "#3cba9f",
+                fill: false
+              }
+            ]
+          },
+          options: {
+            title: {
+              display: true,
+              text: 'Cashflow per week'
+            }
+          }
+        });
+    </script>
+{% endif %}
+{% endblock %}

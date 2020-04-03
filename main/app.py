@@ -48,7 +48,7 @@ def configure(app):
     print("Registered blueprints")
 
     import main.data.transactions.reset_transaction as rt
-    if rt.populate_db(create_timetable=True):
+    if rt.populate_db(create_timetable=True, populate_with_random_bookings=True):
         print("Populated database")
     else:
         print("Database already populated")
@@ -78,6 +78,7 @@ def create_app(config_filename=None):
 
 
 flask_app = create_app()
+flask_app.secret_key = "england is my city"
 
 if __name__ == '__main__':
     flask_app.run(debug=True)
