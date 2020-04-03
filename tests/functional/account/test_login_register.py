@@ -5,17 +5,11 @@ import copy
 import flask
 from bs4 import BeautifulSoup
 
-import tests.conftest as conftest
+from tests.helper.flask_signal_capturer import captured_templates
+from tests.helper.mocked_functions import return_logged_in_user_response, return_not_logged_in_user_response
 
 
 def test_register_get_basic(app, test_client, mocker, template_checker):
-
-    # Mocked side effect
-    def return_logged_in_user_response(request, needs_login):
-        return True, flask.redirect("/account/login")  # TODO: return a real user instead of True
-
-    def return_not_logged_in_user_response(request, needs_login):
-        return False, flask.redirect("/account/login")
 
     # ------------------------------------------------------- #
 
@@ -39,7 +33,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/register' (OPTIONS, HEAD, GET) -> account.register_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.get('/account/register', follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Register",
@@ -65,7 +59,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         test_client.set_cookie("localhost", "vertex_basket_cookie", "this should be removed")
         test_client.set_cookie("localhost", "random_cookie7", "this should persist")
         test_client.set_cookie("localhost", "random_cookie11", "this should persist")
@@ -104,7 +98,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.get("/account/register", follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
@@ -129,7 +123,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         test_client.set_cookie("localhost", "vertex_basket_cookie", "this should persist")
         test_client.set_cookie("localhost", "random_cookie13", "this should persist")
         test_client.set_cookie("localhost", "random_cookie17", "this should persist")
@@ -227,11 +221,11 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/register', data=valid_dict, follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Your Account",
-                         exp_url="/account/home", exp_template_path='/account/account.html',
+                         exp_url="/account/home", exp_template_path='/account/account_home.html',
                          exp_exist_cookies=["vertex_account_cookie"])
 
         assert User.query.filter(User.email == valid_email) is not None
@@ -262,7 +256,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         email_exists_dict = copy.deepcopy(valid_dict)
         email_exists_dict["email"] = "johndoe@thevertex.com"
         exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -299,7 +293,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_emails = ["johndoe", "johndoe@gmail", "johndoe@gmail."]
 
     for invalid_email in invalid_emails:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             email_wrong_format_dict = copy.deepcopy(valid_dict)
             email_wrong_format_dict["email"] = invalid_email
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -336,7 +330,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_pws = ["", "supermegalongpassw0rD"]
 
     for invalid_pw in invalid_pws:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             password_wrong_length_dict = copy.deepcopy(valid_dict)
             password_wrong_length_dict["password_first"] = invalid_pw
             password_wrong_length_dict["password_second"] = invalid_pw
@@ -372,7 +366,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_pws = ["password", "nonumberyay"]
 
     for invalid_pw in invalid_pws:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             password_wrong_length_dict = copy.deepcopy(valid_dict)
             password_wrong_length_dict["password_first"] = invalid_pw
             password_wrong_length_dict["password_second"] = invalid_pw
@@ -408,7 +402,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_pws = invalid_charsets + ["I have space"]
 
     for invalid_pw in invalid_pws:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             password_wrong_length_dict = copy.deepcopy(valid_dict)
             password_wrong_length_dict["password_first"] = invalid_pw
             password_wrong_length_dict["password_second"] = invalid_pw
@@ -442,7 +436,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         password_wrong_length_dict = copy.deepcopy(valid_dict)
         password_wrong_length_dict["password_first"] = "validPW0"
         password_wrong_length_dict["password_second"] = "unmatchPW0"
@@ -478,7 +472,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_first_names = invalid_charsets + ["", "12345678", "supermegalongbutstillvalidnames"]
 
     for invalid_first_name in invalid_first_names:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["first_name"] = invalid_first_name
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -515,7 +509,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_last_names = invalid_charsets + ["", "12345678", "supermegalongbutstillvalidnames"]
 
     for invalid_last_name in invalid_last_names:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["last_name"] = invalid_last_name
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -552,7 +546,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_tels = invalid_charsets + ["", "1234567891234567891234567890", "notnumeric", "1234567a"]
 
     for invalid_tel in invalid_tels:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["tel_number"] = invalid_tel
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -591,7 +585,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
                     datetime.date.today()+datetime.timedelta(days=365*20)]
 
     for invalid_dob in invalid_dobs:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["dob"] = invalid_dob
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -633,7 +627,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     #                 "2000-11-31"]
     #
     # for invalid_dob in invalid_dobs:
-    #     with conftest.captured_templates(app) as templates:
+    #     with captured_templates(app) as templates:
     #         invalid_first_name_dict = copy.deepcopy(valid_dict)
     #         invalid_first_name_dict["dob"] = invalid_dob
     #         exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -670,7 +664,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_postcodes = ["999078", "ABCDEFG123"]
 
     for invalid_postcode in invalid_postcodes:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["postcode"] = invalid_postcode
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -707,7 +701,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_addresses = invalid_charsets + ["", "long"*15]
 
     for invalid_address in invalid_addresses:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["address"] = invalid_address
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -744,7 +738,7 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     invalid_countries = ["@_!#", "$%^&", "*()<", ">?/\\", "|}", ":{~", "", "longgggg"]
 
     for invalid_country in invalid_countries:
-        with conftest.captured_templates(app) as templates:
+        with captured_templates(app) as templates:
             invalid_first_name_dict = copy.deepcopy(valid_dict)
             invalid_first_name_dict["country"] = invalid_country
             exp_retained_dict = copy.deepcopy(valid_dict_password_cleared)
@@ -770,10 +764,10 @@ def test_login_get_basic(app, test_client, mocker, template_checker):
 
     # Mocked side effect
     def return_logged_in_user_response(request, needs_login):
-        return True, flask.redirect("/account/login")  # TODO: return a real user instead of True
+        return True, flask.redirect("/account/login"), True  # TODO: return a real user instead of True
 
     def return_not_logged_in_user_response(request, needs_login):
-        return False, flask.redirect("/account/login")
+        return False, flask.redirect("/account/login"), True
 
     # ------------------------------------------------------- #
 
@@ -794,7 +788,7 @@ def test_login_get_basic(app, test_client, mocker, template_checker):
 
     mocker.patch('main.view_lib.cookie_lib.return_user_response', side_effect=return_not_logged_in_user_response)
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.get('/account/login', follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Login",
@@ -820,7 +814,7 @@ def test_login_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         test_client.set_cookie("localhost", "vertex_basket_cookie", "this should be removed")
         test_client.set_cookie("localhost", "random_cookie7", "this should persist")
         test_client.set_cookie("localhost", "random_cookie11", "this should persist")
@@ -857,7 +851,7 @@ def test_login_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.get("/account/login", follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
@@ -882,7 +876,7 @@ def test_login_get_basic(app, test_client, mocker, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, HEAD, GET) -> account.login_get>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         test_client.set_cookie("localhost", "vertex_basket_cookie", "this should persist")
         test_client.set_cookie("localhost", "random_cookie13", "this should persist")
         test_client.set_cookie("localhost", "random_cookie17", "this should persist")
@@ -929,12 +923,12 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password="passw0rD"), follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Your Account",
-                         exp_url=flask.url_for("account.view_account"), exp_template_path='/account/account.html',
+                         exp_url=flask.url_for("account.view_account"), exp_template_path='/account/account_home.html',
                          exp_exist_cookies=["vertex_account_cookie"])
 
     test_client.delete_cookie("localhost", "vertex_account_cookie")
@@ -960,7 +954,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password="Admin666"), follow_redirects=True)
 
@@ -990,7 +984,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password="Admin667"), follow_redirects=True)
 
@@ -1020,7 +1014,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="doesnotexist@vertex.com",
                                                           password="Admin666"), follow_redirects=True)
 
@@ -1050,7 +1044,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="doesnotexist@vertex.com",
                                                           password="Admin667"), follow_redirects=True)
 
@@ -1081,7 +1075,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password=""), follow_redirects=True)
 
@@ -1112,7 +1106,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password="password@"), follow_redirects=True)
 
@@ -1144,7 +1138,7 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     TESTING FOR <Rule '/account/login' (OPTIONS, POST) -> account.login_post>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.post('/account/login', data=dict(email="johndoe@thevertex.com",
                                                           password="password@"), follow_redirects=True)
 
@@ -1186,7 +1180,7 @@ def test_logout_get_basic(app, test_client, template_checker):
     TESTING FOR <Rule '/account/log_out' (OPTIONS, HEAD, GET) -> account.log_out>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         test_client.set_cookie("localhost", "vertex_account_cookie", "this should be deleted")
 
         rv = test_client.get("/account/log_out", follow_redirects=True)
@@ -1213,7 +1207,7 @@ def test_logout_get_basic(app, test_client, template_checker):
     TESTING FOR <Rule '/account/log_out' (OPTIONS, HEAD, GET) -> account.log_out>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         test_client.set_cookie("localhost", "vertex_account_cookie", "this should be deleted")
         test_client.set_cookie("localhost", "vertex_basket_cookie", "this should be deleted")
 
@@ -1242,7 +1236,7 @@ def test_logout_get_extra(app, test_client, template_checker):
     TESTING FOR <Rule '/account/log_out' (OPTIONS, HEAD, GET) -> account.log_out>
     """
 
-    with conftest.captured_templates(app) as templates:
+    with captured_templates(app) as templates:
         rv = test_client.get("/account/log_out", follow_redirects=True)
 
         template_checker(response=rv, request=flask.request, templates=templates, exp_title="Index",
@@ -1250,3 +1244,24 @@ def test_logout_get_extra(app, test_client, template_checker):
                          exp_exist_cookies=[])
 
     # --------------------------------- END OF THIS TEST: test_logout_get_extra --------------------------------- #
+
+
+# TODO: Implement all...
+def test_view_account_basic():
+    assert False
+
+
+def test_view_account_receipts():
+    assert False
+
+
+def test_view_account_bookings():
+    assert False
+
+
+def test_view_account_membership():
+    assert False
+
+
+def test_view_usages():
+    assert False

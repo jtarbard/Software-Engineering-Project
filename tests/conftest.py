@@ -105,24 +105,6 @@ def test_client(app):
         yield tc
 
 
-# https://stackoverflow.com/questions/23987564/test-flask-render-template-context
-from flask import template_rendered
-from contextlib import contextmanager
-
-@contextmanager
-def captured_templates(app):
-    recorded = []
-
-    def record(sender, template, context, **extra):
-        recorded.append((template, context))
-
-    template_rendered.connect(record, app)
-    try:
-        yield recorded
-    finally:
-        template_rendered.disconnect(record, app)
-
-
 @pytest.fixture(scope="function")
 def template_checker():
 
