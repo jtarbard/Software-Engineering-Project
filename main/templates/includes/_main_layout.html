@@ -53,7 +53,16 @@ as the basic body -->
 <div class="main_content"> <!--Defines the main content for the webpages, this is where all
                                 the content is situated-->
 {% if page_title is defined %} <!-- Page title is not empty -->
-<div class="fluid-container" id="page-title">
+<div
+{% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+    class="fluid-container customer"
+{% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+    class="fluid-container employee"
+{% elif User.__mapper_args__['polymorphic_identity'] == "Manager"%}
+    class="fluid-container manager"
+{% endif%}
+id="page-title"
+>
   <div class="container">
     <h1>{{ page_title }}</h1>
     {% block page_description %} {% endblock %}

@@ -2,10 +2,6 @@
     padding: 0;
 }
 
-aside {
-    height: inherit;
-}
-
 #page-title {
     margin-bottom: 0;
 }
@@ -22,6 +18,13 @@ aside {
     overflow-x: scroll;
 }
 
+@media (min-width: 768px) {
+  .row.equal {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
 aside p {
     display: none;
 }
@@ -33,7 +36,7 @@ aside p {
 /*Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
     aside {
-        height: 75vh;
+        height: inherit;
         overflow-x: auto;
     }
 

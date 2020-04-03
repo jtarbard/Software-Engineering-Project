@@ -10,7 +10,7 @@
 {% block main_content %}
 <div class="container-fluid">
 {% if not sidebar_off %}
-  <div class="row no-gutters">
+  <div class="row no-gutters equal">
         <aside class="col-12 col-md-3 col-lg-2">
             <nav class="navbar navbar-expand">
                 <div class="collapse navbar-collapse ">
@@ -38,7 +38,7 @@
         </aside>
 {% endif %}
     <!-- Page Content -->
-      <div class="col-md-9">
+      <div class="col-md-9 col-lg-10">
         <div id="page-content-wrapper">
             <div id="title-bar">
                 <h1>{{User.first_name.title()}}</h1>

@@ -367,7 +367,7 @@ def view_usages():
                                  weekly_activities=weekly_activities, search_field_data=search_field_data,
                                  activity_types=activity_types, total_cash_in=total_cash_in,
                                  total_cash_out=total_cash_out, total_bookings=total_bookings,
-                                 total_activity_type_bookings=total_activity_type_bookings)
+                                 total_activity_type_bookings=total_activity_type_bookings, page_title="Statistics")
 
 
 # Route for executing if the user wants to log out
