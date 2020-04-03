@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import flask
 from flask_sqlalchemy import SQLAlchemy
 from main.app import register_blueprints, create_logging
-from main.data.db_session import test_init
+from main.data.db_session import test_init, database
 
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
@@ -88,9 +88,13 @@ def app():
     ctx.push()
     # local_app.preprocess_request()
 
+    # create_all() inside
     test_init(local_app)
 
     yield local_app
+
+    # database.session.rollback()
+    database.drop_all()
 
     ctx.pop()
 
@@ -99,28 +103,6 @@ def app():
 def test_client(app):
     with app.test_client(use_cookies=True) as tc:  # THIS WAS THE PROBLEM ALL ALONG OH MY GOD
         yield tc
-
-
-@pytest.yield_fixture(scope='session')
-def db(app):
-    database = SQLAlchemy(app)
-    # database.app = app
-    database.create_all()
-
-    yield database
-
-    database.session.remove()
-    database.drop_all()
-
-
-# For pytest-flask-sqlalchemy. Caused (a lot) more problems than needed.
-# @pytest.fixture(scope='session')
-# def _db(db):
-#     """
-#     Provide the transactional fixtures with access to the database via a Flask-SQLAlchemy
-#     database connection.
-#     """
-#     return db
 
 
 # https://stackoverflow.com/questions/23987564/test-flask-render-template-context
@@ -141,35 +123,6 @@ def captured_templates(app):
         template_rendered.disconnect(record, app)
 
 
-# Deprecated but would still like to keep it here... Perhaps move to snippets?
-# @pytest.fixture(scope='session')
-# def page_title_dict():
-#     # Current working directory = main/..
-#     dictionary = {}
-#
-#     for root, dirs, files in os.walk(os.getcwd()):
-#         for file in [f for f in files if f.endswith(".html")]:
-#             with open(root + "\\" + file, "r", encoding='utf-8') as content:
-#                 title = ""
-#                 is_title_portion = False  # this doesn't matter
-#                 for line in content.readlines():
-#                     # Remove ALL white space and new line
-#                     cleansed_line = line.replace("\n", "").replace(" ", "")
-#                     # Remove comments
-#                     cleansed_line = re.sub("(<!--.*?-->)", "", cleansed_line, flags=re.DOTALL)
-#
-#                     if cleansed_line == "{%blocktitle%}":
-#                         is_title_portion = True
-#                     elif cleansed_line == "{%endblock%}" and is_title_portion:
-#                         dictionary[file] = title
-#                         break  # finish reading title. Read the next file
-#                     elif is_title_portion:
-#                         title += line + ("\n" if title != "" else "")
-#                 if not dictionary.get(file, False):
-#                     dictionary[file] = "No Title"
-#     return dictionary
-
-
 @pytest.fixture(scope="function")
 def template_checker():
 
@@ -188,20 +141,18 @@ def template_checker():
         soup = BeautifulSoup(response.data, 'html.parser')
 
         assert response.status_code == exp_status_code, "Invalid status code"
-        assert request.path == exp_url, "Mismatching url"
+        assert request.path == exp_url, "Mismatching url (usually this indicates wrong redirection)"
         assert len(templates) == 1, "Returned not enough / too many templates. Expected 1 (This should never happen in theory)"
         template, context = templates[0]
         assert exp_title in soup.title.string or exp_title in context.get("page_title", ""), "Expected title not found"
         assert template.name == exp_template_path, "Rendered wrong template"
         # pythonic :)
-        assert all([ any([ context.get(exp_key, "") == val for val in exp_val ]) if type(exp_val) == list else context.get(exp_key, "") == exp_val for (exp_key, exp_val) in exp_template_context.items() ]), "Template rendered with wrong parameters"
+        assert \
+            all([ any([ context.get(exp_key, "") == val for val in exp_val ]) if type(exp_val) == list
+                  else context.get(exp_key, "") == exp_val
+                  for (exp_key, exp_val) in exp_template_context.items()
+                ]), "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + "\nActual:\n" + str(context)
         assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist"
         assert all([ (out_cookie not in request.cookies) for out_cookie in exp_non_exist_cookies ]), "Expected non-existent cookies exist"
 
     return _template_checker
-
-
-# Deprecated. But I would really like to still keep this as a backup solution
-# def cookies(test_client_obj):
-#     return vars(vars(test_client_obj).get("cookie_jar")).get("_cookies").get("localhost.local").get("/").keys()
-
