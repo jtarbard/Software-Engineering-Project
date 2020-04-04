@@ -64,9 +64,9 @@ as the basic body -->
                     {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
                     <a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-1x"></i><p>Statistics</p></a>
                     {% endif %}
-                    <a href="#" class="nav-link pl-0"><i class="fas fa-user fa-1x"></i><p>Account</p></a>
+                    <a href="{{ url_for('account.view_account_details')}}" class="nav-link pl-0"><i class="fas fa-user fa-1x"></i><p>Account</p></a>
                     {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-                    <a href="#" class="nav-link pl-0"><i class="fas fa-credit-card fa-1x"></i><p>Card Details</p></a>
+                    <a href="{{ url_for('account.view_payment_details')}}" class="nav-link pl-0"><i class="fas fa-credit-card fa-1x"></i><p>Card Details</p></a>
                     {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
                     <a href="#" class="nav-link pl-0"><i class="fas fa-table fa-1x"></i><p>Rota</p></a>
                     {% endif %}

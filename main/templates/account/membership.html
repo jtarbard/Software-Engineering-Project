@@ -1,7 +1,7 @@
 {% extends "account/account_layout.html"%}
 
 {% block page_content %}
-<div class="container">
+<div>
     {% if membership %}
         <p>Membership: {{membership_type.name.title()}}</p>
         <p>Start Date: {{membership.start_date.strftime("%d %B, %Y")}}</p>

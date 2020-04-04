@@ -91,9 +91,6 @@ def card_payment_post():
                                  town=data_form.get('town'), city=data_form.get('city'),
                                  postcode=data_form.get('postcode'))
 
-    elif customer.payment_detail:
-        ds.delete_from_database(customer.payment_detail)
-
     new_user = user
     if user.__mapper_args__['polymorphic_identity'] != "Customer":
         new_user = udf.return_user(customer.user_id)

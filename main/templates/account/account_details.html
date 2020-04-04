@@ -8,8 +8,8 @@
             <div class="form-group row no-gutters">
                 <label class="col-12 col-md-3" for="email">Email:</label>
                 <input type="email" name="email" class="form-control-plaintext col-12 col-md-7"  id="email" value="{{customer.email}}" readonly="readonly" required>
+                <a id="change-pass" class="btn btn-secondary" href="">Change Password</a>
             </div>
-            <a id="change-pass" href="">Change Password</a>
         </div>
     </div>
     <div class="row">
@@ -318,13 +318,13 @@
                 {% endfor %}
             {% endif %}
         {% endwith %}
-        <input type="submit" id="submit_btn" value="Submit" class="btn btn-primary col-2" readonly="readonly" required>
-        <button id="cancel-btn" type="button" onclick="edit()" class="btn btn-secondary col-2">Cancel</button>
+        <input type="submit" id="submit_btn" value="Submit" class="btn btn-primary col-4 col-md-2" readonly="readonly" required>
+        <button id="cancel_btn" type="button" onclick="edit()" class="btn btn-secondary col-4 col-md-2">Cancel</button>
 </form>
 </div>
 
 <div class="row no-gutters">
-<button id="edit_btn" onclick="edit()" class="btn btn-danger col-2">Edit Details</button>
+<button id="edit_btn" onclick="edit()" class="btn btn-danger col-4 col-md-2">Edit Details</button>
 </div>
 {% endblock %}
 {% block account_additional_js %}
@@ -342,7 +342,7 @@
         const selects = document.getElementsByTagName("select");
         const submit = document.getElementById("submit_btn");
         const edit = document.getElementById("edit_btn");
-        const cancel = document.getElementById("cancel-btn");
+        const cancel = document.getElementById("cancel_btn");
 
         if(edit_state){
             for (i = 0; i < inputs.length; i++) {

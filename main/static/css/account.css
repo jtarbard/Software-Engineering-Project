@@ -108,6 +108,12 @@ th {
 
 label {
     padding-top: 6px;
+    font-weight: bold;
+}
+
+form h2 {
+    margin-bottom: 1vh;
+    font-size: 1.5rem;
 }
 
 
@@ -129,11 +135,16 @@ table.dataTable thead .sorting_desc_disabled:before {
     margin-bottom: 3vh;
 }
 
-#submit_btn, #cancel-btn {
+#submit_btn, #cancel_btn {
     display: none;
     margin-top: 3vh;
 }
 
-#cancel-btn {
+#cancel_btn {
+    display: none;
     margin-left: 1vw;
+}
+
+#delete_btn {
+   margin-left: 1vw;
 }

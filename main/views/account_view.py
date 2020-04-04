@@ -8,9 +8,10 @@ import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.activity_db_transaction as adf
 import main.view_lib.cookie_lib as cl
 from main.data.db_classes.activity_db_class import ActivityType
-from main.data.db_classes.transaction_db_class import MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer, Manager, Employee
+from main.data.transactions.transaction_db_transaction import add_new_card_details
 from main.view_lib import account_lib
+import main.data.db_session as ds
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -247,6 +248,7 @@ def view_account_membership():
 
     customer: Customer = udf.return_customer_with_user_id(user.user_id)
 
+    membership = None
     for receipt in customer.purchases:
         if receipt.membership:
             membership = receipt.membership
@@ -291,6 +293,47 @@ def view_account_details():
             udf.edit_user_account(customer.user_id, details)
 
     return flask.render_template("/account/account_details.html", User=user, customer=customer, membership_type=membership_type, page_title="Account Details", has_cookie=has_cookie)
+
+
+@blueprint.route("/account/card", methods=["POST", "GET"])
+def view_payment_details():
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+    membership_type = account_lib.get_membership_type(user)
+
+    if customer.payment_detail:
+        payment_details = vars(customer.payment_detail)
+    else:
+        payment_details = None
+
+    print(payment_details)
+
+    if flask.request.method == "POST":
+        data_form = flask.request.form
+
+        if payment_details is not None:
+            ds.delete_from_database(customer.payment_detail)
+
+        if data_form.get("delete") == "True":
+            print("VALUE IS TRUE")
+            ds.delete_from_database(customer.payment_detail)
+        else:
+            add_new_card_details(customer, card_number=data_form.get('card_number'),
+                                     start_date=data_form.get('start_date'),
+                                     expiration_date=data_form.get('expiration_date'),
+                                     street_and_number=data_form.get('street_and_number'),
+                                     town=data_form.get('town'), city=data_form.get('city'),
+                                     postcode=data_form.get('postcode'))
+
+        if customer.payment_detail:
+            payment_details = vars(customer.payment_detail)
+        else:
+            payment_details = None
+
+    return flask.render_template("/account/card_details.html", User=user, customer=customer, payment_details=payment_details, membership_type=membership_type, page_title="Card Details", has_cookie=has_cookie)
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
 def view_usages():
