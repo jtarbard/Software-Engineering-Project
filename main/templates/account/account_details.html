@@ -1,334 +1,348 @@
 {% extends "account/account_layout.html"%}
 
 {% block page_content %}
-<form class="row no-gutters" method="post">
-    <div class="col-12 col-md-12 col-xl-4">
-        <h2>Account Details:</h2>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" name="email" class="form-control-plaintext" id="email" value="{{customer.email}}" readonly="readonly" required>
-        </div>
-        <a href="">Change Password</a>
-    </div>
-    <div class="col-12 col-md-6 col-xl-4">
-        <h2>Personal Details:</h2>
-        <div class="form-group">
-            <label for="title">Title:</label>
-            <select name="title" id="title" class="custom-select" disabled="disabled">
-                <option value="Mr" {% if customer.title == 'Mr'%}selected{% endif %}>Mr</option>
-                <option value="Mrs" {% if customer.title == 'Mrs'%}selected{% endif %}>Mrs</option>
-                <option value="Miss" {% if customer.title == 'Miss'%}selected{% endif %}>Miss</option>
-                <option value="Ms" {% if customer.title == 'Ms'%}selected{% endif %}>Ms</option>
-                <option value="Dr" {% if customer.title == 'Dr'%}selected{% endif %}>Dr</option>
-                <option value="Lord" {% if customer.title == 'Lord'%}selected{% endif %}>Lord</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="first_name">First Name:</label>
-            <input type="text" name="first_name" class="form-control-plaintext" id="first_name" value="{{customer.first_name}}" readonly="readonly" required>
-        </div>
-        <div class="form-group">
-            <label for="last_name">Last Name:</label>
-            <input type="text" name="last_name" class="form-control-plaintext" id="last_name" value="{{customer.last_name}}" readonly="readonly" required>
-        </div>
-        <div class="form-group">
-            <label for="dob">Date of Birth:</label>
-            <input type="date" name="dob" class="form-control-plaintext" id="dob" value="{{customer.dob}}" readonly="readonly" required>
+<form method="post">
+    <div class="row" id="personal_details_row">
+        <div class="col-12 col-md-6 col-xl-4">
+            <h2>Account Details:</h2>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-3" for="email">Email:</label>
+                <input type="email" name="email" class="form-control-plaintext col-12 col-md-7"  id="email" value="{{customer.email}}" readonly="readonly" required>
+            </div>
+            <a id="change-pass" href="">Change Password</a>
         </div>
     </div>
-    <div class="col-12 col-md-6 col-xl-4">
-        <h2>Contact Details:</h2>
-        <div class="form-group">
-            <label for="tel_number">Phone:</label>
-            <input type="tel" name="tel_number" class="form-control-plaintext" id="tel_number" value="{{customer.tel_number}}" readonly="readonly" required>
+    <div class="row">
+        <div class="col-12 col-md-6">
+            <h2>Personal Details:</h2>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="title">Title:</label>
+                <select name="title" id="title" class="custom-select col-12 col-md-4" disabled="disabled">
+                    <option value="Mr">Mr</option>
+                    <option value="Mrs">Mrs</option>
+                    <option value="Miss">Miss</option>
+                    <option value="Ms">Ms</option>
+                    <option value="Dr">Dr</option>
+                    <option value="Lord">Lord</option>
+                </select>
+            </div>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="first_name">First Name:</label>
+                <input type="text" name="first_name" class="form-control-plaintext col-12 col-md-7"  id="first_name" value="{{customer.first_name}}" readonly="readonly" required>
+            </div>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="last_name">Last Name:</label>
+                <input type="text" name="last_name" class="form-control-plaintext col-12 col-md-7"  id="last_name" value="{{customer.last_name}}" readonly="readonly" required>
+            </div>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="dob">Date of Birth:</label>
+                <input type="date" name="dob" class="form-control-plaintext col-12 col-md-4"  id="dob" value="{{customer.dob}}" readonly="readonly" required>
+            </div>
         </div>
-        <div class="form-group">
-            <label for="address">Address:</label>
-            <input type="text" name="address" class="form-control-plaintext" id="address" value="{{customer.address}}" readonly="readonly" required>
-        </div>
-        <div class="form-group">
-            <label for="postal_code">Postcode:</label>
-            <input type="text" name="postal_code" class="form-control-plaintext" id="postal_code" value="{{customer.postal_code}}" readonly="readonly" required>
-        </div>
-        <div class="country">
-            <label for="country">Country:</label>
-<!--            TODO FINISH INSERTING COUNTRY CHECK VALUES-->
-            <select name="country" id="country" class="custom-select" disabled="disabled" required>
-                <option value="AF" {% if customer.country == 'AF'%}selected{% endif %}>Afghanistan</option>
-                <option value="AX"  {% if customer.country == 'AX' %}selected{% endif %}>Åland Islands</option>
-                <option value="AL"  {% if customer.country == 'AL' %}selected{% endif %}>Albania</option>
-                <option value="DZ"  {% if customer.country == 'DZ' %}selected{% endif %}>Algeria</option>
-                <option value="AS"  {% if customer.country == 'AS' %}selected{% endif %}>American Samoa</option>
-                <option value="AD"  {% if customer.country == 'AD' %}selected{% endif %}>Andorra</option>
-                <option value="AO"  {% if customer.country == 'AO' %}selected{% endif %}>Angola</option>
-                <option value="AI"  {% if customer.country == 'AI' %}selected{% endif %}>Anguilla</option>
-                <option value="AQ"  {% if customer.country == 'AQ' %}selected{% endif %}>Antarctica</option>
-                <option value="AG"  {% if customer.country == 'AG' %}selected{% endif %}>Antigua and Barbuda</option>
-                <option value="AR"  {% if customer.country == 'AR' %}selected{% endif %}>Argentina</option>
-                <option value="AM"  {% if customer.country == 'AM' %}selected{% endif %}>Armenia</option>
-                <option value="AW"  {% if customer.country == 'AW' %}selected{% endif %}>Aruba</option>
-                <option value="AU"  {% if customer.country == 'AU' %}selected{% endif %}>Australia</option>
-                <option value="AT"  {% if customer.country == 'AT' %}selected{% endif %}>Austria</option>
-                <option value="AZ"  {% if customer.country == 'AZ' %}selected{% endif %}>Azerbaijan</option>
-                <option value="BS"  {% if customer.country == 'BS' %}selected{% endif %}>Bahamas</option>
-                <option value="BH"  {% if customer.country == 'BH' %}selected{% endif %}>Bahrain</option>
-                <option value="BD"  {% if customer.country == 'BD' %}selected{% endif %}>Bangladesh</option>
-                <option value="BB"  {% if customer.country == '' %}selected{% endif %}>Barbados</option>
-                <option value="BY"  {% if customer.country == '' %}selected{% endif %}>Belarus</option>
-                <option value="BE"  {% if customer.country == '' %}selected{% endif %}>Belgium</option>
-                <option value="BZ"  {% if customer.country == '' %}selected{% endif %}>Belize</option>
-                <option value="BJ"  {% if customer.country == '' %}selected{% endif %}>Benin</option>
-                <option value="BM"  {% if customer.country == '' %}selected{% endif %}>Bermuda</option>
-                <option value="BT"  {% if customer.country == '' %}selected{% endif %}>Bhutan</option>
-                <option value="BO"  {% if customer.country == '' %}selected{% endif %}>Bolivia, Plurinational State of</option>
-                <option value="BQ"  {% if customer.country == '' %}selected{% endif %}>Bonaire, Sint Eustatius and Saba</option>
-                <option value="BA"  {% if customer.country == '' %}selected{% endif %}>Bosnia and Herzegovina</option>
-                <option value="BW"  {% if customer.country == '' %}selected{% endif %}>Botswana</option>
-                <option value="BV"  {% if customer.country == '' %}selected{% endif %}>Bouvet Island</option>
-                <option value="BR"  {% if customer.country == '' %}selected{% endif %}>Brazil</option>
-                <option value="IO"  {% if customer.country == '' %}selected{% endif %}>British Indian Ocean Territory</option>
-                <option value="BN"  {% if customer.country == '' %}selected{% endif %}>Brunei Darussalam</option>
-                <option value="BG"  {% if customer.country == '' %}selected{% endif %}>Bulgaria</option>
-                <option value="BF"  {% if customer.country == '' %}selected{% endif %}>Burkina Faso</option>
-                <option value="BI"  {% if customer.country == '' %}selected{% endif %}>Burundi</option>
-                <option value="KH"  {% if customer.country == '' %}selected{% endif %}>Cambodia</option>
-                <option value="CM"  {% if customer.country == '' %}selected{% endif %}>Cameroon</option>
-                <option value="CA"  {% if customer.country == '' %}selected{% endif %}>Canada</option>
-                <option value="CV"  {% if customer.country == '' %}selected{% endif %}>Cape Verde</option>
-                <option value="KY"  {% if customer.country == '' %}selected{% endif %}>Cayman Islands</option>
-                <option value="CF"  {% if customer.country == '' %}selected{% endif %}>Central African Republic</option>
-                <option value="TD"  {% if customer.country == '' %}selected{% endif %}>Chad</option>
-                <option value="CL"  {% if customer.country == '' %}selected{% endif %}>Chile</option>
-                <option value="CN"  {% if customer.country == '' %}selected{% endif %}>China</option>
-                <option value="CX"  {% if customer.country == '' %}selected{% endif %}>Christmas Island</option>
-                <option value="CC"  {% if customer.country == '' %}selected{% endif %}>Cocos (Keeling) Islands</option>
-                <option value="CO"  {% if customer.country == '' %}selected{% endif %}>Colombia</option>
-                <option value="KM"  {% if customer.country == '' %}selected{% endif %}>Comoros</option>
-                <option value="CG"  {% if customer.country == '' %}selected{% endif %}>Congo</option>
-                <option value="CD"  {% if customer.country == '' %}selected{% endif %}>Congo, the Democratic Republic of the</option>
-                <option value="CK"  {% if customer.country == '' %}selected{% endif %}>Cook Islands</option>
-                <option value="CR"  {% if customer.country == '' %}selected{% endif %}>Costa Rica</option>
-                <option value="CI"  {% if customer.country == '' %}selected{% endif %}>Côte d'Ivoire</option>
-                <option value="HR"  {% if customer.country == '' %}selected{% endif %}>Croatia</option>
-                <option value="CU"  {% if customer.country == '' %}selected{% endif %}>Cuba</option>
-                <option value="CW"  {% if customer.country == '' %}selected{% endif %}>Curaçao</option>
-                <option value="CY"  {% if customer.country == '' %}selected{% endif %}>Cyprus</option>
-                <option value="CZ"  {% if customer.country == '' %}selected{% endif %}>Czech Republic</option>
-                <option value="DK"  {% if customer.country == '' %}selected{% endif %}>Denmark</option>
-                <option value="DJ"  {% if customer.country == '' %}selected{% endif %}>Djibouti</option>
-                <option value="DM"  {% if customer.country == '' %}selected{% endif %}>Dominica</option>
-                <option value="DO"  {% if customer.country == '' %}selected{% endif %}>Dominican Republic</option>
-                <option value="EC"  {% if customer.country == '' %}selected{% endif %}>Ecuador</option>
-                <option value="EG"  {% if customer.country == '' %}selected{% endif %}>Egypt</option>
-                <option value="SV"  {% if customer.country == '' %}selected{% endif %}>El Salvador</option>
-                <option value="GQ"  {% if customer.country == '' %}selected{% endif %}>Equatorial Guinea</option>
-                <option value="ER"  {% if customer.country == '' %}selected{% endif %}>Eritrea</option>
-                <option value="EE"  {% if customer.country == '' %}selected{% endif %}>Estonia</option>
-                <option value="ET"  {% if customer.country == '' %}selected{% endif %}>Ethiopia</option>
-                <option value="FK"  {% if customer.country == '' %}selected{% endif %}>Falkland Islands (Malvinas)</option>
-                <option value="FO"  {% if customer.country == '' %}selected{% endif %}>Faroe Islands</option>
-                <option value="FJ"  {% if customer.country == '' %}selected{% endif %}>Fiji</option>
-                <option value="FI"  {% if customer.country == '' %}selected{% endif %}>Finland</option>
-                <option value="FR"  {% if customer.country == '' %}selected{% endif %}>France</option>
-                <option value="GF"  {% if customer.country == '' %}selected{% endif %}>French Guiana</option>
-                <option value="PF"  {% if customer.country == '' %}selected{% endif %}>French Polynesia</option>
-                <option value="TF"  {% if customer.country == '' %}selected{% endif %}>French Southern Territories</option>
-                <option value="GA"  {% if customer.country == '' %}selected{% endif %}>Gabon</option>
-                <option value="GM"  {% if customer.country == '' %}selected{% endif %}>Gambia</option>
-                <option value="GE"  {% if customer.country == '' %}selected{% endif %}>Georgia</option>
-                <option value="DE"  {% if customer.country == '' %}selected{% endif %}>Germany</option>
-                <option value="GH"  {% if customer.country == '' %}selected{% endif %}>Ghana</option>
-                <option value="GI"  {% if customer.country == '' %}selected{% endif %}>Gibraltar</option>
-                <option value="GR"  {% if customer.country == '' %}selected{% endif %}>Greece</option>
-                <option value="GL"  {% if customer.country == '' %}selected{% endif %}>Greenland</option>
-                <option value="GD"  {% if customer.country == '' %}selected{% endif %}>Grenada</option>
-                <option value="GP"  {% if customer.country == '' %}selected{% endif %}>Guadeloupe</option>
-                <option value="GU"  {% if customer.country == '' %}selected{% endif %}>Guam</option>
-                <option value="GT"  {% if customer.country == '' %}selected{% endif %}>Guatemala</option>
-                <option value="GG"  {% if customer.country == '' %}selected{% endif %}>Guernsey</option>
-                <option value="GN"  {% if customer.country == '' %}selected{% endif %}>Guinea</option>
-                <option value="GW"  {% if customer.country == '' %}selected{% endif %}>Guinea-Bissau</option>
-                <option value="GY"  {% if customer.country == '' %}selected{% endif %}>Guyana</option>
-                <option value="HT"  {% if customer.country == '' %}selected{% endif %}>Haiti</option>
-                <option value="HM"  {% if customer.country == '' %}selected{% endif %}>Heard Island and McDonald Islands</option>
-                <option value="VA"  {% if customer.country == '' %}selected{% endif %}>Holy See (Vatican City State)</option>
-                <option value="HN"  {% if customer.country == '' %}selected{% endif %}>Honduras</option>
-                <option value="HK"  {% if customer.country == '' %}selected{% endif %}>Hong Kong</option>
-                <option value="HU"  {% if customer.country == '' %}selected{% endif %}>Hungary</option>
-                <option value="IS"  {% if customer.country == '' %}selected{% endif %}>Iceland</option>
-                <option value="IN"  {% if customer.country == '' %}selected{% endif %}>India</option>
-                <option value="ID"  {% if customer.country == '' %}selected{% endif %}>Indonesia</option>
-                <option value="IR"  {% if customer.country == '' %}selected{% endif %}>Iran, Islamic Republic of</option>
-                <option value="IQ"  {% if customer.country == '' %}selected{% endif %}>Iraq</option>
-                <option value="IE"  {% if customer.country == '' %}selected{% endif %}>Ireland</option>
-                <option value="IM"  {% if customer.country == '' %}selected{% endif %}>Isle of Man</option>
-                <option value="IL"  {% if customer.country == '' %}selected{% endif %}>Israel</option>
-                <option value="IT"  {% if customer.country == '' %}selected{% endif %}>Italy</option>
-                <option value="JM"  {% if customer.country == '' %}selected{% endif %}>Jamaica</option>
-                <option value="JP"  {% if customer.country == '' %}selected{% endif %}>Japan</option>
-                <option value="JE"  {% if customer.country == '' %}selected{% endif %}>Jersey</option>
-                <option value="JO"  {% if customer.country == '' %}selected{% endif %}>Jordan</option>
-                <option value="KZ"  {% if customer.country == '' %}selected{% endif %}>Kazakhstan</option>
-                <option value="KE"  {% if customer.country == '' %}selected{% endif %}>Kenya</option>
-                <option value="KI"  {% if customer.country == '' %}selected{% endif %}>Kiribati</option>
-                <option value="KP"  {% if customer.country == '' %}selected{% endif %}>Korea, Democratic People's Republic of</option>
-                <option value="KR"  {% if customer.country == '' %}selected{% endif %}>Korea, Republic of</option>
-                <option value="KW"  {% if customer.country == '' %}selected{% endif %}>Kuwait</option>
-                <option value="KG"  {% if customer.country == '' %}selected{% endif %}>Kyrgyzstan</option>
-                <option value="LA"  {% if customer.country == '' %}selected{% endif %}>Lao People's Democratic Republic</option>
-                <option value="LV"  {% if customer.country == '' %}selected{% endif %}>Latvia</option>
-                <option value="LB"  {% if customer.country == '' %}selected{% endif %}>Lebanon</option>
-                <option value="LS"  {% if customer.country == '' %}selected{% endif %}>Lesotho</option>
-                <option value="LR"  {% if customer.country == '' %}selected{% endif %}>Liberia</option>
-                <option value="LY"  {% if customer.country == '' %}selected{% endif %}>Libya</option>
-                <option value="LI"  {% if customer.country == '' %}selected{% endif %}>Liechtenstein</option>
-                <option value="LT"  {% if customer.country == '' %}selected{% endif %}>Lithuania</option>
-                <option value="LU"  {% if customer.country == '' %}selected{% endif %}>Luxembourg</option>
-                <option value="MO"  {% if customer.country == '' %}selected{% endif %}>Macao</option>
-                <option value="MK"  {% if customer.country == '' %}selected{% endif %}>Macedonia, the former Yugoslav Republic of</option>
-                <option value="MG"  {% if customer.country == '' %}selected{% endif %}>Madagascar</option>
-                <option value="MW"  {% if customer.country == '' %}selected{% endif %}>Malawi</option>
-                <option value="MY"  {% if customer.country == '' %}selected{% endif %}>Malaysia</option>
-                <option value="MV"  {% if customer.country == '' %}selected{% endif %}>Maldives</option>
-                <option value="ML"  {% if customer.country == '' %}selected{% endif %}>Mali</option>
-                <option value="MT"  {% if customer.country == '' %}selected{% endif %}>Malta</option>
-                <option value="MH"  {% if customer.country == '' %}selected{% endif %}>Marshall Islands</option>
-                <option value="MQ"  {% if customer.country == '' %}selected{% endif %}>Martinique</option>
-                <option value="MR"  {% if customer.country == '' %}selected{% endif %}>Mauritania</option>
-                <option value="MU"  {% if customer.country == '' %}selected{% endif %}>Mauritius</option>
-                <option value="YT"  {% if customer.country == '' %}selected{% endif %}>Mayotte</option>
-                <option value="MX"  {% if customer.country == '' %}selected{% endif %}>Mexico</option>
-                <option value="FM"  {% if customer.country == '' %}selected{% endif %}>Micronesia, Federated States of</option>
-                <option value="MD"  {% if customer.country == '' %}selected{% endif %}>Moldova, Republic of</option>
-                <option value="MC"  {% if customer.country == '' %}selected{% endif %}>Monaco</option>
-                <option value="MN"  {% if customer.country == '' %}selected{% endif %}>Mongolia</option>
-                <option value="ME"  {% if customer.country == '' %}selected{% endif %}>Montenegro</option>
-                <option value="MS"  {% if customer.country == '' %}selected{% endif %}>Montserrat</option>
-                <option value="MA"  {% if customer.country == '' %}selected{% endif %}>Morocco</option>
-                <option value="MZ"  {% if customer.country == '' %}selected{% endif %}>Mozambique</option>
-                <option value="MM"  {% if customer.country == '' %}selected{% endif %}>Myanmar</option>
-                <option value="NA"  {% if customer.country == '' %}selected{% endif %}>Namibia</option>
-                <option value="NR"  {% if customer.country == '' %}selected{% endif %}>Nauru</option>
-                <option value="NP"  {% if customer.country == '' %}selected{% endif %}>Nepal</option>
-                <option value="NL"  {% if customer.country == '' %}selected{% endif %}>Netherlands</option>
-                <option value="NC"  {% if customer.country == '' %}selected{% endif %}>New Caledonia</option>
-                <option value="NZ"  {% if customer.country == '' %}selected{% endif %}>New Zealand</option>
-                <option value="NI"  {% if customer.country == '' %}selected{% endif %}>Nicaragua</option>
-                <option value="NE"  {% if customer.country == '' %}selected{% endif %}>Niger</option>
-                <option value="NG"  {% if customer.country == '' %}selected{% endif %}>Nigeria</option>
-                <option value="NU"  {% if customer.country == '' %}selected{% endif %}>Niue</option>
-                <option value="NF"  {% if customer.country == '' %}selected{% endif %}>Norfolk Island</option>
-                <option value="MP"  {% if customer.country == '' %}selected{% endif %}>Northern Mariana Islands</option>
-                <option value="NO"  {% if customer.country == '' %}selected{% endif %}>Norway</option>
-                <option value="OM"  {% if customer.country == '' %}selected{% endif %}>Oman</option>
-                <option value="PK"  {% if customer.country == '' %}selected{% endif %}>Pakistan</option>
-                <option value="PW"  {% if customer.country == '' %}selected{% endif %}>Palau</option>
-                <option value="PS"  {% if customer.country == '' %}selected{% endif %}>Palestinian Territory, Occupied</option>
-                <option value="PA"  {% if customer.country == '' %}selected{% endif %}>Panama</option>
-                <option value="PG"  {% if customer.country == '' %}selected{% endif %}>Papua New Guinea</option>
-                <option value="PY"  {% if customer.country == '' %}selected{% endif %}>Paraguay</option>
-                <option value="PE"  {% if customer.country == '' %}selected{% endif %}>Peru</option>
-                <option value="PH"  {% if customer.country == '' %}selected{% endif %}>Philippines</option>
-                <option value="PN"  {% if customer.country == '' %}selected{% endif %}>Pitcairn</option>
-                <option value="PL"  {% if customer.country == '' %}selected{% endif %}>Poland</option>
-                <option value="PT"  {% if customer.country == '' %}selected{% endif %}>Portugal</option>
-                <option value="PR"  {% if customer.country == '' %}selected{% endif %}>Puerto Rico</option>
-                <option value="QA"  {% if customer.country == '' %}selected{% endif %}>Qatar</option>
-                <option value="RE"  {% if customer.country == '' %}selected{% endif %}>Réunion</option>
-                <option value="RO"  {% if customer.country == '' %}selected{% endif %}>Romania</option>
-                <option value="RU"  {% if customer.country == '' %}selected{% endif %}>Russian Federation</option>
-                <option value="RW"  {% if customer.country == '' %}selected{% endif %}>Rwanda</option>
-                <option value="BL"  {% if customer.country == '' %}selected{% endif %}>Saint Barthélemy</option>
-                <option value="SH"  {% if customer.country == '' %}selected{% endif %}>Saint Helena, Ascension and Tristan da Cunha</option>
-                <option value="KN"  {% if customer.country == '' %}selected{% endif %}>Saint Kitts and Nevis</option>
-                <option value="LC"  {% if customer.country == '' %}selected{% endif %}>Saint Lucia</option>
-                <option value="MF"  {% if customer.country == '' %}selected{% endif %}>Saint Martin (French part)</option>
-                <option value="PM"  {% if customer.country == '' %}selected{% endif %}>Saint Pierre and Miquelon</option>
-                <option value="VC"  {% if customer.country == '' %}selected{% endif %}>Saint Vincent and the Grenadines</option>
-                <option value="WS"  {% if customer.country == '' %}selected{% endif %}>Samoa</option>
-                <option value="SM"  {% if customer.country == '' %}selected{% endif %}>San Marino</option>
-                <option value="ST"  {% if customer.country == '' %}selected{% endif %}>Sao Tome and Principe</option>
-                <option value="SA"  {% if customer.country == '' %}selected{% endif %}>Saudi Arabia</option>
-                <option value="SN"  {% if customer.country == '' %}selected{% endif %}>Senegal</option>
-                <option value="RS"  {% if customer.country == '' %}selected{% endif %}>Serbia</option>
-                <option value="SC"  {% if customer.country == '' %}selected{% endif %}>Seychelles</option>
-                <option value="SL"  {% if customer.country == '' %}selected{% endif %}>Sierra Leone</option>
-                <option value="SG"  {% if customer.country == '' %}selected{% endif %}>Singapore</option>
-                <option value="SX"  {% if customer.country == '' %}selected{% endif %}>Sint Maarten (Dutch part)</option>
-                <option value="SK"  {% if customer.country == '' %}selected{% endif %}>Slovakia</option>
-                <option value="SI"  {% if customer.country == '' %}selected{% endif %}>Slovenia</option>
-                <option value="SB"  {% if customer.country == '' %}selected{% endif %}>Solomon Islands</option>
-                <option value="SO"  {% if customer.country == '' %}selected{% endif %}>Somalia</option>
-                <option value="ZA"  {% if customer.country == '' %}selected{% endif %}>South Africa</option>
-                <option value="GS"  {% if customer.country == '' %}selected{% endif %}>South Georgia and the South Sandwich Islands</option>
-                <option value="SS"  {% if customer.country == '' %}selected{% endif %}>South Sudan</option>
-                <option value="ES"  {% if customer.country == '' %}selected{% endif %}>Spain</option>
-                <option value="LK"  {% if customer.country == '' %}selected{% endif %}>Sri Lanka</option>
-                <option value="SD"  {% if customer.country == '' %}selected{% endif %}>Sudan</option>
-                <option value="SR"  {% if customer.country == '' %}selected{% endif %}>Suriname</option>
-                <option value="SJ"  {% if customer.country == '' %}selected{% endif %}>Svalbard and Jan Mayen</option>
-                <option value="SZ"  {% if customer.country == '' %}selected{% endif %}>Swaziland</option>
-                <option value="SE"  {% if customer.country == '' %}selected{% endif %}>Sweden</option>
-                <option value="CH"  {% if customer.country == '' %}selected{% endif %}>Switzerland</option>
-                <option value="SY"  {% if customer.country == '' %}selected{% endif %}>Syrian Arab Republic</option>
-                <option value="TW"  {% if customer.country == '' %}selected{% endif %}>Taiwan, Province of China</option>
-                <option value="TJ"  {% if customer.country == '' %}selected{% endif %}>Tajikistan</option>
-                <option value="TZ"  {% if customer.country == '' %}selected{% endif %}>Tanzania, United Republic of</option>
-                <option value="TH"  {% if customer.country == '' %}selected{% endif %}>Thailand</option>
-                <option value="TL"  {% if customer.country == '' %}selected{% endif %}>Timor-Leste</option>
-                <option value="TG"  {% if customer.country == '' %}selected{% endif %}>Togo</option>
-                <option value="TK"  {% if customer.country == '' %}selected{% endif %}>Tokelau</option>
-                <option value="TO"  {% if customer.country == '' %}selected{% endif %}>Tonga</option>
-                <option value="TT"  {% if customer.country == '' %}selected{% endif %}>Trinidad and Tobago</option>
-                <option value="TN"  {% if customer.country == '' %}selected{% endif %}>Tunisia</option>
-                <option value="TR"  {% if customer.country == '' %}selected{% endif %}>Turkey</option>
-                <option value="TM"  {% if customer.country == '' %}selected{% endif %}>Turkmenistan</option>
-                <option value="TC"  {% if customer.country == '' %}selected{% endif %}>Turks and Caicos Islands</option>
-                <option value="TV"  {% if customer.country == '' %}selected{% endif %}>Tuvalu</option>
-                <option value="UG"  {% if customer.country == '' %}selected{% endif %}>Uganda</option>
-                <option value="UA"  {% if customer.country == '' %}selected{% endif %}>Ukraine</option>
-                <option value="AE"  {% if customer.country == 'UK' %}selected{% endif %}>United Arab Emirates</option>
-                <option value="GB"  {% if customer.country == ''%}selected{% endif %}>United Kingdom</option>
-                <option value="US"  {% if customer.country == '' %}selected{% endif %}>United States</option>
-                <option value="UM"  {% if customer.country == '' %}selected{% endif %}>United States Minor Outlying Islands</option>
-                <option value="UY"  {% if customer.country == '' %}selected{% endif %}>Uruguay</option>
-                <option value="UZ"  {% if customer.country == '' %}selected{% endif %}>Uzbekistan</option>
-                <option value="VU"  {% if customer.country == '' %}selected{% endif %}>Vanuatu</option>
-                <option value="VE"  {% if customer.country == '' %}selected{% endif %}>Venezuela, Bolivarian Republic of</option>
-                <option value="VN"  {% if customer.country == '' %}selected{% endif %}>Viet Nam</option>
-                <option value="VG"  {% if customer.country == '' %}selected{% endif %}>Virgin Islands, British</option>
-                <option value="VI"  {% if customer.country == '' %}selected{% endif %}>Virgin Islands, U.S.</option>
-                <option value="WF"  {% if customer.country == '' %}selected{% endif %}>Wallis and Futuna</option>
-                <option value="EH"  {% if customer.country == '' %}selected{% endif %}>Western Sahara</option>
-                <option value="YE"  {% if customer.country == '' %}selected{% endif %}>Yemen</option>
-                <option value="ZM"  {% if customer.country == '' %}selected{% endif %}>Zambia</option>
-                <option value="ZW"  {% if customer.country == '' %}selected{% endif %}>Zimbabwe</option>
+        <div class="col-12 col-md-6">
+            <h2>Contact Details:</h2>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="tel_number">Phone:</label>
+                <input type="tel" name="tel_number" class="form-control-plaintext col-12 col-md-7"  id="tel_number" value="{{customer.tel_number}}" readonly="readonly" required>
+            </div>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="address">Address:</label>
+                <input type="text" name="address" class="form-control-plaintext col-12 col-md-7"  id="address" value="{{customer.address}}" readonly="readonly" required>
+            </div>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="postal_code">Postcode:</label>
+                <input type="text" name="postal_code" class="form-control-plaintext col-12 col-md-7"  id="postal_code" value="{{customer.postal_code}}" readonly="readonly" required>
+            </div>
+            <div class="form-group row no-gutters">
+                <label class="col-12 col-md-4" for="country">Country:</label>
+                <!-- TODO FINISH INSERTING COUNTRY CHECK VALUES -->
+                <select name="country" id="country" class="custom-select col-12 col-md-7" disabled="disabled" required>
+                    <option value="AF">Afghanistan</option>
+                    <option value="AX">Åland Islands</option>
+                    <option value="AL">Albania</option>
+                    <option value="DZ">Algeria</option>
+                    <option value="AS">American Samoa</option>
+                    <option value="AD">Andorra</option>
+                    <option value="AO">Angola</option>
+                    <option value="AI">Anguilla</option>
+                    <option value="AQ">Antarctica</option>
+                    <option value="AG">Antigua and Barbuda</option>
+                    <option value="AR">Argentina</option>
+                    <option value="AM">Armenia</option>
+                    <option value="AW">Aruba</option>
+                    <option value="AU">Australia</option>
+                    <option value="AT">Austria</option>
+                    <option value="AZ">Azerbaijan</option>
+                    <option value="BS">Bahamas</option>
+                    <option value="BH">Bahrain</option>
+                    <option value="BD">Bangladesh</option>
+                    <option value="BB">Barbados</option>
+                    <option value="BY">Belarus</option>
+                    <option value="BE">Belgium</option>
+                    <option value="BZ">Belize</option>
+                    <option value="BJ">Benin</option>
+                    <option value="BM">Bermuda</option>
+                    <option value="BT">Bhutan</option>
+                    <option value="BO">Bolivia, Plurinational State of</option>
+                    <option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+                    <option value="BA">Bosnia and Herzegovina</option>
+                    <option value="BW">Botswana</option>
+                    <option value="BV">Bouvet Island</option>
+                    <option value="BR">Brazil</option>
+                    <option value="IO">British Indian Ocean Territory</option>
+                    <option value="BN">Brunei Darussalam</option>
+                    <option value="BG">Bulgaria</option>
+                    <option value="BF">Burkina Faso</option>
+                    <option value="BI">Burundi</option>
+                    <option value="KH">Cambodia</option>
+                    <option value="CM">Cameroon</option>
+                    <option value="CA">Canada</option>
+                    <option value="CV">Cape Verde</option>
+                    <option value="KY">Cayman Islands</option>
+                    <option value="CF">Central African Republic</option>
+                    <option value="TD">Chad</option>
+                    <option value="CL">Chile</option>
+                    <option value="CN">China</option>
+                    <option value="CX">Christmas Island</option>
+                    <option value="CC">Cocos (Keeling) Islands</option>
+                    <option value="CO">Colombia</option>
+                    <option value="KM">Comoros</option>
+                    <option value="CG">Congo</option>
+                    <option value="CD">Congo, the Democratic Republic of the</option>
+                    <option value="CK">Cook Islands</option>
+                    <option value="CR">Costa Rica</option>
+                    <option value="CI">Côte d'Ivoire</option>
+                    <option value="HR">Croatia</option>
+                    <option value="CU">Cuba</option>
+                    <option value="CW">Curaçao</option>
+                    <option value="CY">Cyprus</option>
+                    <option value="CZ">Czech Republic</option>
+                    <option value="DK">Denmark</option>
+                    <option value="DJ">Djibouti</option>
+                    <option value="DM">Dominica</option>
+                    <option value="DO">Dominican Republic</option>
+                    <option value="EC">Ecuador</option>
+                    <option value="EG">Egypt</option>
+                    <option value="SV">El Salvador</option>
+                    <option value="GQ">Equatorial Guinea</option>
+                    <option value="ER">Eritrea</option>
+                    <option value="EE">Estonia</option>
+                    <option value="ET">Ethiopia</option>
+                    <option value="FK">Falkland Islands (Malvinas)</option>
+                    <option value="FO">Faroe Islands</option>
+                    <option value="FJ">Fiji</option>
+                    <option value="FI">Finland</option>
+                    <option value="FR">France</option>
+                    <option value="GF">French Guiana</option>
+                    <option value="PF">French Polynesia</option>
+                    <option value="TF">French Southern Territories</option>
+                    <option value="GA">Gabon</option>
+                    <option value="GM">Gambia</option>
+                    <option value="GE">Georgia</option>
+                    <option value="DE">Germany</option>
+                    <option value="GH">Ghana</option>
+                    <option value="GI">Gibraltar</option>
+                    <option value="GR">Greece</option>
+                    <option value="GL">Greenland</option>
+                    <option value="GD">Grenada</option>
+                    <option value="GP">Guadeloupe</option>
+                    <option value="GU">Guam</option>
+                    <option value="GT">Guatemala</option>
+                    <option value="GG">Guernsey</option>
+                    <option value="GN">Guinea</option>
+                    <option value="GW">Guinea-Bissau</option>
+                    <option value="GY">Guyana</option>
+                    <option value="HT">Haiti</option>
+                    <option value="HM">Heard Island and McDonald Islands</option>
+                    <option value="VA">Holy See (Vatican City State)</option>
+                    <option value="HN">Honduras</option>
+                    <option value="HK">Hong Kong</option>
+                    <option value="HU">Hungary</option>
+                    <option value="IS">Iceland</option>
+                    <option value="IN">India</option>
+                    <option value="ID">Indonesia</option>
+                    <option value="IR">Iran, Islamic Republic of</option>
+                    <option value="IQ">Iraq</option>
+                    <option value="IE">Ireland</option>
+                    <option value="IM">Isle of Man</option>
+                    <option value="IL">Israel</option>
+                    <option value="IT">Italy</option>
+                    <option value="JM">Jamaica</option>
+                    <option value="JP">Japan</option>
+                    <option value="JE">Jersey</option>
+                    <option value="JO">Jordan</option>
+                    <option value="KZ">Kazakhstan</option>
+                    <option value="KE">Kenya</option>
+                    <option value="KI">Kiribati</option>
+                    <option value="KP">Korea, Democratic People's Republic of</option>
+                    <option value="KR">Korea, Republic of</option>
+                    <option value="KW">Kuwait</option>
+                    <option value="KG">Kyrgyzstan</option>
+                    <option value="LA">Lao People's Democratic Republic</option>
+                    <option value="LV">Latvia</option>
+                    <option value="LB">Lebanon</option>
+                    <option value="LS">Lesotho</option>
+                    <option value="LR">Liberia</option>
+                    <option value="LY">Libya</option>
+                    <option value="LI">Liechtenstein</option>
+                    <option value="LT">Lithuania</option>
+                    <option value="LU">Luxembourg</option>
+                    <option value="MO">Macao</option>
+                    <option value="MK">Macedonia, the former Yugoslav Republic of</option>
+                    <option value="MG">Madagascar</option>
+                    <option value="MW">Malawi</option>
+                    <option value="MY">Malaysia</option>
+                    <option value="MV">Maldives</option>
+                    <option value="ML">Mali</option>
+                    <option value="MT">Malta</option>
+                    <option value="MH">Marshall Islands</option>
+                    <option value="MQ">Martinique</option>
+                    <option value="MR">Mauritania</option>
+                    <option value="MU">Mauritius</option>
+                    <option value="YT">Mayotte</option>
+                    <option value="MX">Mexico</option>
+                    <option value="FM">Micronesia, Federated States of</option>
+                    <option value="MD">Moldova, Republic of</option>
+                    <option value="MC">Monaco</option>
+                    <option value="MN">Mongolia</option>
+                    <option value="ME">Montenegro</option>
+                    <option value="MS">Montserrat</option>
+                    <option value="MA">Morocco</option>
+                    <option value="MZ">Mozambique</option>
+                    <option value="MM">Myanmar</option>
+                    <option value="NA">Namibia</option>
+                    <option value="NR">Nauru</option>
+                    <option value="NP">Nepal</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="NC">New Caledonia</option>
+                    <option value="NZ">New Zealand</option>
+                    <option value="NI">Nicaragua</option>
+                    <option value="NE">Niger</option>
+                    <option value="NG">Nigeria</option>
+                    <option value="NU">Niue</option>
+                    <option value="NF">Norfolk Island</option>
+                    <option value="MP">Northern Mariana Islands</option>
+                    <option value="NO">Norway</option>
+                    <option value="OM">Oman</option>
+                    <option value="PK">Pakistan</option>
+                    <option value="PW">Palau</option>
+                    <option value="PS">Palestinian Territory, Occupied</option>
+                    <option value="PA">Panama</option>
+                    <option value="PG">Papua New Guinea</option>
+                    <option value="PY">Paraguay</option>
+                    <option value="PE">Peru</option>
+                    <option value="PH">Philippines</option>
+                    <option value="PN">Pitcairn</option>
+                    <option value="PL">Poland</option>
+                    <option value="PT">Portugal</option>
+                    <option value="PR">Puerto Rico</option>
+                    <option value="QA">Qatar</option>
+                    <option value="RE">Réunion</option>
+                    <option value="RO">Romania</option>
+                    <option value="RU">Russian Federation</option>
+                    <option value="RW">Rwanda</option>
+                    <option value="BL">Saint Barthélemy</option>
+                    <option value="SH">Saint Helena, Ascension and Tristan da Cunha</option>
+                    <option value="KN">Saint Kitts and Nevis</option>
+                    <option value="LC">Saint Lucia</option>
+                    <option value="MF">Saint Martin (French part)</option>
+                    <option value="PM">Saint Pierre and Miquelon</option>
+                    <option value="VC">Saint Vincent and the Grenadines</option>
+                    <option value="WS">Samoa</option>
+                    <option value="SM">San Marino</option>
+                    <option value="ST">Sao Tome and Principe</option>
+                    <option value="SA">Saudi Arabia</option>
+                    <option value="SN">Senegal</option>
+                    <option value="RS">Serbia</option>
+                    <option value="SC">Seychelles</option>
+                    <option value="SL">Sierra Leone</option>
+                    <option value="SG">Singapore</option>
+                    <option value="SX">Sint Maarten (Dutch part)</option>
+                    <option value="SK">Slovakia</option>
+                    <option value="SI">Slovenia</option>
+                    <option value="SB">Solomon Islands</option>
+                    <option value="SO">Somalia</option>
+                    <option value="ZA">South Africa</option>
+                    <option value="GS">South Georgia and the South Sandwich Islands</option>
+                    <option value="SS">South Sudan</option>
+                    <option value="ES">Spain</option>
+                    <option value="LK">Sri Lanka</option>
+                    <option value="SD">Sudan</option>
+                    <option value="SR">Suriname</option>
+                    <option value="SJ">Svalbard and Jan Mayen</option>
+                    <option value="SZ">Swaziland</option>
+                    <option value="SE">Sweden</option>
+                    <option value="CH">Switzerland</option>
+                    <option value="SY">Syrian Arab Republic</option>
+                    <option value="TW">Taiwan, Province of China</option>
+                    <option value="TJ">Tajikistan</option>
+                    <option value="TZ">Tanzania, United Republic of</option>
+                    <option value="TH">Thailand</option>
+                    <option value="TL">Timor-Leste</option>
+                    <option value="TG">Togo</option>
+                    <option value="TK">Tokelau</option>
+                    <option value="TO">Tonga</option>
+                    <option value="TT">Trinidad and Tobago</option>
+                    <option value="TN">Tunisia</option>
+                    <option value="TR">Turkey</option>
+                    <option value="TM">Turkmenistan</option>
+                    <option value="TC">Turks and Caicos Islands</option>
+                    <option value="TV">Tuvalu</option>
+                    <option value="UG">Uganda</option>
+                    <option value="UA">Ukraine</option>
+                    <option value="AE">United Arab Emirates</option>
+                    <option value="GB">United Kingdom</option>
+                    <option value="US">United States</option>
+                    <option value="UM">United States Minor Outlying Islands</option>
+                    <option value="UY">Uruguay</option>
+                    <option value="UZ">Uzbekistan</option>
+                    <option value="VU">Vanuatu</option>
+                    <option value="VE">Venezuela, Bolivarian Republic of</option>
+                    <option value="VN">Viet Nam</option>
+                    <option value="VG">Virgin Islands, British</option>
+                    <option value="VI">Virgin Islands, U.S.</option>
+                    <option value="WF">Wallis and Futuna</option>
+                    <option value="EH">Western Sahara</option>
+                    <option value="YE">Yemen</option>
+                    <option value="ZM">Zambia</option>
+                    <option value="ZW">Zimbabwe</option>
                 </select>
             </div>
         </div>
     </div>
-    {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-            {% for message in messages %}
-                <p>Error: {{ message[1] }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
-    <div class="form-group" id="submit_btn">
-        <input type="submit" value="submit" class="btn btn-primary" readonly="readonly" required>
-    </div>
+    <div class="form-group row no-gutters">
+       {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for message in messages %}
+                   <label for="submit_btn" class="offset-1 col-7">Error: {{ message[1] }}</label>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <input type="submit" id="submit_btn" value="Submit" class="btn btn-primary col-2" readonly="readonly" required>
+        <button id="cancel-btn" type="button" onclick="edit()" class="btn btn-secondary col-2">Cancel</button>
 </form>
-<button id="edit_btn" onclick="edit()" class="btn btn-danger" value="False">Edit Details</button>
-{% endblock %}
+</div>
 
+<div class="row no-gutters">
+<button id="edit_btn" onclick="edit()" class="btn btn-danger col-2">Edit Details</button>
+</div>
+{% endblock %}
 {% block account_additional_js %}
 <script>
     let edit_state = false;
+
+    $(document).ready(function(){
+        var country = document.getElementById("country").querySelector("option[value={{customer.country}}");
+        country.setAttribute("selected", "selected");
+    });
 
     function edit(){
         let i;
         const inputs = document.getElementsByTagName("input");
         const selects = document.getElementsByTagName("select");
+        const submit = document.getElementById("submit_btn");
+        const edit = document.getElementById("edit_btn");
+        const cancel = document.getElementById("cancel-btn");
 
         if(edit_state){
             for (i = 0; i < inputs.length; i++) {
@@ -339,6 +353,9 @@
 
             selects[0].setAttribute("disabled","disabled");
             selects[1].setAttribute("disabled","disabled");
+            submit.style.display = "none";
+            cancel.style.display = "none";
+            edit.style.display = "block";
 
             edit_state = false;
         }
@@ -351,6 +368,9 @@
 
             selects[0].removeAttribute("disabled");
             selects[1].removeAttribute("disabled");
+            edit.style.display = "none";
+            submit.style.display = "block";
+            cancel.style.display = "block";
 
             edit_state = true;
         }

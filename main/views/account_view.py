@@ -284,44 +284,6 @@ def view_account_details():
             "postal_code": data_form.get("postal_code"),
             "address": data_form.get("address"),
         }
-        current_date = datetime.date.today()
-
-        # For all of the main string values that the user enters, the fields are checked to make sure they are
-        # Valid, this is done using the check_if_input_error() function in the user transactions
-        fields_to_check = ["first_name", "last_name", "tel_number", "postal_code", "address"]
-        for field in fields_to_check:
-
-            special_character_regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
-            if special_character_regex.search(details[field]) or len(details[field]) < 3 or len(details[field]) > 40:
-                server_error = "Input error: " + field + " is not a valid input"
-                break
-
-        if len(details["title"]) > 5:  # Checks the title is greater than 5
-            server_error = "Input Error: Title is not valid"
-        elif len(details["address"]) < 10 or len(details["address"]) > 40:
-            server_error = "Input error: address is not of correct size (10-40)"  # Checks address is valid
-        elif len(details["first_name"]) < 3 or len(details["first_name"]) > 15 or len(details["last_name"]) < 3 or len(
-                details["last_name"]) > 15:  # Checks first and last name sizes
-            server_error = "Input error: first name or last name of incorrect length"
-        elif len(details["tel_number"]) > 11 or len(details["tel_number"]) < 7:  # Checks telephone number length
-            server_error = "Input error: telephone of incorrect length"
-        elif len(details["country"]) > 5 or len(details["country"]) < 2:  # Checks country code length
-            server_error = "Input error: country of incorrect length"
-
-        date_values = data_form.get("dob").split("-")
-        formatted_dob = datetime.date(int(date_values[0]), int(date_values[1]), int(date_values[2]))
-        if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", details["email"]):  # Validates email format
-            server_error = "Input Error: Email not in valid format"
-        elif not re.fullmatch(  # Validates postcode based on the regex provided by the Government
-                r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})",
-                details["postal_code"]):
-            server_error = "Input Error: Post code not in valid format"
-        elif not details["tel_number"].isnumeric():  # Telephone can only contain numbers
-            server_error = "Input Error: telephone not in valid format"
-        elif udf.check_if_email_exists(details["email"]):  # Checks if email exists in database
-            server_error = "Input Error: Email already exists"
-        elif formatted_dob > current_date - datetime.timedelta(days=365 * 16):  # Checks that user is over 16
-            server_error = "Input Error: Incorrect date of birth entered (must be over 16)"
 
         if server_error is not None:
             flask.flash(server_error, "error")

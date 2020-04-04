@@ -7,7 +7,7 @@
 }
 
 #page-content-wrapper {
-    padding: 0 2.5%;
+    padding: 0 2.5% 3vh;
 }
 
 aside {
@@ -106,6 +106,10 @@ th {
     background-color: #1E1E1E;
 }
 
+label {
+    padding-top: 6px;
+}
+
 
 table.dataTable thead .sorting:after,
 table.dataTable thead .sorting:before,
@@ -119,4 +123,17 @@ table.dataTable thead .sorting_desc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:before {
     color: #F2F2F2;
     bottom: .5em;
+}
+
+#personal_details_row {
+    margin-bottom: 3vh;
+}
+
+#submit_btn, #cancel-btn {
+    display: none;
+    margin-top: 3vh;
+}
+
+#cancel-btn {
+    margin-left: 1vw;
 }
