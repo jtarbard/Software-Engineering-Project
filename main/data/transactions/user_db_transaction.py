@@ -27,6 +27,31 @@ def create_new_user_account(usertype, **kwargs):
         print("DEBUG (udt) Failed to add new user")
         return None
 
+#Method for editing user account details.
+#user_id is the id of the user from the users database
+#details is a dictionary of user details to be changed. dict items should be titled the name of the database field
+#with the value being the new value to be inserted into the database.
+def edit_user_account(user_id, details):
+    user = return_user(user_id)
+
+    user.title = details["title"]
+
+    user.first_name = details["first_name"]
+
+    user.last_name = details["last_name"]
+
+    user.dob = details["dob"]
+
+    user.email = details["email"]
+
+    user.address = details["address"]
+
+    user.country = details["country"]
+
+    user.postal_code = details["postal_code"]
+
+    db.session.commit()
+
 
 # Simply returns the user with matching ID. Mainly used when a user has a verified cookie and needs access to
 # customer details
