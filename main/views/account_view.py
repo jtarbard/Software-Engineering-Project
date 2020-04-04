@@ -196,10 +196,15 @@ def view_account_receipts(returned_receipts=None):
     else:
         return flask.abort(500)
 
+    returned_receipts.reverse() #reverse so that items appear in chronological order
+
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user, has_cookie=has_cookie,
-                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+
+# def get_start_time(elem):
+#         return elem[2]
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
@@ -216,14 +221,14 @@ def view_account_bookings():
                 for booking in receipt.bookings:
                     if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
                         if booking.activity not in returned_bookings:
-                            returned_bookings[booking.activity] = [receipt, 1]
+                            returned_bookings[booking.activity] = [receipt, 1, booking.activity.start_time]
                         else:
                             returned_bookings[booking.activity][1] += 1
     elif user.__mapper_args__['polymorphic_identity'] == "Employee":
         returned_bookings = {}
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
     #     TODO: add manager functionality: returning booking stats.
-        returned_receipts = {}
+        returned_bookings = {}
     else:
         return flask.abort(500)
 
@@ -242,7 +247,6 @@ def view_account_membership():
 
     customer: Customer = udf.return_customer_with_user_id(user.user_id)
 
-    returned_bookings = {}
     for receipt in customer.purchases:
         if receipt.membership:
             membership = receipt.membership

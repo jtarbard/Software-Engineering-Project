@@ -1,43 +1,56 @@
 {% extends "account/account_layout.html"%}
 
 {% block page_content %}
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr><td colspan="4"> Upcoming bookings </td></tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Activity</td>
-                    <td>Date</td>
-                    <td>Start Time </td>
-                    <td>End Time</td>
-                    <td>Facility</td>
-                    <td>Places Booked</td>
-                    {% if membership_type != 2 %}
-                    <td>Refund</td>
-                    {% else %}
-                    <td>Cancel</td>
-                    {% endif %}
-                </tr>
-                {% for activity, receipt_and_amount in returned_bookings.items() %}
+    <div class="row">
+        <div class="col-sm-12" class="overflow-auto">
+            <table class="table table-striped display w-100" id="data-bookings">
+                <thead class="table-header">
                     <tr>
-                        <td>{{ activity.activity_type.name.title() }}</td>
-                        <td>{{ activity.start_time.strftime("%d/%m/%y") }}</td>
-                        <td>{{ activity.start_time.strftime("%I:%M%p") }}</td>
-                        <td>{{ activity.end_time.strftime("%I:%M%p") }}</td>
-                        <td>{{ activity.facility.name.title() }}</td>
-                        <td>{{ receipt_and_amount[1] }}</td>
-                        <td>
-                            <form action="/transactions/refund" method="post">
-                                <input class="btn btn-danger" type="submit" name="refund" value="Refund">
-                                <input type="hidden" name="activity_id" value="{{activity.activity_id}}">
-                                <input type="hidden" name="receipt_id" value="{{receipt_and_amount[0].receipt_id}}">
-                            </form>
-                        </td>
+                        <th>Activity</th>
+                        <th>Date</th>
+                        <th>Start Time </th>
+                        <th>End Time</th>
+                        <th>Facility</th>
+                        <th>Places</th>
+                        {% if membership_type != 2 %}
+                        <th>Refund</th>
+                        {% else %}
+                        <th>Cancel</th>
+                        {% endif %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for activity, receipt_and_amount in returned_bookings.items() %}
+                        <tr>
+                            <td>{{ activity.activity_type.name.title() }}</td>
+                            <td>{{ activity.start_time.strftime("%d/%m/%y") }}</td>
+                            <td>{{ activity.start_time.strftime("%H:%M") }}</td>
+                            <td>{{ activity.end_time.strftime("%H:%M") }}</td>
+                            <td>{{ activity.facility.name.title() }}</td>
+                            <td>{{ receipt_and_amount[1] }}</td>
+                            <td>
+                                <form action="/transactions/refund" method="post">
+                                    <input class="btn btn-danger" type="submit" name="refund" value="Refund">
+                                    <input type="hidden" name="activity_id" value="{{activity.activity_id}}">
+                                    <input type="hidden" name="receipt_id" value="{{receipt_and_amount[0].receipt_id}}">
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
+{% endblock %}
+{% block account_additional_js %}
+<script>
+    $(document).ready(function() {
+    $('#data-bookings').DataTable( {
+        "order": [[ 1, "asc" ],[ 2, "asc" ],[ 3, "asc" ]],
+        "lengthMenu": [ 10, 20, 50 ],
+        "dom" : '<"row"<"col-6"l><"col-6"f>>t<"col-12"p>',
+        "scrollX": true
+    });
+});
+</script>
 {% endblock %}

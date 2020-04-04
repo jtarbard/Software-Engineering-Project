@@ -1,6 +1,7 @@
 {% extends "includes/_main_layout.html"%}
 
 {% block additional_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
 {% block accounts_additional_css %}
 {% endblock %}
@@ -43,11 +44,11 @@
             <div id="title-bar">
                 <h1>{{User.first_name.title()}}</h1>
                 {% if membership_type %}
-                <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
+                <span class="badge customer"><p>{{membership_type.name.title()}} Membership</p></span>
                 {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-                <span class="badge badge-secondary">Manager</span>
+                <span class="badge manager">Manager</span>
                 {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
-                <span class="badge badge-secondary">Employee</span>
+                <span class="badge employee">Employee</span>
                 {% else %}
                 <span class="badge badge-secondary">Non-Member</span>
                 {% endif %}
@@ -60,4 +61,17 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block additional_js %}
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script>
+     $(document).ready(function(){
+         document.getElementById("page_title_container").classList.remove("container");
+         document.getElementById("page_title_container").classList.add("row");
+         document.getElementById("page_title_h1").classList.add("offset-1", "offset-md-3", "offset-lg-2");
+     });
+</script>
+{% block account_additional_js %}
+{% endblock %}
 {% endblock %}

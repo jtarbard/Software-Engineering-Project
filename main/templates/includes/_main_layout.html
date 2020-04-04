@@ -93,8 +93,8 @@ as the basic body -->
     {% endif %}
 id="page-title"
 >
-  <div class="container">
-    <h1>{{ page_title }}</h1>
+  <div class="container" id="page_title_container">
+    <h1 id="page_title_h1">{{ page_title }}</h1>
     {% block page_description %} {% endblock %}
   </div>
 </div>
@@ -120,6 +120,7 @@ id="page-title"
         {% endfor %}
     {% endif %}
 {% endwith %}
+</div>
 </div>
 
 {% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->

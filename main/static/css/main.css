@@ -8,14 +8,17 @@ body {
 }
 
 .customer {
+    color: #F2F2F2;
     background-color: #5BBDC8;
 }
 
 .employee {
+    color: #F2F2F2;
     background-color: #77b953;
 }
 
 .manager {
+    color: #F2F2F2;
     background-color: #E1234B;
 }
 

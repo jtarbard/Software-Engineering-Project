@@ -70,7 +70,7 @@ aside a, aside a:hover {
 }
 
 #title-bar {
-    margin-top: 2vh;
+    margin: 2vh 0;
     height: 10vh;
 }
 
@@ -88,10 +88,35 @@ aside a, aside a:hover {
     margin: 1vh 0 1vh 0;
 }
 
-#title-bar span {
-    min-width: 8vw;
-    height: 8vh;
-    line-height: 7vh;
+#title-bar .badge {
+    display: inline-block;
+    height: inherit;
+    min-width: 10vw;
     float: right;
-    margin: 1vh 0 1vh 0;
+    font-size: inherit;
+}
+
+#title-bar .badge p {
+    margin-top: auto;
+    margin-bottom: auto;
+}
+
+th {
+    color: #F2F2F2;
+    background-color: #1E1E1E;
+}
+
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+    color: #F2F2F2;
+    bottom: .5em;
 }
