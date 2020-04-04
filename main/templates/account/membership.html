@@ -1,15 +1,17 @@
 {% extends "account/account_layout.html"%}
 
 {% block page_content %}
-{% if membership %}
-    <p>Membership: {{membership_type.name.title()}}</p>
-    <p>Start Date: {{membership.start_date.strftime("%d %B, %Y")}}</p>
-    <p>End Date: {{membership.end_date.strftime("%d %B, %Y")}}</p>
-    <!-- TODO: implement renew function   -->
-    <a href="" class="btn btn-primary">Renew Membership</a>
-    <a href="/info/memberships/cancel" class="btn btn-danger">Cancel Membership</a>
-{% else %}
-    <p>Membership: No Membership Owned</p>
-    <a href="{{ url_for('info.membership_view')}}" class="btn btn-primary">Purchase Membership</a>
-{% endif %}
+<div class="container">
+    {% if membership %}
+        <p>Membership: {{membership_type.name.title()}}</p>
+        <p>Start Date: {{membership.start_date.strftime("%d %B, %Y")}}</p>
+        <p>End Date: {{membership.end_date.strftime("%d %B, %Y")}}</p>
+        <!-- TODO: implement renew function   -->
+        <a href="" class="btn btn-primary">Renew Membership</a>
+        <a href="/info/memberships/cancel" class="btn btn-danger">Cancel Membership</a>
+    {% else %}
+        <p>Membership: No Membership Owned</p>
+        <a href="{{ url_for('info.membership_view')}}" class="btn btn-primary">Purchase Membership</a>
+    {% endif %}
+</div>
 {% endblock %}

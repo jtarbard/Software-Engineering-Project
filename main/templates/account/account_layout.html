@@ -10,6 +10,7 @@
 
 {% block main_content %}
 <div class="container-fluid">
+<!--  Sidebar/Nav   -->
 {% if not sidebar_off %}
   <div class="row no-gutters equal">
         <aside class="col-12 col-md-3 col-lg-2">
@@ -26,7 +27,7 @@
                         {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
                         <li><a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-2x"></i><p>Statistics</p></a></li>
                         {% endif %}
-                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-user fa-2x"></i><p>Account</p></a></li>
+                        <li><a href="{{ url_for('account.view_account_details')}}" class="nav-link pl-0"><i class="fas fa-user fa-2x"></i><p>Account</p></a></li>
                         {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
                         <li><a href="#" class="nav-link pl-0"><i class="fas fa-credit-card fa-2x"></i><p>Card Details</p></a></li>
                         {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
@@ -67,6 +68,7 @@
 <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
 <script>
      $(document).ready(function(){
+         document.getElementById("page_title").style.marginRight = "-15px";
          document.getElementById("page_title_container").classList.remove("container");
          document.getElementById("page_title_container").classList.add("row");
          document.getElementById("page_title_h1").classList.add("offset-1", "offset-md-3", "offset-lg-2");

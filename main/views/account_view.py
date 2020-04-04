@@ -201,7 +201,7 @@ def view_account_receipts(returned_receipts=None):
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user, has_cookie=has_cookie,
-                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Receipts")
 
 # def get_start_time(elem):
 #         return elem[2]
@@ -236,7 +236,7 @@ def view_account_bookings():
 
     return flask.render_template("/account/bookings.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type,
-                                 page_title="Your Upcoming Bookings", has_cookie=has_cookie)
+                                 page_title="Upcoming Bookings", has_cookie=has_cookie)
 
 
 @blueprint.route("/account/membership", methods=["GET"])
@@ -257,6 +257,19 @@ def view_account_membership():
     return flask.render_template("/account/membership.html", User=user,
                                  membership_type=membership_type, membership=membership, page_title="Membership", has_cookie=has_cookie)
 
+@blueprint.route("/account/details", methods=["GET", "POST"])
+def view_account_details():
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+    membership_type = account_lib.get_membership_type(user)
+
+    if False:
+        s = customer.po
+
+    return flask.render_template("/account/account_details.html", User=user, customer=customer, membership_type=membership_type, page_title="Account Details", has_cookie=has_cookie)
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
 def view_usages():
