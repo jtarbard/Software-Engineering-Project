@@ -21,7 +21,7 @@ def login_get():
         response.set_cookie("vertex_basket_cookie", "", expires=0)
         return response
 
-    return flask.render_template("/account/login_register.html", page_type="login")
+    return flask.render_template("/account/login_register.html", page_type="login", page_title="Login")
 
 
 # Route for executing when the customer submits login data from the login page
@@ -74,7 +74,7 @@ def register_get():
         return response
 
 
-    return flask.render_template("/account/login_register.html", page_type="register")
+    return flask.render_template("/account/login_register.html", page_type="register", page_title="Register")
 
 
 # Route for executing when the customer submits register data from the register page

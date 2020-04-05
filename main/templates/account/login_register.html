@@ -5,7 +5,7 @@ The Vertex {{page_type.capitalize()}}
 {% endblock %} <!--Sets the page title to be the page type (either login or register)-->
 
 {% block main_content %}
-    <body background="/static/imgs/facility-img/facility2.jpg" style="opacity: 1;">
+    <body background="/static/imgs/facility-img/facility2.jpg">
         <form id="TaskForm" method="post">
             {% if page_type == "login" %} <!-- Shown if this is the login page -->
                 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
@@ -31,8 +31,9 @@ The Vertex {{page_type.capitalize()}}
                     </div>
             {% else %} <!-- Shown if this is the register page -->
                 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/register.css') }}">
-                    <div id="register-container">
-                        <div class="col-lg-6 col-sml-12">
+                    <div id="register-container" class="col-md-8 offset-md-2">
+                        <div class="col-12">
+                            <h5 id="title">Title:</h5>
                             <select name='title' required>
                                 <option value="Mr" {% if title == 'Mr'%}selected{% endif %}>Mr</option>
                                 <option value="Mrs" {% if title == 'Mrs'%}selected{% endif %}>Mrs</option>
@@ -41,25 +42,25 @@ The Vertex {{page_type.capitalize()}}
                                 <option value="Dr" {% if title == 'Dr'%}selected{% endif %}>Dr</option>
                                 <option value="Lord" {% if title == 'Lord'%}selected{% endif %}>Lord</option>
                             </select>
-                            <label for="first_name" class="form-control">First name:</label>
+                            <h5>First name:</h5>
                             <input type="text" name="first_name" required maxlength="20" value="{{ first_name }}">
-                            <label for="last_name" class="form-control">Last name:</label>
+                            <h5>Last name:</h5>
                             <input type="text" name="last_name" required maxlength="20" value="{{ last_name }}">
-                            <label for="password_first" class="form-control">Password:</label>
+                            <h5>Password:</h5>
                             <input type="password" name="password_first" required>
-                            <label for="password_second" class="form-control">Password Retype:</label>
+                            <h5>Password Retype:</h5>
                             <input type="password" name="password_second" required>
-                            <label for="email" class="form-control">Email:</label>
+                            <h5>Email:</h5>
                             <input type="email" name="email" required value="{{ email }}">
-                            <label for="tel_number" class="form-control">Telephone:</label>
+                            <h5>Telephone:</h5>
                             <input type="tel" name="tel_number" required value="{{ tel_number }}">
-                            <label for="dob" class="form-control">Date of birth:</label>
+                            <h5>Date of birth:</h5>
                             <input type="date" name="dob" required value="{{dob}}">
-                            <label for="postcode" class="form-control">Postal code:</label>
+                            <h5>Postal code:</h5>
                             <input type="text" name="postcode" required maxlength="10" value="{{ postcode }}">
-                            <label for="address" class="form-control">Address:</label>
+                            <h5>Address:</h5>
                             <input type="text" name="address" required maxlength="40" value="{{ address }}">
-                            <label for="country" class="form-control">Country:</label>
+                            <h5>Country:</h5>
                             <select name="country" required>
                                 <option value="AF">Afghanistan</option>
                                 <option value="AX">Åland Islands</option>
@@ -311,8 +312,10 @@ The Vertex {{page_type.capitalize()}}
                                 <option value="YE">Yemen</option>
                                 <option value="ZM">Zambia</option>
                                 <option value="ZW">Zimbabwe</option>
-                                </select>
-                            <input type="submit" value="Register" class="btn-success">
+                            </select>
+                        </div>
+                        <div class="col-2 offset-9">
+                            <input type="submit" value="   Register   " class="btn-success">
                         </div>
                     </div>
             {% endif %}
