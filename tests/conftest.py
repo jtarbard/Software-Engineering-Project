@@ -19,46 +19,17 @@ from main.data.db_classes.user_db_class import Customer, Employee, Manager
 # TODO: Investigate what a hook is... https://pytest.org/en/latest/reference.html#hook-reference
 def pytest_runtest_setup(item):
     """ called before ``pytest_runtest_call(item). """
+    import tests.helper.database_creation as creation
+    creation.create_all()
 
 
-# www.stackoverflow.com/questions/44677426/can-i-pass-arguments-to-pytest-fixtures
-@pytest.fixture(scope='module')
-def new_user():
-    """
-    Tests Customer, Employee, and Manager classes
-    :return: an object of the appropriate class, with the supplied parameters
-    """
-    titles = ["Mr", "Mr", "Mrs"]
-    passwords = ["passw0rD", "oai9*(13jiovn__eiqf9OIJqlk", "Admin666"]
-    first_names = ["John", "FIRSTNAME", "jane"]
-    last_names = ["Doe", "LASTNAME", "doe"]
-    emails = ["johndoe@thevertex.com", "notsurewhattoexpect@but.hereyougo", "JANEDOE@GMAIL.COM"]
-    tels = ["01685469958", "13854685599", "99999999999"]
-    bdays = [datetime.datetime(1960, 1, 1), datetime.datetime(1975, 1, 4), datetime.datetime(2004, 3, 22)]
-    postcodes = ["W1A 0AX", "DN55 1PT", "EC1A 1BB"]
-    addresses = ["3 Clos Waun Wen, Morriston", "The Old Mill, Llwyngwril", "14 Gwyn Drive, Caerphilly"]
-    countries = ["GB", "US", "CN"]
-
-    def _create_user(user_type):
-        if user_type.lower() == 'customer':
-            i = 0
-            return Customer(title=titles[i], password=passwords[i], first_name=first_names[i],
-                            last_name=last_names[i], email=emails[i], tel_number=tels[i],
-                            dob=bdays[i], postal_code=postcodes[i], address=addresses[i], country=countries[i])
-        elif user_type.lower() == 'employee':
-            i = 1
-            return Employee(title=titles[i], password=passwords[i], first_name=first_names[i],
-                            last_name=last_names[i], email=emails[i], tel_number=tels[i],
-                            dob=bdays[i], postal_code=postcodes[i], address=addresses[i], country=countries[i])
-        elif user_type.lower() == 'manager':
-            i = 2
-            return Manager(title=titles[i], password=passwords[i], first_name=first_names[i],
-                           last_name=last_names[i], email=emails[i], tel_number=tels[i],
-                           dob=bdays[i], postal_code=postcodes[i], address=addresses[i], country=countries[i])
-        else:
-            raise Exception(f"[TESTING: conftest.py > new_user()] Unknown user type {user_type}")
-
-    return _create_user
+# Automatically run for every test.
+# Rolls the database back to the initial state (empty) so each test database is independent.
+@pytest.yield_fixture(scope="function", autouse=True)
+def db_setup_rollback():
+    database.session.begin_nested()
+    yield
+    database.session.rollback()
 
 
 @pytest.yield_fixture(scope='session')
@@ -136,5 +107,7 @@ def template_checker():
                 ]), "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + "\nActual:\n" + str(context)
         assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist"
         assert all([ (out_cookie not in request.cookies) for out_cookie in exp_non_exist_cookies ]), "Expected non-existent cookies exist"
+
+        return context
 
     return _template_checker

@@ -3,8 +3,10 @@ import flask
 
 from main.data.transactions.transaction_db_transaction import return_activities_and_memberships_from_basket_cookie_if_exists
 
+from tests.helper.database_creation import populate_database
 
-def test_return_activities_and_memberships_from_basket_cookie_if_exists(test_client, populate_basket_cookies_db, basket_cookie_data):
+
+def test_return_activities_and_memberships_from_basket_cookie_if_exists(test_client, populate_database, basket_cookie_data):
     """
     Test for checking whether the basket cookie can be decoded correctly.
     :param cookie_value: basket cookie value
@@ -16,6 +18,8 @@ def test_return_activities_and_memberships_from_basket_cookie_if_exists(test_cli
     3. Singular membership object which have id stored in the cookie
     4. Duration (in months) of the membership object which is stored in the cookie
     """
+
+    populate_database(["facility", "membership_type", "activity_type", "activity"])
 
     # ------------------------------------------------------- #
 
