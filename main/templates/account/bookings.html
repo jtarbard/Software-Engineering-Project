@@ -1,7 +1,7 @@
 {% extends "account/account_layout.html"%}
 
 {% block page_content %}
-    <div class="row">
+    <div class="row no-gutters">
         <div class="col-sm-12" class="overflow-auto">
             <table class="table table-striped display w-100" id="data-bookings">
                 <thead class="table-header">
@@ -48,7 +48,7 @@
     $('#data-bookings').DataTable( {
         "order": [[ 1, "asc" ],[ 2, "asc" ],[ 3, "asc" ]],
         "lengthMenu": [ 10, 20, 50 ],
-        "dom" : '<"row"<"col-6"l><"col-6"f>>t<"col-12"p>',
+        "dom" : '<"row no-gutters"<"col-12 col-md-6"l><"col-12 col-md-6"f>>t<"col-12"p>',
         "scrollX": true
     });
 });

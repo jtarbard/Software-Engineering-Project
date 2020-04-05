@@ -5,7 +5,7 @@
 {% endblock %}
 {% block page_content %}
         <form id="qr-search" action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
-            <div class="form-group row">
+            <div class="form-group row no-gutters">
                 <div class="col-6 offset-md-4 col-md-4 offset-xl-6 col-xl-3">
                     <input type="button" class="btn btn-secondary col-12" id="loadFileXml" value="Upload QR Code" onclick="document.getElementById('file').click()"/>
                     <input type="file" style="display:none;" id="file" name="file"/>
@@ -24,7 +24,6 @@
                     <th scope="col">Purchase Date</th>
                     <th scope="col">Total Cost</th>
                     <th scope="col">View Receipt</th>
-                    <th scope="col">View Items</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,7 +38,6 @@
                         <td>{{receipt.creation_time.strftime("%d/%m/%y")}}</td>
                         <td>£{{receipt.total_cost}}</td>
                         <td><a class="btn btn-primary" href="{{url_for('transaction.e_m_get', receipt_id=receipt.receipt_id)}}">View</a></td>
-                        <td><a class="btn btn-danger" href="">Edit</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -52,7 +50,7 @@
     $('#data-receipts').DataTable( {
         "order": [[ 0, "desc" ]],
         "lengthMenu": [ 10, 20, 50 ],
-        "dom" : '<"row"<"col-6"l><"col-6"f>>t<"col-12"p>',
+        "dom" : '<"row no-gutters"<"col-12 col-md-6"l><"col-12 col-md-6"f>>t<"col-12"p>',
         "scrollX": true,
     });
 } );

@@ -43,7 +43,7 @@
             <input type="button" id="cancel_btn" onclick="edit()" value="Cancel" class="btn btn-secondary col-4 col-md-2" required>
             <input type="button" id="edit_btn" onclick="edit()" value={% if payment_details == None %}"Add Card"{% else %}"Edit Card"{% endif %} class="btn btn-primary col-4 col-md-2" required>
             {% if payment_details is not none %}
-            <input type="button" id="delete_btn" onclick="del()" value="Delete Card" class="btn btn-danger col-4 col-md-2">
+            <input type="button" id="delete_btn" onclick="delete_card()" value="Delete Card" class="btn btn-danger col-4 col-md-2">
             {% endif %}
         </div>
     </form>
@@ -54,7 +54,7 @@
 <script>
     let edit_state = false;
 
-    function del(){
+    function delete_card(){
         document.getElementById("delete").setAttribute("value","True");
         document.getElementById("card_details").submit();
     }
@@ -76,7 +76,9 @@
 
             submit.style.display = "none";
             cancel.style.display = "none";
-            del.style.display = "block";
+            if (del != null) {
+                del.style.display = "block";
+            }
             edit.style.display = "block";
 
             edit_state = false;
@@ -91,8 +93,10 @@
             submit.style.display = "block";
             cancel.style.display = "block";
             edit.style.display = "none";
-            del.style.display = "none";
 
+            if (del != null){
+                del.style.display = "none";
+            }
             edit_state = true;
         }
     }

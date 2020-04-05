@@ -48,7 +48,7 @@ def configure(app):
     print("Registered blueprints")
 
     import main.data.transactions.reset_transaction as rt
-    if rt.populate_db(create_timetable=True, populate_with_random_bookings=True):
+    if rt.populate_db(create_timetable=True, populate_with_random_bookings=False):
         print("Populated database")
     else:
         print("Database already populated")

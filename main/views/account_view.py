@@ -216,15 +216,14 @@ def view_account_bookings():
 
     returned_bookings = {}
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
-        if user.__mapper_args__['polymorphic_identity'] == "Customer":
-            customer: Customer = udf.return_customer_with_user_id(user.user_id)
-            for receipt in customer.purchases:
-                for booking in receipt.bookings:
-                    if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
-                        if booking.activity not in returned_bookings:
-                            returned_bookings[booking.activity] = [receipt, 1, booking.activity.start_time]
-                        else:
-                            returned_bookings[booking.activity][1] += 1
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            for booking in receipt.bookings:
+                if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
+                    if booking.activity not in returned_bookings:
+                        returned_bookings[booking.activity] = [receipt, 1, booking.activity.start_time]
+                    else:
+                        returned_bookings[booking.activity][1] += 1
     elif user.__mapper_args__['polymorphic_identity'] == "Employee":
         returned_bookings = {}
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":

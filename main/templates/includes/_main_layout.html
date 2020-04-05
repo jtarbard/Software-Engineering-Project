@@ -79,9 +79,7 @@ as the basic body -->
       </div>
     </nav>
 {% endif %}
-
-<div class="main_content"> <!--Defines the main content for the webpages, this is where all
-                                the content is situated-->
+<div>
 {% if page_title is defined %} <!-- Page title is not empty -->
 <div id="page_title"
     {% if not User or User.__mapper_args__['polymorphic_identity'] == "Customer" %}
@@ -99,6 +97,7 @@ as the basic body -->
 </div>
 {% endif %}
 
+<!--Defines the main content for the webpages, this is where allthe content is situated-->
 {% block main_content %} {% endblock %}
 
 {% with messages = get_flashed_messages(with_categories=True) %}
