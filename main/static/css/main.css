@@ -62,6 +62,7 @@ body {
     color: #F2F2F2;
 }
 
+/*Sets navbar height to a total of 10vh*/
 .navbar-brand {
   height: 7.5vh;
   padding: 1vh 0 1vh;
