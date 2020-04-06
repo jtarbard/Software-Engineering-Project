@@ -16,6 +16,7 @@ as the basic body -->
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
           crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/includes/global.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/includes/main.css') }}">
     <link rel="icon" href="../../static/favicon.ico" type="image/ico" sizes="16x16">
     {% block additional_css %}{% endblock %} <!--Allows extra css to be added-->
@@ -81,18 +82,10 @@ as the basic body -->
 {% endif %}
 <div>
 {% if page_title is defined %} <!-- Page title is not empty -->
-<div id="page_title"
-    {% if not User or User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-        class="fluid-container customer"
-    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
-        class="fluid-container employee"
-    {% elif User.__mapper_args__['polymorphic_identity'] == "Manager"%}
-        class="fluid-container manager"
-    {% endif %}
->
+<div id="page_title" class="fluid-container customer {{User.__mapper_args__['polymorphic_identity'].lower()}}">
   <div class="container" id="page_title_container">
     <h1 id="page_title_h1">{{ page_title }}</h1>
-    {% block page_description %} {% endblock %}
+      <div id="page-description">{% block page_description %} {% endblock %}</div>
   </div>
 </div>
 {% endif %}
