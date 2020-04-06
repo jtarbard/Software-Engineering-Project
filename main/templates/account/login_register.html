@@ -8,7 +8,7 @@ The Vertex {{page_type.capitalize()}}
     <body background="/static/imgs/facility-img/facility2.jpg">
         <form id="TaskForm" method="post">
             {% if page_type == "login" %} <!-- Shown if this is the login page -->
-                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account/login.css') }}">
                     <div id="login-container" class="col-md-4 offset-md-4">
                         <center>
                         <h1 class="col-12">Welcome</h1>
@@ -30,7 +30,7 @@ The Vertex {{page_type.capitalize()}}
                         </center>
                     </div>
             {% else %} <!-- Shown if this is the register page -->
-                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/register.css') }}">
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account/register.css') }}">
                     <div id="register-container" class="col-md-8 offset-md-2">
                         <div class="col-12">
                             <h5 id="title">Title:</h5>
