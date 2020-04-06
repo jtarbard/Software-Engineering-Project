@@ -2,7 +2,6 @@ import flask
 from flask_qrcode import QRcode
 from flask_mail import Mail
 
-
 # All app blueprints are added
 def register_blueprints(app):
     from main.views import index_view
@@ -29,10 +28,10 @@ def setup_db(app):
 
 
 # Error logging is created so all errors are recorded
-def create_logging(app, transaction_filename="transactions.log", server_error_filename="server_error.log"):
+def create_logging(app):
     import main.logger as logger
-    logger.create_transaction_logger(transaction_filename)
-    logger.create_flask_logger(app, server_error_filename)
+    logger.create_transaction_logger()
+    logger.create_flask_logger(app)
 
 
 # App is configured
@@ -78,8 +77,9 @@ def create_app(config_filename=None):
     return app
 
 
+flask_app = create_app()
+flask_app.secret_key = "england is my city"
+
 if __name__ == '__main__':
-    flask_app = create_app()
-    flask_app.secret_key = "england is my city"
     flask_app.run(debug=True)
 

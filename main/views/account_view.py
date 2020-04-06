@@ -8,7 +8,6 @@ import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.activity_db_transaction as adf
 import main.view_lib.cookie_lib as cl
 from main.data.db_classes.activity_db_class import ActivityType
-from main.data.db_classes.transaction_db_class import MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer, Manager, Employee
 from main.data.transactions.transaction_db_transaction import add_new_card_details
 from main.view_lib import account_lib
@@ -198,10 +197,15 @@ def view_account_receipts(returned_receipts=None):
     else:
         return flask.abort(500)
 
+    returned_receipts.reverse() #reverse so that items appear in chronological order
+
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user, has_cookie=has_cookie,
-                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Receipts")
+
+# def get_start_time(elem):
+#         return elem[2]
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
@@ -212,20 +216,19 @@ def view_account_bookings():
 
     returned_bookings = {}
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
-        if user.__mapper_args__['polymorphic_identity'] == "Customer":
-            customer: Customer = udf.return_customer_with_user_id(user.user_id)
-            for receipt in customer.purchases:
-                for booking in receipt.bookings:
-                    if booking.activity.start_time > datetime.datetime.now() or booking.deleted == False:
-                        if booking.activity not in returned_bookings:
-                            returned_bookings[booking.activity] = [receipt, 1]
-                        else:
-                            returned_bookings[booking.activity][1] += 1
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            for booking in receipt.bookings:
+                if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
+                    if booking.activity not in returned_bookings:
+                        returned_bookings[booking.activity] = [receipt, 1, booking.activity.start_time]
+                    else:
+                        returned_bookings[booking.activity][1] += 1
     elif user.__mapper_args__['polymorphic_identity'] == "Employee":
         returned_bookings = {}
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
     #     TODO: add manager functionality: returning booking stats.
-        returned_receipts = {}
+        returned_bookings = {}
     else:
         return flask.abort(500)
 
@@ -233,7 +236,7 @@ def view_account_bookings():
 
     return flask.render_template("/account/bookings.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type,
-                                 page_title="Your Upcoming Bookings", has_cookie=has_cookie)
+                                 page_title="Upcoming Bookings", has_cookie=has_cookie)
 
 
 @blueprint.route("/account/membership", methods=["GET"])
@@ -242,12 +245,94 @@ def view_account_membership():
     if response:
         return response
 
-    returned_bookings = {}
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+
+    membership = None
+    for receipt in customer.purchases:
+        if receipt.membership:
+            membership = receipt.membership
+            break
+
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/membership.html", User=user,
-                                 membership_type=membership_type, page_title="Membership", has_cookie=has_cookie)
+                                 membership_type=membership_type, membership=membership, page_title="Membership", has_cookie=has_cookie)
 
+@blueprint.route("/account/details", methods=["GET", "POST"])
+def view_account_details():
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+    membership_type = account_lib.get_membership_type(user)
+
+    if flask.request.method == "POST":
+        data_form = flask.request.form
+
+
+        #TODO: create input validation function to remove repeated code
+        server_error = None
+        # All of the values the user entered at the register page
+        details = {
+            "first_name": data_form.get("first_name"),
+            "last_name": data_form.get("last_name"),
+            "title": data_form.get("title"),
+            "email": data_form.get("email"),
+            "dob": datetime.datetime.strptime(data_form.get("dob"), "%Y-%m-%d"),
+            "tel_number": data_form.get("tel_number"),
+            "country": data_form.get("country"),
+            "postal_code": data_form.get("postal_code"),
+            "address": data_form.get("address"),
+        }
+
+        if server_error is not None:
+            flask.flash(server_error, "error")
+        else:
+            udf.edit_user_account(customer.user_id, details)
+
+    return flask.render_template("/account/account_details.html", User=user, customer=customer, membership_type=membership_type, page_title="Account Details", has_cookie=has_cookie)
+
+
+@blueprint.route("/account/card", methods=["POST", "GET"])
+def view_payment_details():
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+    membership_type = account_lib.get_membership_type(user)
+
+    if customer.payment_detail:
+        payment_details = vars(customer.payment_detail)
+    else:
+        payment_details = None
+
+    print(payment_details)
+
+    if flask.request.method == "POST":
+        data_form = flask.request.form
+
+        if payment_details is not None:
+            ds.delete_from_database(customer.payment_detail)
+
+        if data_form.get("delete") == "True":
+            print("VALUE IS TRUE")
+            ds.delete_from_database(customer.payment_detail)
+        else:
+            add_new_card_details(customer, card_number=data_form.get('card_number'),
+                                     start_date=data_form.get('start_date'),
+                                     expiration_date=data_form.get('expiration_date'),
+                                     street_and_number=data_form.get('street_and_number'),
+                                     town=data_form.get('town'), city=data_form.get('city'),
+                                     postcode=data_form.get('postcode'))
+
+        if customer.payment_detail:
+            payment_details = vars(customer.payment_detail)
+        else:
+            payment_details = None
+
+    return flask.render_template("/account/card_details.html", User=user, customer=customer, payment_details=payment_details, membership_type=membership_type, page_title="Card Details", has_cookie=has_cookie)
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
 def view_usages():
