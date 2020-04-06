@@ -7,16 +7,16 @@
 
 {% block main_content %}
 <div class="container">
-    <div id="title-bar">
-        <h1>{{User.first_name.title()}}</h1>
+    <div id="title-bar" class="row no-gutters">
+        <h1 class="col-8 col-lg-9">{{User.first_name.title()}}</h1>
         {% if membership_type %}
-        <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
+        <p class="customer col-4 col-lg-3">{{membership_type.name.title()}} Membership</p>
         {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-        <span class="badge badge-secondary">Manager</span>
+        <p class="manager col-4 col-lg-3">Manager</p>
         {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
-        <span class="badge badge-secondary">Employee</span>
+        <p class="employee col-4 col-lg-3">Employee</p>
         {% else %}
-        <span class="badge badge-secondary">Non-Member</span>
+        <p class="secondary col-4 col-lg-3">Non-Member</p>
         {% endif %}
     </div>
     <div class="row">
@@ -38,7 +38,7 @@
                 <div class="img media-left">
                         <span class="align-middle">
                             <i class="fas fa-file-invoice fa-3x"></i>
-                        </span>
+
                 </div>
                 <div class="content media-content">
                     <h2><a href="{{ url_for('account.view_account_receipts')}}" class="stretched-link">Receipts</a></h2>
@@ -57,17 +57,6 @@
                     <h2><a href="{{ url_for('account.view_account_membership')}}" class="stretched-link">Membership</a>
                     </h2>
                     <p>View and edit your membership.</p>
-                </div>
-            </div>
-        </div>
-        {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
-        <div class="col-md-6 col-lg-4">
-            <div class="media ">
-                <div class="img media-left">
-                    <i class="fas fa-question fa-3x"></i>
-                </div>
-                <div class="content media-content">
-                    <h2><a href="" class="stretched-link">Placeholder</a></h2>
                 </div>
             </div>
         </div>
@@ -105,7 +94,8 @@
                     <i class="fas fa-credit-card fa-3x"></i>
                 </div>
                 <div class="content media-content">
-                    <h2><a href="{{ url_for('account.view_payment_details')}}" class="stretched-link">Card Details</a></h2>
+                    <h2><a href="{{ url_for('account.view_payment_details')}}" class="stretched-link">Card Details</a>
+                    </h2>
                     <p>View and edit your card details.</p>
                 </div>
             </div>

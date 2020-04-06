@@ -4,14 +4,11 @@
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/receipts.css') }}">
 {% endblock %}
 {% block page_content %}
-        <form id="qr-search" action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
+        <form id="qr_search" action="/transactions/receipts/check_receipt_input" method="post" enctype = "multipart/form-data">
             <div class="form-group row no-gutters">
-                <div class="col-6 offset-md-4 col-md-4 offset-xl-6 col-xl-3">
-                    <input type="button" class="btn btn-secondary col-12" id="loadFileXml" value="Upload QR Code" onclick="document.getElementById('file').click()"/>
+                <div class="col-6 col-md-4 col-xl-2">
+                    <input type="button" class="btn btn-secondary col-12" id="file_upload" value="Upload QR Code" onclick="document.getElementById('file').click()"/>
                     <input type="file" style="display:none;" id="file" name="file"/>
-                </div>
-                <div class="col-6 col-md-4 col-xl-3">
-                    <input class="btn btn-outline-success col-12" type="submit" value="Find Receipt by QR">
                 </div>
             </div>
         </form>
@@ -47,12 +44,16 @@
 {% block account_additional_js %}
 <script>
     $(document).ready(function() {
-    $('#data-receipts').DataTable( {
-        "order": [[ 0, "desc" ]],
-        "lengthMenu": [ 10, 20, 50 ],
-        "dom" : '<"row no-gutters"<"col-12 col-md-6"l><"col-12 col-md-6"f>>t<"col-12"p>',
-        "scrollX": true,
+        $('#data-receipts').DataTable( {
+            "order": [[ 0, "desc" ]],
+            "lengthMenu": [ 10, 20, 50 ],
+            "dom" : '<"row no-gutters"<"col-12 col-md-6"l><"col-12 col-md-6"f>>t<"col-12"p>',
+            "scrollX": true,
+        });
     });
-} );
+
+    document.getElementById("file").onchange = function() {
+        document.getElementById("qr_search").submit();
+    };
 </script>
 {% endblock %}
