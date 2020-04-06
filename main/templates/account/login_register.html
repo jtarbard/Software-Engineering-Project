@@ -1,34 +1,39 @@
 {% extends "includes/_main_layout.html"%}
-{% block additional_css %}
-
-{% endblock %}
 
 {% block title %}
 The Vertex {{page_type.capitalize()}}
 {% endblock %} <!--Sets the page title to be the page type (either login or register)-->
 
 {% block main_content %}
-    <form id="TaskForm" method="post">
-        <div class="container">
-                {% if page_type == "login" %} <!-- Shown if this is the login page -->
-                    <div class="row" id="login_row">
-                        <div class="form-group col-lg-6 col-sml-12">
-                            <label for="email" class="form-control">Email:</label>
-                            <input type="email" name="email" required value="{{ email }}">
+    <body background="/static/imgs/facility-img/facility2.jpg">
+        <form id="TaskForm" method="post">
+            {% if page_type == "login" %} <!-- Shown if this is the login page -->
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
+                    <div id="login-container" class="col-md-4 offset-md-4">
+                        <center>
+                        <h1 class="col-12">Welcome</h1>
+                        <div id="login-icon" class="col-12">
+                            <img src="/static/imgs/login.png" alt="login">
                         </div>
-                        <div class="form-group col-lg-6 col-sml-12">
-                            <label for="password" class="form-control">Password:</label>
-                            <input type="password" name="password" required value="{{ password }}">
+                        <div class="form-group col-12">
+                            <input type="email" placeholder="Enter Email" name="email" required value="{{ email }}">
                         </div>
+                        <div class="form-group col-12">
+                            <input type="password" placeholder="Enter Password" name="password" required value="{{ password }}">
+                        </div>
+                        <div id="login-button" class="col-12">
+                            <input type="submit" id="submit" value="      Login      " class="btn-success">
+                        </div>
+                        <div id="register-link" class="col-12">
+                            <a class="col-12" href="/account/register">Register now</a>
+                        </div>
+                        </center>
                     </div>
-                    <input type="submit" id="submit" value="Login" class="btn-success">
-                    <p>Don't have an account? <br><a href="/account/register">Register now</a></p>
-                    <div id="break"></div>
-                {% else %} <!-- Shown if this is the register page -->
-                    <div class="row">
-                        <div class="col-lg-6 col-sml-12">
-                            <div class="form-group">
-                            <label for="title" class="form-control">Title:</label>
+            {% else %} <!-- Shown if this is the register page -->
+                <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/register.css') }}">
+                    <div id="register-container" class="col-md-8 offset-md-2">
+                        <div class="col-12">
+                            <h5 id="title">Title:</h5>
                             <select name='title' required>
                                 <option value="Mr" {% if title == 'Mr'%}selected{% endif %}>Mr</option>
                                 <option value="Mrs" {% if title == 'Mrs'%}selected{% endif %}>Mrs</option>
@@ -37,37 +42,25 @@ The Vertex {{page_type.capitalize()}}
                                 <option value="Dr" {% if title == 'Dr'%}selected{% endif %}>Dr</option>
                                 <option value="Lord" {% if title == 'Lord'%}selected{% endif %}>Lord</option>
                             </select>
-                            <label for="first_name" class="form-control">First name:</label>
+                            <h5>First name:</h5>
                             <input type="text" name="first_name" required maxlength="20" value="{{ first_name }}">
-                            <label for="last_name" class="form-control">Last name:</label>
+                            <h5>Last name:</h5>
                             <input type="text" name="last_name" required maxlength="20" value="{{ last_name }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="password_first" class="form-control">Password:</label>
+                            <h5>Password:</h5>
                             <input type="password" name="password_first" required>
-                            <label for="password_second" class="form-control">Password Retype:</label>
+                            <h5>Password Retype:</h5>
                             <input type="password" name="password_second" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email" class="form-control">Email:</label>
+                            <h5>Email:</h5>
                             <input type="email" name="email" required value="{{ email }}">
-                        </div>
-                            </div>
-                        <div class="col-lg-6 col-sml-12">
-                        <div class="form-group">
-                            <label for="tel_number" class="form-control">Telephone:</label>
+                            <h5>Telephone:</h5>
                             <input type="tel" name="tel_number" required value="{{ tel_number }}">
-                            <label for="dob" class="form-control">Date of birth:</label>
+                            <h5>Date of birth:</h5>
                             <input type="date" name="dob" required value="{{dob}}">
-                            </div>
-                        <div class="form-group">
-                            <label for="postal_code" class="form-control">Postal code:</label>
-                            <input type="text" name="postal_code" required maxlength="10" value="{{ postcode }}">
-                            <label for="address" class="form-control">Address:</label>
+                            <h5>Postal code:</h5>
+                            <input type="text" name="postcode" required maxlength="10" value="{{ postcode }}">
+                            <h5>Address:</h5>
                             <input type="text" name="address" required maxlength="40" value="{{ address }}">
-                        </div>
-                        <div class="form-group">
-                            <label for="country" class="form-control">Country:</label>
+                            <h5>Country:</h5>
                             <select name="country" required>
                                 <option value="AF">Afghanistan</option>
                                 <option value="AX">Åland Islands</option>
@@ -286,7 +279,7 @@ The Vertex {{page_type.capitalize()}}
                                 <option value="SE">Sweden</option>
                                 <option value="CH">Switzerland</option>
                                 <option value="SY">Syrian Arab Republic</option>
-                                <option value="TW">Taiwan, Province of China</option>
+                                <option value="TW">Taiwan</option>
                                 <option value="TJ">Tajikistan</option>
                                 <option value="TZ">Tanzania, United Republic of</option>
                                 <option value="TH">Thailand</option>
@@ -319,16 +312,16 @@ The Vertex {{page_type.capitalize()}}
                                 <option value="YE">Yemen</option>
                                 <option value="ZM">Zambia</option>
                                 <option value="ZW">Zimbabwe</option>
-                                </select>
-                            </div>
+                            </select>
                         </div>
-                    <input type="submit" value="Register" class="btn-success">
-                {% endif %}
-        </div>
-    </form>
-    <div class="container" id="ErrorDiv" {% if ServerError%} style="visibility: visible" {% endif %}>
-        <p>
-            {{ ServerError }} <!-- Outputs a server error if there is one -->
-        </p>
-    </divclass>
+                        <div class="col-2 offset-9">
+                            <input type="submit" value="   Register   " class="btn-success">
+                        </div>
+                    </div>
+            {% endif %}
+            <div class="container" id="ErrorDiv" {% if ServerError%} style="visibility: visible" {% endif %}>
+                <p>{{ ServerError }} <!-- Outputs a server error if there is one --></p>
+            </div>
+        </form>
+    </body>
 {% endblock %}

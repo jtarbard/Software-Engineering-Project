@@ -1,0 +1,51 @@
+body {
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+#login-container {
+    background-color: rgba(256, 256, 256, 0.93);
+    margin-top: 10vh;
+    border-radius: 20px;
+    padding: 30px 30px 30px 30px;
+}
+
+#login-container h1 {
+    color: #1E1E1E;
+}
+
+#login-icon img {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 77px;
+    height: 77px;
+}
+
+#login-container input[type="email"], input[type="password"] {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid black;
+    outline: none;
+    height: 30px;
+}
+
+#login-container input[type="submit"] {
+    border: none;
+    border-radius: 20px;
+    background: #5BBDC8;
+    margin-top: 10px;
+    font-size: 18px;
+    color: white;
+}
+
+#register-link {
+    padding-top: 8px;
+    padding-bottom: 10px;
+}
+
+#login-container a {
+    color: #1E1E1E;
+    margin: 0;
+    font-size: 15px;
+}
