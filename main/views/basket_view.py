@@ -99,7 +99,7 @@ def basket_view():
         total_activity_price += current_price - (current_price * bulk_discount)
 
     current_membership_discount = 0
-    total_discounted_price = 0
+    # total_discounted_price = 0  # can uncomment but this is not needed (why is python weird)
     if basket_membership:
         total_discounted_price = (total_activity_price - basket_membership.discount / 100 * total_activity_price)
 
@@ -115,6 +115,7 @@ def basket_view():
             current_membership_discount = customer_membership.membership_type.discount
             final_price = total_discounted_price
         else:
+            total_discounted_price = total_activity_price
             final_price = total_activity_price
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
