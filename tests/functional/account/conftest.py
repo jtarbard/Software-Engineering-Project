@@ -4,7 +4,32 @@ import pytest
 
 def pytest_generate_tests(metafunc):
     if "basket_view_basic_data" in metafunc.fixturenames:
-        metafunc.parametrize("basket_view_basic_data", range(23), indirect=True)
+        metafunc.parametrize("basket_view_basic_data", range(23), indirect=True,
+                             ids=["no_basket_cookie",
+                                  "A:1",
+                                  "A:1;A:2;A:3",
+                                  "M:1:1",
+                                  "M:1:12",
+                                  "A:1;M:1:1",
+                                  "A:1;M:2:1",
+                                  "empty basket cookie",
+                                  "Multi-buy: A:3;A:3;A:3",
+                                  "Pure bulk buy: A:3;A:6;A:9",
+                                  "Bulk buy mix normal buy: A:2;A:2;A:5;A:3;A:6;A:9",
+                                  "Pure bulk buy with membership: A:3;A:6;A:9;M:1:1",
+                                  "Pure bulk buy with membership: A:3;A:6;A:9;M:2:1",
+                                  "Pre-existing membership + A:1",
+                                  "Pre-existing membership + A:1;A:2;A:3",
+                                  "Pre-existing membership + A:1",
+                                  "Pre-existing membership + A:1;A:2;A:3",
+                                  "Removes overly booked activities: A:13;A:13;A:13;A:13;A:13",
+                                  "User logged out, expects to be redirected to login page",
+                                  "User logged out, expects to be redirected to login page and basket cookie deleted",
+                                  "Floating point arithmetic test 1",
+                                  "Floating point arithmetic test 2",
+                                  "Floating point arithmetic test 3"])
+    if "basket_delete_activity_basic_data" in metafunc.fixturenames:
+        metafunc.parametrize("basket_delete_activity_basic_data", range(1), indirect=True, ids=[])
 
 
 @pytest.fixture
@@ -19,14 +44,14 @@ def basket_view_basic_data(request):
     Basket_View_Basic_Test
     GIVEN a Flask application
     WHEN the '/account/basket' page is requested (GET)
-    UNDER CONDITIONS 1. User with no membership is logged in (vertex_account_cookie exists)
-                     2. Basket cookie with 1 valid activity (type = 1, hourly price = 40, hour = 1) exist
-                     3. Basket cookie with NO memberships
+    VARYING CONDITIONS 1. User with/without membership is logged in / not logged in (vertex_account_cookie exists or not)
+                       2. Basket cookie with ? valid activity
+                       3. Basket cookie with ? membership
     THEN check 1. Valid status code (200)
-               2. The redirected url is "/account/basket"
-               3. page_title (rendered template parameter) or actual page title has "Basket"
-               4. '/account/basket.html' is rendered
-               5. Account cookie and Basket cookie still exists (Remember this is GET)
+               2. The redirected url
+               3. page_title (rendered template parameter) or actual page title
+               4. name of the rendered template
+               5. Existing cookies
                6. Here we will rely on the cookie being correctly decoded (Yes this is bad and depends on another
                   function, but for the convenience of setting 3 test input data with a single string is irresistible...
                   However, ensuring the cookie is correctly decoded is NOT the focus here.) Check that:
@@ -202,7 +227,7 @@ def basket_view_basic_data(request):
     # 1. vertex_account_cookie exists
     # 2. User does not have a membership
     # 3. vertex_basket_cookie exists
-    # 4. Basket cookie with 3x 1 valid activity (type = 3)
+    # 4. Basket cookie with 3x 1 valid activity (type = 3, hourly = 30, duration = 3)
     # 5. Basket cookie with NO membership
     exp_total_activity_price = 270.0  # 30*3 * 3
 
@@ -218,7 +243,7 @@ def basket_view_basic_data(request):
     # 1. vertex_account_cookie exists
     # 2. User does not have a membership
     # 3. vertex_basket_cookie exists
-    # 4. Basket cookie with 3 valid activity (type = 3, 6, 9)
+    # 4. Basket cookie with 3 valid activity (type = 3, 6, 9, hourly = 30, duration = 3)
     # 5. Basket cookie with NO membership
     exp_total_activity_price = 229.5  # bulk discount on activities only. 30*3 * 3 * 0.85
     exp_total_discounted_price = 229.5  # bulk discount and membership discount.30*3 * 3 * 0.85
@@ -511,3 +536,51 @@ def basket_view_basic_data(request):
                  ["vertex_basket_cookie", "vertex_account_cookie"]))
 
     return data[request.param]
+
+
+@pytest.fixture
+def basket_delete_activity_basic_data(request):
+    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
+    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
+        return_customer_premium_with_no_response, \
+        return_customer_standard_with_no_response, \
+        return_not_logged_in_user_response
+
+    """
+    Basket_Delete_Activity_Basic_Test
+    GIVEN a Flask application
+    WHEN delete/update button is clicked on the '/account/basket' page (POST)
+    VARYING CONDITIONS 1. User with/without membership is logged in / not logged in (vertex_account_cookie exists or not)
+                       2. Basket cookie with ? valid activity
+                       3. Basket cookie with ? membership
+    THEN check 1. Valid status code (200)
+               2. The redirected url
+               3. page_title (rendered template parameter) or actual page title
+               4. name of the rendered template
+               5. Existing cookies
+               6. Here we will rely on the cookie being correctly decoded (Yes this is bad and depends on another
+                  function, but for the convenience of setting 3 test input data with a single string is irresistible...
+                  However, ensuring the cookie is correctly decoded is NOT the focus here.) Check that:
+                  a. basket_activities returns accordingly
+                  b. basket_membership returns accordingly
+                  c. basket_membership_duration returns accordingly
+               7. current_membership_discount returns accordingly (depends on basket / user owned membership)
+               8. total_activity_price is calculated correctly (subtotal of all activity prices, without discounts)
+               9. total_discounted_price is calculated correctly (subtotal of all activity prices, after discount)
+               10. activity_and_price (a dict) returns accordingly:
+                   a. All keys (activity objs) exist in the expected activity objs dict key set (exp_activities)
+                   b. For each activity object, the hourly activity price is correctly retrieved
+                   c. For each activity object, the number of bookings for that activity is correctly summed up
+                   d. For each activity object, the bulk discount due to the number of bookings for that activity is correctly returned
+               11. final_price is calculated correctly (sum of total_discounted_price and membership_price)
+
+    TESTING FOR <Rule '/account/basket' (OPTIONS, POST) -> basket.basket_delete_activity>
+    """
+
+    # Test_0 - basic increase
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 1 valid activity (type = 1, hourly price = 10, hour = 1) exist
+    # 5. Basket cookie with NO memberships
+    pass
