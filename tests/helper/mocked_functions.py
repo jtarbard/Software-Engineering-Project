@@ -3,15 +3,11 @@ import flask
 
 def return_customer_no_membership_with_no_response(request, needs_login):
     from tests.helper.database_creation import customer_objs
-    print(customer_objs[0])
-    print(customer_objs[0].user_id)
     return customer_objs[0], None, True
 
 
 def return_customer_standard_with_no_response(request, needs_login):
     from tests.helper.database_creation import customer_with_membership_objs
-    print(customer_with_membership_objs[0])
-    print(customer_with_membership_objs[0].user_id)
     return customer_with_membership_objs[0], None, True
 
 
