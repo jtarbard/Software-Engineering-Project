@@ -2,7 +2,6 @@ import datetime
 import pytest
 
 
-
 def pytest_generate_tests(metafunc):
     if "basket_cookie_data" in metafunc.fixturenames:
         metafunc.parametrize("basket_cookie_data", range(25), indirect=True)
