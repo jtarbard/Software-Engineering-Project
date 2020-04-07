@@ -53,18 +53,35 @@ as the basic body -->
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base href="{{ url_for('account.register_get')}}">Register</a></li>
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base href="{{ url_for('account.login_get')}}">Login</a></li>
             {% else %}
-            <li class="nav-item"><a class="nav-link glyphicon glyphicon-user" base href="{{ url_for('account.view_account')}}">My Account</a></li>
+            <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a href="{{ url_for('account.view_account')}}" class="nav-link pl-0"><i class="fas fa-home fa-1x"></i><p>Home</p></a>
+                    <a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0"><i class="fas fa-calendar-alt fa-1x"></i><p>Bookings</p></a>
+                    <a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0"><i class="fas fa-file-invoice fa-1x"></i><p>Receipts</p></a>
+                    {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+                    <a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0"><i class="fas fa-id-card-alt fa-1x"></i><p>Membership</p></a>
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                    <a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-1x"></i><p>Statistics</p></a>
+                    {% endif %}
+                    <a href="{{ url_for('account.view_account_details')}}" class="nav-link pl-0"><i class="fas fa-user fa-1x"></i><p>Account</p></a>
+                    {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+                    <a href="{{ url_for('account.view_payment_details')}}" class="nav-link pl-0"><i class="fas fa-credit-card fa-1x"></i><p>Card Details</p></a>
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                    <a href="#" class="nav-link pl-0"><i class="fas fa-table fa-1x"></i><p>Rota</p></a>
+                    {% endif %}
+                    <a href="{{ url_for('account.log_out')}}" class="nav-link pl-0"><i class="fas fa-sign-out-alt fa-1x"></i><p>Log Out</p></a>
+                </div>
+            </li>
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base href="{{ url_for('basket.basket_view')}}">View Basket</a></li>
             {% endif %}
         </ul>
       </div>
     </nav>
 {% endif %}
-
-<div class="main_content"> <!--Defines the main content for the webpages, this is where all
-                                the content is situated-->
+<div>
 {% if page_title is defined %} <!-- Page title is not empty -->
-<div
+<div id="page_title"
     {% if not User or User.__mapper_args__['polymorphic_identity'] == "Customer" %}
         class="fluid-container customer"
     {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
@@ -72,15 +89,15 @@ as the basic body -->
     {% elif User.__mapper_args__['polymorphic_identity'] == "Manager"%}
         class="fluid-container manager"
     {% endif %}
-id="page-title"
 >
-  <div class="container">
-    <h1>{{ page_title }}</h1>
+  <div class="container" id="page_title_container">
+    <h1 id="page_title_h1">{{ page_title }}</h1>
     {% block page_description %} {% endblock %}
   </div>
 </div>
 {% endif %}
 
+<!--Defines the main content for the webpages, this is where allthe content is situated-->
 {% block main_content %} {% endblock %}
 
 {% with messages = get_flashed_messages(with_categories=True) %}
@@ -101,6 +118,7 @@ id="page-title"
         {% endfor %}
     {% endif %}
 {% endwith %}
+</div>
 </div>
 
 {% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->

@@ -28,6 +28,24 @@ def create_new_user_account(usertype, **kwargs):
         return None
 
 
+# Method for editing user account details.
+# user_id is the id of the user from the users database
+# details is a dictionary of user details to be changed. dict items should be titled the name of the database field
+# with the value being the new value to be inserted into the database.
+def update_user_account(user_id, new_details):
+    # Note: COULD be problematic if somehow user_id is not unique. However, in that case, the database table is probably
+    #       already quite messed up, as user_id is a primary key. SQLAlchemy should prevent this kind of behaviour,
+    #       therefore this should always only return exactly 1 user (or None. In that case, update() does nothing)
+    update_success = User.query.filter(User.user_id == user_id).update(new_details)
+
+    if update_success:
+        log_transaction(f"Updated User {user_id} details")
+    else:
+        log_transaction(f"Attempted to update User {user_id} details, didn't seem to work. There might be no user with id {user_id} in the database.")
+
+    db.database.session.commit()
+
+
 # Simply returns the user with matching ID. Mainly used when a user has a verified cookie and needs access to
 # customer details
 def return_user(account_id):

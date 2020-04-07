@@ -2,12 +2,22 @@
     padding: 0;
 }
 
+#sidebar .nav-link p {
+    position: relative;
+    bottom: 0.2rem;
+}
+
+#sidebar .nav-link:hover {
+    transition: 0.3s;
+    background-color: #373737;
+}
+
 #page-title {
     margin-bottom: 0;
 }
 
 #page-content-wrapper {
-    padding: 0 2.5%;
+    padding: 0 2.5% 3vh;
 }
 
 aside {
@@ -35,6 +45,10 @@ aside p {
 
 /*Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
+    .navbar-expand .navbar-nav .nav-link {
+    padding: 0.8rem 1rem;
+    }
+
     aside {
         min-height: 74.5vh;
         height: inherit;
@@ -60,7 +74,7 @@ aside p {
 
     #list-title {
         display: inline;
-        padding: 2vh 0;
+        padding: 1.2rem 1rem 1.2rem 1.5rem;
     }
 }
 
@@ -69,16 +83,15 @@ aside a, aside a:hover {
     text-decoration: none;
 }
 
-#title-bar {
-    margin-top: 2vh;
-    height: 10vh;
+.selected_nav_link {
+    color: #1E1E1E;
+    background-color: #F2F2F2;
 }
 
-#title-bar button {
-    min-width: 4vw;
-    height: 8vh;
-    float: left;
-    margin: 1vh 1vw 1vh 0;
+#title-bar {
+    margin: 2vh 0;
+    height: 10vh;
+
 }
 
 #title-bar h1 {
@@ -88,10 +101,63 @@ aside a, aside a:hover {
     margin: 1vh 0 1vh 0;
 }
 
-#title-bar span {
-    min-width: 8vw;
-    height: 8vh;
-    line-height: 7vh;
+#title-bar p {
+ display: flex;
+    height: inherit;
+    padding: .25em .8em;
+    min-width: 10vw;
     float: right;
-    margin: 1vh 0 1vh 0;
+    font-size: inherit;
+    border-radius: 0.3rem;
+    font-weight: bold;
+    justify-content: center;
+    align-items: center;
+}
+
+th {
+    color: #F2F2F2;
+    background-color: #1E1E1E;
+}
+
+label {
+    padding-top: 6px;
+    font-weight: bold;
+}
+
+form h2 {
+    margin-bottom: 1vh;
+    font-size: 1.5rem;
+}
+
+
+table.dataTable thead .sorting:after,
+table.dataTable thead .sorting:before,
+table.dataTable thead .sorting_asc:after,
+table.dataTable thead .sorting_asc:before,
+table.dataTable thead .sorting_asc_disabled:after,
+table.dataTable thead .sorting_asc_disabled:before,
+table.dataTable thead .sorting_desc:after,
+table.dataTable thead .sorting_desc:before,
+table.dataTable thead .sorting_desc_disabled:after,
+table.dataTable thead .sorting_desc_disabled:before {
+    color: #F2F2F2;
+    bottom: .5em;
+}
+
+#personal_details_row {
+    margin-bottom: 3vh;
+}
+
+#submit_btn, #cancel_btn {
+    display: none;
+    margin-top: 3vh;
+}
+
+#cancel_btn {
+    display: none;
+    margin-left: 1vw;
+}
+
+#delete_btn {
+   margin-left: 1vw;
 }

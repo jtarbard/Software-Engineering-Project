@@ -7,132 +7,122 @@
 
 {% block main_content %}
 <div class="container">
-    <div id="page-content-wrapper">
-        <div id="title-bar">
-            <h1>{{User.first_name.title()}}</h1>
-            {% if membership_type %}
-            <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
-            {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-            <span class="badge badge-secondary">Manager</span>
-            {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
-            <span class="badge badge-secondary">Employee</span>
-            {% else %}
-            <span class="badge badge-secondary">Non-Member</span>
-            {% endif %}
-        </div>
-        <div class="row">
-            <!-- Bookings -->
-            <div class="col-md-6 col-lg-4">
-                <div class="media">
-                    <div class="img media-left">
-                        <i class="fas fa-calendar-alt fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="{{ url_for('account.view_account_bookings')}}" class="stretched-link">Bookings</a></h2>
-                        <p>View your upcoming bookings.</p>
-                    </div>
+    <div id="title-bar" class="row no-gutters">
+        <h1 class="col-8 col-lg-9">{{User.first_name.title()}}</h1>
+        {% if membership_type %}
+        <p class="customer col-4 col-lg-3">{{membership_type.name.title()}} Membership</p>
+        {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+        <p class="manager col-4 col-lg-3">Manager</p>
+        {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+        <p class="employee col-4 col-lg-3">Employee</p>
+        {% else %}
+        <p class="secondary col-4 col-lg-3">Non-Member</p>
+        {% endif %}
+    </div>
+    <div class="row">
+        <!-- Bookings -->
+        <div class="col-md-6 col-lg-4">
+            <div class="media">
+                <div class="img media-left">
+                    <i class="fas fa-calendar-alt fa-3x"></i>
+                </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.view_account_bookings')}}" class="stretched-link">Bookings</a></h2>
+                    <p>View your upcoming bookings.</p>
                 </div>
             </div>
-            <!-- Receipts -->
-            <div class="col-md-6 col-lg-4">
-                <div class="media">
-                    <div class="img media-left">
+        </div>
+        <!-- Receipts -->
+        <div class="col-md-6 col-lg-4">
+            <div class="media">
+                <div class="img media-left">
                         <span class="align-middle">
                             <i class="fas fa-file-invoice fa-3x"></i>
-                        </span>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="{{ url_for('account.view_account_receipts')}}" class="stretched-link">Receipts</a></h2>
-                        <p>View your past purchase receipts.</p>
-                    </div>
+
+                </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.view_account_receipts')}}" class="stretched-link">Receipts</a></h2>
+                    <p>View your past purchase receipts.</p>
                 </div>
             </div>
-            {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-            <!--Membership-->
-            <div class="col-md-6 col-lg-4">
-                <div class="media ">
-                    <div class="img media-left">
-                        <i class="fas fa-id-card-alt fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="{{ url_for('account.view_account_membership')}}" class="stretched-link">Membership</a></h2>
-                        <p>View and edit your membership.</p>
-                    </div>
+        </div>
+        {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+        <!--Membership-->
+        <div class="col-md-6 col-lg-4">
+            <div class="media ">
+                <div class="img media-left">
+                    <i class="fas fa-id-card-alt fa-3x"></i>
+                </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.view_account_membership')}}" class="stretched-link">Membership</a>
+                    </h2>
+                    <p>View and edit your membership.</p>
                 </div>
             </div>
-            {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
-            <div class="col-md-6 col-lg-4">
-                <div class="media ">
-                    <div class="img media-left">
-                        <i class="fas fa-question fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="" class="stretched-link">Placeholder</a></h2>
-                    </div>
+        </div>
+        {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+        <!--Statistics-->
+        <div class="col-md-6 col-lg-4">
+            <div class="media ">
+                <div class="img media-left">
+                    <i class="far fa-chart-bar fa-3x"></i>
+                </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.view_usages')}}" class="stretched-link">Statistics</a></h2>
+                    <p>View weekly statistics for the Vertex.</p>
                 </div>
             </div>
-            {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
-            <!--Statistics-->
-            <div class="col-md-6 col-lg-4">
-                <div class="media ">
-                    <div class="img media-left">
-                        <i class="far fa-chart-bar fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="{{ url_for('account.view_usages')}}" class="stretched-link">Statistics</a></h2>
-                        <p>View weekly statistics for the Vertex.</p>
-                    </div>
+        </div>
+        {% endif %}
+        <!--Manage Account-->
+        <div class="col-md-6 col-lg-4">
+            <div class="media">
+                <div class="img media-left">
+                    <i class="fas fa-user fa-3x"></i>
+                </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.view_account_details')}}" class="stretched-link">Account</a></h2>
+                    <p>View and edit your account details.</p>
                 </div>
             </div>
-            {% endif %}
-            <!--Manage Account-->
-            <div class="col-md-6 col-lg-4">
-                <div class="media">
-                    <div class="img media-left">
-                        <i class="fas fa-user fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="" class="stretched-link">Manage Account</a></h2>
-                        <p>View and edit your account details.</p>
-                    </div>
+        </div>
+        {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
+        <!--Card Details-->
+        <div class="col-md-6 col-lg-4">
+            <div class="media">
+                <div class="img media-left">
+                    <i class="fas fa-credit-card fa-3x"></i>
+                </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.view_payment_details')}}" class="stretched-link">Card Details</a>
+                    </h2>
+                    <p>View and edit your card details.</p>
                 </div>
             </div>
-            {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-            <!--Card Details-->
-            <div class="col-md-6 col-lg-4">
-                <div class="media">
-                    <div class="img media-left">
-                        <i class="fas fa-credit-card fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="" class="stretched-link">Card Details</a></h2>
-                        <p>View and edit your card details.</p>
-                    </div>
+        </div>
+        {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or
+        User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+        <div class="col-md-6 col-lg-4">
+            <div class="media">
+                <div class="img media-left">
+                    <i class="fas fa-table fa-3x"></i>
+                </div>
+                <div class="content media-content">
+                    <h2><a href="" class="stretched-link">Rota</a></h2>
+                    <p>View and edit your card details.</p>
                 </div>
             </div>
-            {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
-            <div class="col-md-6 col-lg-4">
-                <div class="media">
-                    <div class="img media-left">
-                        <i class="fas fa-table fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="" class="stretched-link">Rota</a></h2>
-                        <p>View and edit your card details.</p>
-                    </div>
+        </div>
+        {% endif %}
+        <!--Logout-->
+        <div class="col-md-6 col-lg-4">
+            <div class="media">
+                <div class="img media-left">
+                    <i class="fas fa-sign-out-alt fa-3x"></i>
                 </div>
-            </div>
-            {% endif %}
-            <!--Logout-->
-            <div class="col-md-6 col-lg-4">
-                <div class="media">
-                    <div class="img media-left">
-                        <i class="fas fa-sign-out-alt fa-3x"></i>
-                    </div>
-                    <div class="content media-content">
-                        <h2><a href="{{ url_for('account.log_out')}}" class="stretched-link">Logout</a></h2>
-                        <p>Logout of your account.</p>
-                    </div>
+                <div class="content media-content">
+                    <h2><a href="{{ url_for('account.log_out')}}" class="stretched-link">Logout</a></h2>
+                    <p>Logout of your account.</p>
                 </div>
             </div>
         </div>

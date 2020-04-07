@@ -1,37 +1,81 @@
 {% extends "includes/_main_layout.html"%}
 
 {% block additional_css %}
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css">
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account.css') }}">
 {% block accounts_additional_css %}
 {% endblock %}
-
 {% endblock %}
 
 {% block main_content %}
 <div class="container-fluid">
+<!--  Sidebar/Nav   -->
 {% if not sidebar_off %}
   <div class="row no-gutters equal">
         <aside class="col-12 col-md-3 col-lg-2">
-            <nav class="navbar navbar-expand">
-                <div class="collapse navbar-collapse ">
-                    <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between col-12 p-0">
+            <nav class="navbar navbar-expand p-0">
+                <div class="collapse navbar-collapse">
+                    <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between col-12 p-0" id="sidebar">
                         <li id="list-title" class="col-12"><p>Account Settings</p></li>
-                        <li><a href="{{ url_for('account.view_account')}}" class="nav-link pl-0"><i class="fas fa-home fa-2x"></i><p>Home</p></a></li>
-                        <li><a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0"><i class="fas fa-calendar-alt fa-2x"></i><p>Bookings</p></a></li>
-                        <li><a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0"><i class="fas fa-file-invoice fa-2x"></i><p>Receipts</p></a></li>
-                        {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-                        <li><a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0"><i class="fas fa-id-card-alt fa-2x"></i><p>Membership</p></a></li>
-                        {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
-                        {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
-                        <li><a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-2x"></i><p>Statistics</p></a></li>
+                        <li>
+                            <a href="{{ url_for('account.view_account')}}" class="nav-link">
+                                <i class="fas fa-home fa-2x"></i>
+                                <p>Home</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('account.view_account_bookings')}}" class="nav-link {% if page_title == "Upcoming Bookings" %} selected_nav_link {% endif %}">
+                                <i class="fas fa-calendar-alt fa-2x"></i><p>Bookings</p>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('account.view_account_receipts')}}" class="nav-link {% if page_title == "Receipts" %} selected_nav_link {% endif %}">
+                                <i class="fas fa-file-invoice fa-2x"></i>
+                                <p>Receipts</p>
+                            </a>
+                        </li>
+                        {% if User.__mapper_args__['polymorphic_identity'] =="Customer" %}
+                        <li>
+                            <a href="{{ url_for('account.view_account_membership')}}" class="nav-link  {% if page_title == "Membership" %} selected_nav_link {% endif %}">
+                                <i class="fas fa-id-card-alt fa-2x"></i>
+                                <p>Membership</p>
+                            </a>
+                        </li>
+                        {% elif User.__mapper_args__['polymorphic_identity'] =="Manager" %}
+                        <li>
+                            <a href="{{ url_for('account.view_usages')}}" class="nav-link  {% if page_title == "Statistics" %} selected_nav_link {% endif %}">
+                                <i class="far fa-chart-bar fa-2x"></i>
+                                <p>Statistics</p>
+                            </a>
+                        </li>
                         {% endif %}
-                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-user fa-2x"></i><p>Account</p></a></li>
-                        {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-credit-card fa-2x"></i><p>Card Details</p></a></li>
-                        {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
-                        <li><a href="#" class="nav-link pl-0"><i class="fas fa-table fa-2x"></i><p>Rota</p></a></li>
+                        <li>
+                            <a href="{{ url_for('account.view_account_details')}}" class="nav-link {% if page_title == "Account Details" %} selected_nav_link {% endif %}">
+                                <i class="fas fa-user fa-2x"></i>
+                                <p>Account</p>
+                            </a>
+                        </li>
+                        {% if User.__mapper_args__['polymorphic_identity'] =="Customer" %}
+                        <li>
+                            <a href="{{ url_for('account.view_payment_details')}}" class="nav-link {% if page_title == "Card Details" %} selected_nav_link {% endif %}">
+                                <i class="fas fa-credit-card fa-2x"></i>
+                                <p>Card Details</p>
+                            </a>
+                        </li>
+                        {% elif User.__mapper_args__['polymorphic_identity'] =="Employee" or User.__mapper_args__['polymorphic_identity'] =="Manager" %}
+                        <li>
+                            <a href="#" class="nav-link {% if page_title == "Rota" %} selected_nav_link {% endif %}">
+                                <i class="fas fa-table fa-2x"></i>
+                                <p>Rota</p>
+                            </a>
+                        </li>
                         {% endif %}
-                        <li><a href="{{ url_for('account.log_out')}}" class="nav-link pl-0"><i class="fas fa-sign-out-alt fa-2x"></i><p>Log Out</p></a></li>
+                        <li>
+                            <a href="{{ url_for('account.log_out')}}" class="nav-link">
+                                <i class="fas fa-sign-out-alt fa-2x"></i>
+                                <p>Log Out</p>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </nav>
@@ -40,16 +84,16 @@
     <!-- Page Content -->
       <div class="col-md-9 col-lg-10">
         <div id="page-content-wrapper">
-            <div id="title-bar">
-                <h1>{{User.first_name.title()}}</h1>
+            <div id="title-bar" class="row no-gutters">
+                <h1 class="col-8 col-lg-9">{{User.first_name.title()}}</h1>
                 {% if membership_type %}
-                <span class="badge badge-secondary">{{membership_type.name.title()}} Membership</span>
+                <p class="customer col-4 col-lg-3">{{membership_type.name.title()}} Membership</p>
                 {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-                <span class="badge badge-secondary">Manager</span>
+                <p class="manager col-4 col-lg-3">Manager</p>
                 {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
-                <span class="badge badge-secondary">Employee</span>
+                <p class="employee col-4 col-lg-3">Employee</p>
                 {% else %}
-                <span class="badge badge-secondary">Non-Member</span>
+                <p class="secondary col-4 col-lg-3">Non-Member</p>
                 {% endif %}
             </div>
             <div id="page-content">
@@ -60,4 +104,18 @@
     </div>
   </div>
 </div>
+{% endblock %}
+{% block additional_js %}
+<script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js"></script>
+<script>
+     $(document).ready(function(){
+         document.getElementById("page_title").style.marginRight = "- 15px";
+         document.getElementById("page_title_container").classList.remove("container");
+         document.getElementById("page_title_container").classList.add("row", "no-gutters");
+         document.getElementById("page_title_h1").classList.add("offset-1", "offset-md-3", "offset-lg-2");
+     });
+</script>
+{% block account_additional_js %}
+{% endblock %}
 {% endblock %}

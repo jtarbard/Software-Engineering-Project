@@ -8,9 +8,10 @@ import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.activity_db_transaction as adf
 import main.view_lib.cookie_lib as cl
 from main.data.db_classes.activity_db_class import ActivityType
-from main.data.db_classes.transaction_db_class import MembershipType, Membership
 from main.data.db_classes.user_db_class import Customer, Manager, Employee
+from main.data.transactions.transaction_db_transaction import add_new_card_details
 from main.view_lib import account_lib
+import main.data.db_session as ds
 
 blueprint = flask.Blueprint("account", __name__)
 
@@ -27,7 +28,7 @@ def login_get():
         response.set_cookie("vertex_basket_cookie", "", expires=0)
         return response
 
-    return flask.render_template("/account/login_register.html", page_type="login", has_cookie=has_cookie)
+    return flask.render_template("/account/login_register.html", User=user, page_type="login", has_cookie=has_cookie)
 
 
 # Route for executing when the customer submits login data from the login page
@@ -79,14 +80,13 @@ def register_get():
         response.set_cookie("vertex_basket_cookie", "", expires=0)
         return response
 
-    return flask.render_template("/account/login_register.html", page_type="register", has_cookie=has_cookie)
+    return flask.render_template("/account/login_register.html", User=user, page_type="register", has_cookie=has_cookie)
 
 
 # Route for executing when the customer submits register data from the register page
 @blueprint.route("/account/register", methods=["POST"])
 def register_post():
 
-    server_error = None
     # All of the values the user entered at the register page
     data_form = flask.request
     title = data_form.form.get("title")
@@ -102,54 +102,18 @@ def register_post():
     country = data_form.form.get('country')
     current_date = datetime.date.today()
 
-    # For all of the main string values that the user enters, the fields are checked to make sure they are
-    # Valid, this is done using the check_if_input_error() function in the user transactions
-    fields_to_check = [password_first, first_name, last_name, tel_number, postcode, address]
-    for field in fields_to_check:
-
-        special_character_regex = re.compile('[@_!#$%^&*()<>?/\|}{~:]')
-        if special_character_regex.search(field) or len(field) < 3 or len(field) > 40:
-            server_error = "Input error: " + field + " is not a valid input"
-            break
-
-    if len(title) > 5: # Checks the title is greater than 5
-        server_error = "Input Error: Title is not valid"
-    elif len(password_first) < 8 or len(password_first) > 15: # Checks password size
-        server_error = "Input error: password is not of correct size (8-15)"
-    elif len(address) < 10 or len(address) > 40:
-        server_error = "Input error: address is not of correct size (10-40)" # Checks address is valid
-    elif len(first_name) < 3 or len(first_name) > 15 or len(last_name) < 3 or len(last_name) > 15: # Checks first and last name sizes
-        server_error = "Input error: first name or last name of incorrect length"
-    elif len(tel_number) > 11 or len(tel_number) < 7: # Checks telephone number length
-        server_error = "Input error: telephone of incorrect length"
-    elif len(country) > 5 or len(country) < 2: # Checks country code length
-        server_error = "Input error: country of incorrect length"
-
     date_values = dob.split("-")
     formatted_dob = datetime.date(int(date_values[0]), int(date_values[1]), int(date_values[2]))
-    if not re.fullmatch(r"[^@]+@[^@]+\.[^@]+", email):  # Validates email format
-        server_error = "Input Error: Email not in valid format"
-    elif not re.fullmatch( # Validates postcode based on the regex provided by the Government
-            r"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})",
-            postcode):
-        server_error = "Input Error: Post code not in valid format"
-    elif not first_name.isalpha() or not last_name.isalpha():  # First name / last name can only be alphabets
-        server_error = "Input Error: First name or last name can only contain english alphabets"
-    elif not tel_number.isnumeric():  # Telephone can only contain numbers
-        server_error = "Input Error: telephone not in valid format"
-    elif udf.check_if_email_exists(email):  # Checks if email exists in database
-        server_error = "Input Error: Email already exists"
-    elif password_first != password_second:  # Checks that both passwords match
-        server_error = "Input Error: Passwords do not match"
-    elif " " in password_first: # Makes sure password doesn't contain spaces
-        server_error = "Input Error: Password cannot contain spaces"
-    elif not any(num in password_first for num in ["0","1","2","3","4","5","6","7","8","9"]): # Checks password has a number
-        server_error = "Input Error: Password must contain a number"
-    elif formatted_dob > current_date - datetime.timedelta(days=365 * 16 + 4):  # Checks that user is over 16 (takes account into leap years)
-        server_error = "Input Error: Incorrect date of birth entered (must be over 16)"
 
-    if server_error:  # If there was an error then the normal register page is loaded with all the values that the user
-                      # entered inserted into the fields
+    success, server_error = account_lib.validate_user_details(title=title, password_first=password_first,
+                                                              password_second=password_second, first_name=first_name,
+                                                              last_name=last_name, email=email, tel_number=tel_number,
+                                                              dob=dob, postcode=postcode, address=address,
+                                                              country=country, current_date=current_date,
+                                                              check_email=True)
+
+    if not success:  # If there was an error then the normal register page is loaded with all the values that the user
+                     # entered inserted into the fields
 
         return flask.render_template("/account/login_register.html", page_type="register",
                                      ServerError=server_error, email=email, date_of_birth=str(dob), first_name=first_name,
@@ -197,10 +161,12 @@ def view_account_receipts(returned_receipts=None):
     else:
         return flask.abort(500)
 
+    returned_receipts.reverse()  # reverse so that items appear in chronological order
+
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user, has_cookie=has_cookie,
-                                 returned_bookings=returned_receipts, membership_type=membership_type, page_title="Your Receipts")
+                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Receipts")
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
@@ -211,15 +177,14 @@ def view_account_bookings():
 
     returned_bookings = {}
     if user.__mapper_args__['polymorphic_identity'] == "Customer":
-        if user.__mapper_args__['polymorphic_identity'] == "Customer":
-            customer: Customer = udf.return_customer_with_user_id(user.user_id)
-            for receipt in customer.purchases:
-                for booking in receipt.bookings:
-                    if booking.activity.start_time > datetime.datetime.now() or booking.deleted == False:
-                        if booking.activity not in returned_bookings:
-                            returned_bookings[booking.activity] = [receipt, 1]
-                        else:
-                            returned_bookings[booking.activity][1] += 1
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        for receipt in customer.purchases:
+            for booking in receipt.bookings:
+                if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
+                    if booking.activity not in returned_bookings:
+                        returned_bookings[booking.activity] = [receipt, 1, booking.activity.start_time]
+                    else:
+                        returned_bookings[booking.activity][1] += 1
     elif user.__mapper_args__['polymorphic_identity'] == "Employee":
         returned_bookings = {}
     elif user.__mapper_args__['polymorphic_identity'] == "Manager":
@@ -232,7 +197,7 @@ def view_account_bookings():
 
     return flask.render_template("/account/bookings.html", User=user,
                                  returned_bookings=returned_bookings, membership_type=membership_type,
-                                 page_title="Your Upcoming Bookings", has_cookie=has_cookie)
+                                 page_title="Upcoming Bookings", has_cookie=has_cookie)
 
 
 @blueprint.route("/account/membership", methods=["GET"])
@@ -241,11 +206,95 @@ def view_account_membership():
     if response:
         return response
 
-    returned_bookings = {}
-    membership_type = account_lib.get_membership_type(user)
+    membership = None
+    membership_type = None
+    if user.__mapper_args__['polymorphic_identity'] == "Customer":
+        customer: Customer = udf.return_customer_with_user_id(user.user_id)
+        membership = customer.current_membership
+        membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/membership.html", User=user,
-                                 membership_type=membership_type, page_title="Membership", has_cookie=has_cookie)
+                                 membership_type=membership_type, membership=membership, page_title="Membership", has_cookie=has_cookie)
+
+
+# TODO: Refactor so that it handles other roles of users
+@blueprint.route("/account/details", methods=["GET", "POST"])
+def view_account_details():
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+    membership_type = account_lib.get_membership_type(user)
+
+    if flask.request.method == "POST":
+        data_form = flask.request.form
+
+        # All of the values the user entered at the register page
+        details = {
+            "title": data_form.get("title"),
+            "first_name": data_form.get("first_name"),
+            "last_name": data_form.get("last_name"),
+            "title": data_form.get("title"),
+            "email": data_form.get("email"),
+            "dob": datetime.datetime.strptime(data_form.get("dob"), "%Y-%m-%d"),
+            "tel_number": data_form.get("tel_number"),
+            "country": data_form.get("country"),
+            "postal_code": data_form.get("postal_code"),
+            "address": data_form.get("address")
+        }
+
+        success, server_error = account_lib.validate_user_details(**details)
+
+        if server_error is not None:
+            flask.flash(server_error, "error")
+        else:
+            udf.update_user_account(user.user_id, details)
+
+    return flask.render_template("/account/account_details.html", User=user, customer=customer,
+                                 membership_type=membership_type, page_title="Account Details", has_cookie=has_cookie)
+
+
+# TODO: Refactor to handle users with different roles
+@blueprint.route("/account/card", methods=["POST", "GET"])
+def view_payment_details():
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+    if response:
+        return response
+
+    customer: Customer = udf.return_customer_with_user_id(user.user_id)
+    membership_type = account_lib.get_membership_type(user)
+
+    if customer.payment_detail:
+        payment_details = vars(customer.payment_detail)
+    else:
+        payment_details = None
+
+    print(payment_details)
+
+    if flask.request.method == "POST":
+        data_form = flask.request.form
+
+        if payment_details is not None:
+            ds.delete_from_database(customer.payment_detail)
+
+        if data_form.get("delete") == "True":
+            print("VALUE IS TRUE")
+            ds.delete_from_database(customer.payment_detail)
+        else:
+            add_new_card_details(customer, card_number=data_form.get('card_number'),
+                                     start_date=data_form.get('start_date'),
+                                     expiration_date=data_form.get('expiration_date'),
+                                     street_and_number=data_form.get('street_and_number'),
+                                     town=data_form.get('town'), city=data_form.get('city'),
+                                     postcode=data_form.get('postcode'))
+
+        if customer.payment_detail:
+            payment_details = vars(customer.payment_detail)
+        else:
+            payment_details = None
+
+    return flask.render_template("/account/card_details.html", User=user, payment_details=payment_details, membership_type=membership_type, page_title="Card Details", has_cookie=has_cookie)
 
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])

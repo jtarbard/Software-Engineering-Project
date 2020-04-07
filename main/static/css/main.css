@@ -8,26 +8,44 @@ body {
 }
 
 .customer {
+    color: #F2F2F2;
     background-color: #5BBDC8;
 }
 
 .employee {
+    color: #F2F2F2;
     background-color: #77b953;
 }
 
 .manager {
+    color: #F2F2F2;
     background-color: #E1234B;
 }
 
-#page-title {
+.dropdown-menu {
+    color: #F2F2F2;
+    background-color: #1E1E1E;
+}
+
+.dropdown-menu a i {
+    padding-left: 1vw;
+}
+
+.dropdown-menu a p {
+    display: inline;
+    padding-left: 1vw;
+}
+
+#page_title {
     height: 15vh;
     padding-top: 0.5vh;
     color: white;
 }
 
-#page-title h1 {
+#page_title h1 {
     padding-bottom: 0;
     margin-bottom: 0;
+    line-height: 15vh;
 }
 
 #page-description {
@@ -38,17 +56,10 @@ body {
   color: white;
 }
 
+
 .bg-black {
     background-color: #1E1E1E;
     color: #F2F2F2;
-}
-
-#page-title h1 {
-  line-height: 15vh;
-}
-
-#page-title {
-    margin-bottom: 5vh;
 }
 
 .navbar-brand {
