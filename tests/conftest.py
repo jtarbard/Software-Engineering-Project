@@ -2,6 +2,7 @@ import pytest
 import os
 import datetime
 import re
+from pprint import pprint
 
 from bs4 import BeautifulSoup
 
@@ -93,10 +94,12 @@ def template_checker():
 
         soup = BeautifulSoup(response.data, 'html.parser')
 
+        template, context = templates[0]
+        print("Context obtained:")
+        pprint(context)
         assert response.status_code == exp_status_code, "Invalid status code"
         assert request.path == exp_url, "Mismatching url (usually this indicates wrong redirection)"
         assert len(templates) == 1, "Returned not enough / too many templates. Expected 1 (This should never happen in theory)"
-        template, context = templates[0]
         assert exp_title in soup.title.string or exp_title in context.get("page_title", ""), "Expected title not found"
         assert template.name == exp_template_path, "Rendered wrong template"
         # pythonic :)
@@ -111,3 +114,34 @@ def template_checker():
         return context
 
     return _template_checker
+
+
+@pytest.fixture(scope="function")
+def basket_template_checker(template_checker):
+
+    def _basket_template_checker(**kwargs):
+        exp_activities: dict = kwargs.get("exp_activities", dict())
+        exp_membership = kwargs.get("exp_membership", None)
+        exp_basket_membership_duration = kwargs.get("exp_basket_membership_duration", None)
+        exp_membership_discount = kwargs.get("exp_membership_discount", 0)
+        exp_total_activity_price = kwargs.get("exp_total_activity_price", 0)
+        exp_total_discounted_price = kwargs.get("exp_total_discounted_price", 0)
+        exp_final_price = kwargs.get("exp_final_price", 0)
+
+        context = template_checker(**kwargs)
+
+        assert all( actual_activity in list(exp_activities.keys()) for actual_activity in context.get("basket_activities", []) ), "Found unexpected activitiies in rendered page"
+        assert context.get("basket_membership", None) == exp_membership, "Mismatching basket_membership"
+        assert context.get("basket_membership_duration", None) == exp_basket_membership_duration, "Mismatching basket_membership_duration"
+        assert context.get("current_membership_discount", 0) == exp_membership_discount, "Mismatching current_membership_discount"
+        assert context.get("total_activity_price", 0) == exp_total_activity_price, "Mismatching total_activity_price"
+        assert context.get("total_discounted_price", 0) == exp_total_discounted_price, "Mismatching total_discounted_price"
+        for ctx_activity_obj, (session_price, num_bookings, bulk_discount) in context.get("activity_and_price", dict()).items():
+            assert ctx_activity_obj in exp_activities, "Rendered with an unexpected activity in activity_and_price"
+            exp_session_price, exp_num_bookings, exp_bulk_discount = exp_activities.get(ctx_activity_obj, (None, None, None))
+            assert session_price == exp_session_price, "Mismatching session_price for activity " + str(ctx_activity_obj)
+            assert num_bookings == exp_num_bookings, "Mismatching num_bookings for activity " + str(ctx_activity_obj)
+            assert bulk_discount == exp_bulk_discount, "Mismatching bulk_discount for activity " + str(ctx_activity_obj)
+        assert context.get("final_price", 0) == exp_final_price, "Mismatching final_price"
+
+    return _basket_template_checker
