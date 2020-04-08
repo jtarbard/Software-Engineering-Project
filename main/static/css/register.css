@@ -1,0 +1,43 @@
+body {
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+}
+
+#register-container {
+    background-color: rgba(256, 256, 256, 0.93);
+    margin-top: 8vh;
+    border-radius: 20px;
+    padding: 2.5vw 2.5vw 2.5vw 2.5vw;
+}
+
+#register-container h5[id="title"]{
+    margin-top: 10px;
+}
+
+#register-container select {
+    margin-bottom: 30px;
+    margin-top: 5px;
+}
+
+#register-container input[type="text"],input[type="password"],input[type="email"],input[type="tel"],input[type="date"] {
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px solid #5BBDC8;
+    outline: none;
+    width: 175px;
+    margin-bottom: 30px;
+}
+
+#register-container input[name="address"] {
+    width: 58vw;
+}
+
+#register-container input[type="submit"] {
+    border: none;
+    border-radius: 20px;
+    background: #5BBDC8;
+    margin-bottom: 10px;
+    font-size: 18px;
+    color: white;
+}
