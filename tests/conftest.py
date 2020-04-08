@@ -108,7 +108,7 @@ def template_checker():
                   else context.get(exp_key, "") == exp_val
                   for (exp_key, exp_val) in exp_template_context.items()
                 ]), "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + "\nActual:\n" + str(context)
-        assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist"
+        assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist: " + str(request.cookies)
         assert all([ (out_cookie not in request.cookies) for out_cookie in exp_non_exist_cookies ]), "Expected non-existent cookies exist"
 
         return context
