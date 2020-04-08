@@ -12,7 +12,7 @@ blueprint = flask.Blueprint("basket", __name__)
 
 
 @blueprint.route("/misc/add_booking_to_basket", methods=["POST"])
-def view_classes_post():
+def add_booking_to_basket_post():
     user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response

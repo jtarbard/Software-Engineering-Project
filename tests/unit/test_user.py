@@ -7,7 +7,7 @@ def test_new_customer_legal():
     WHEN a new Customer is created
     THEN check all fields are defined correctly
     """
-    from tests.helper.database_creation import customer_objs, employee_objs, manager_objs
+    from main.helper_functions.test_helpers.database_creation import customer_objs, employee_objs, manager_objs
 
     objs = [customer_objs[0], employee_objs[0], manager_objs[0]]
 

@@ -1,4 +1,3 @@
-import datetime
 import pytest
 
 
@@ -9,7 +8,7 @@ def pytest_generate_tests(metafunc):
 
 @pytest.fixture
 def basket_cookie_data(request):
-    from tests.helper.database_creation import activity_objs, membership_type_objs
+    from main.helper_functions.test_helpers.database_creation import activity_objs, membership_type_objs
 
     data = [("", (False, None, None, None)),              # Empty basket - Invalid (if it were valid, empty receipts could be created)
             ("A:1", (True, [activity_objs[0]], None, None)),    # 1 Valid Activity

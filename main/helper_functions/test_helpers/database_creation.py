@@ -146,29 +146,6 @@ def create_customer_with_membership():
     return [smembership_obj, pmembership_obj], [sreceipt_obj, preceipt_obj]
 
 
-@pytest.yield_fixture(scope="function")
-def populate_database():
-    def _add(tables_to_populate: list):
-        table_dict = {"facility": facility_objs,
-                      "membership_type": membership_type_objs,
-                      "activity_type": activity_type_objs,
-                      "activity": activity_objs,
-                      "customer": customer_objs,
-                      # TODO: Bundle the following 3 into 1. Add customer first, then receipt, then membership
-                      "customer_with_membership": customer_with_membership_objs,
-                      "membership": membership_objs,
-                      "membership_receipt": receipt_for_membership_objs,
-                      "employee": employee_objs,
-                      "manager": manager_objs
-                      }
-
-        for table in [table for table in tables_to_populate if (table in table_dict.keys())]:
-            for obj in table_dict[table]:
-                database.session.add(obj)
-
-    return _add
-
-
 def create_all():
     global facility_objs, membership_type_objs, activity_type_objs, activity_objs
     global customer_objs, customer_with_membership_objs, membership_objs, receipt_for_membership_objs

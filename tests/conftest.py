@@ -10,6 +10,9 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 from main.app import register_blueprints, create_logging
 from main.data.db_session import test_init, database
+from main.helper_functions.test_helpers.database_creation import membership_type_objs, \
+    receipt_for_membership_objs, customer_with_membership_objs, membership_objs, \
+    activity_type_objs, activity_objs, facility_objs, customer_objs, employee_objs, manager_objs
 
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
@@ -20,7 +23,7 @@ from main.data.db_classes.user_db_class import Customer, Employee, Manager
 # TODO: Investigate what a hook is... https://pytest.org/en/latest/reference.html#hook-reference
 def pytest_runtest_setup(item):
     """ called before ``pytest_runtest_call(item). """
-    import tests.helper.database_creation as creation
+    import main.helper_functions.test_helpers.database_creation as creation
     creation.create_all()
 
 
@@ -75,6 +78,29 @@ def app():
 def test_client(app):
     with app.test_client(use_cookies=True) as tc:  # THIS WAS THE PROBLEM ALL ALONG OH MY GOD
         yield tc
+
+
+@pytest.yield_fixture(scope="function")
+def populate_database():
+    def _add(tables_to_populate: list):
+        table_dict = {"facility": facility_objs,
+                      "membership_type": membership_type_objs,
+                      "activity_type": activity_type_objs,
+                      "activity": activity_objs,
+                      "customer": customer_objs,
+                      # TODO: Bundle the following 3 into 1. Add customer first, then receipt, then membership
+                      "customer_with_membership": customer_with_membership_objs,
+                      "membership": membership_objs,
+                      "membership_receipt": receipt_for_membership_objs,
+                      "employee": employee_objs,
+                      "manager": manager_objs
+                      }
+
+        for table in [table for table in tables_to_populate if (table in table_dict.keys())]:
+            for obj in table_dict[table]:
+                database.session.add(obj)
+
+    return _add
 
 
 @pytest.fixture(scope="function")

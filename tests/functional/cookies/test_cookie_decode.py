@@ -3,8 +3,6 @@ import flask
 
 from main.data.transactions.transaction_db_transaction import return_activities_and_memberships_from_basket_cookie_if_exists
 
-from tests.helper.database_creation import populate_database
-
 
 def test_return_activities_and_memberships_from_basket_cookie_if_exists(test_client, populate_database, basket_cookie_data):
     """

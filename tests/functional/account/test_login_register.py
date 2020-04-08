@@ -5,9 +5,8 @@ import copy
 import flask
 from bs4 import BeautifulSoup
 
-from tests.helper.flask_signal_capturer import captured_templates
-from tests.helper.database_creation import populate_database
-from tests.helper.mocked_functions import return_logged_in_user_response, return_not_logged_in_user_response
+from main.helper_functions.test_helpers.flask_signal_capturer import captured_templates
+from main.helper_functions.test_helpers.mocked_functions import return_logged_in_user_response, return_not_logged_in_user_response
 
 
 def test_register_get_basic(app, test_client, mocker, template_checker):

@@ -31,19 +31,19 @@ Your Basket
                             <td>Sub-Price</td>
                             <td>Update</td>
                         </tr>
-                        {% for activity, tuple in activity_and_price.items() %}
+                        {% for activity, (session_price, num_bookings, bulk_discount) in activity_and_price.items() %}
                             <tr>
                                 <td>{{ activity.activity_type.name.capitalize() }}</td>
                                 <td>{{ activity.start_time }}</td>
                                 <td>{{ activity.end_time }}</td>
                                 <td>{{ activity.facility.name.capitalize() }}</td>
-                                <td>{{ tuple[1] }}</td>
-                                <td>£{{ tuple[0] }}</td>
-                                <td>{{ tuple[2] * 100 }}%</td>
-                                <td>£{{ (tuple[1] * tuple[0])- (tuple[1] * tuple[0]* tuple[2]) }}</td>
+                                <td>{{ num_bookings }}</td>
+                                <td>£{{ session_price }}</td>
+                                <td>{{ bulk_discount * 100 }}%</td>
+                                <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * bulk_discount) }}</td>
                                 <td>    
                                     <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
-                                        <input type="number" name="num_change" max="8" min="0" value="{{tuple[1]}}">
+                                        <input type="number" name="num_change" max="8" min="0" value="{{num_bookings}}">
                                         <input type="submit" name="update" value="Update">
                                         <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
                                     </form>

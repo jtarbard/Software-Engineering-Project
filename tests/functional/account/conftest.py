@@ -1,4 +1,3 @@
-import datetime
 import pytest
 
 
@@ -87,7 +86,7 @@ def basket_view_data(request):
     TESTING FOR <Rule '/account/basket' (OPTIONS, HEAD, GET) -> basket.basket_view>
     """
 
-    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
+    from main.helper_functions.test_helpers.database_creation import activity_objs, activity_type_objs, membership_type_objs
     from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
         return_customer_premium_with_no_response, \
         return_customer_standard_with_no_response, \
@@ -642,11 +641,10 @@ def basket_delete_activity_data(request):
     TESTING FOR <Rule '/account/basket' (OPTIONS, POST) -> basket.basket_delete_activity>
     """
 
-    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
-    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
+    from main.helper_functions.test_helpers.database_creation import activity_objs, activity_type_objs, membership_type_objs
+    from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
         return_customer_premium_with_no_response, \
-        return_customer_standard_with_no_response, \
-        return_not_logged_in_user_response
+        return_customer_standard_with_no_response
 
     # -----------------------------------------| ============= |----------------------------------------- #
     # -----------------------------------------|  Basic Tests  |----------------------------------------- #
