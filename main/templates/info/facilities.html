@@ -9,9 +9,9 @@ The Vertex - Facilities!
 
 {% block main_content %}
 <div class="container">
-    <div class="card-deck">
+    <div class="row row-cols-1 row-cols-md-2">
         {% for facility in facilities %}
-        <div class="col-sm-12 col-md-6" id="{{facility.facility_id}}">
+        <div class="col-12 col-md-6" id="{{facility.facility_id}}">
             <div class="card">
               <img src="/static/imgs/facility-img/facility{{ facility.facility_id }}.jpg" class="card-img-top" alt="{{ facility.facility_id }}">
               <div class="card-body">
