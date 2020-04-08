@@ -10,9 +10,6 @@ import flask
 from flask_sqlalchemy import SQLAlchemy
 from main.app import register_blueprints, create_logging
 from main.data.db_session import test_init, database
-from main.helper_functions.test_helpers.database_creation import membership_type_objs, \
-    receipt_for_membership_objs, customer_with_membership_objs, membership_objs, \
-    activity_type_objs, activity_objs, facility_objs, customer_objs, employee_objs, manager_objs
 
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
@@ -80,8 +77,12 @@ def test_client(app):
         yield tc
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def populate_database():
+    from main.helper_functions.test_helpers.database_creation import membership_type_objs, \
+        receipt_for_membership_objs, customer_with_membership_objs, membership_objs, \
+        activity_type_objs, activity_objs, facility_objs, customer_objs, employee_objs, manager_objs
+
     def _add(tables_to_populate: list):
         table_dict = {"facility": facility_objs,
                       "membership_type": membership_type_objs,

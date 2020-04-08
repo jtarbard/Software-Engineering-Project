@@ -64,6 +64,7 @@ def test_basket_view(app, test_client, mocker, basket_template_checker, populate
 
     test_client.delete_cookie("localhost", "vertex_basket_cookie")
     test_client.delete_cookie("localhost", "vertex_account_cookie")
+    test_client.get("/")
 
     # --------------------------------- END OF THIS TEST: test_basket_view --------------------------------- #
 
@@ -313,6 +314,4 @@ def test_basket_delete_activity_chain(app, test_client, mocker, basket_template_
 
 
 def test_view_classes_post(app, test_client, mocker, basket_template_checker, populate_database):
-    import sys
-    print(sys.path)
     assert False

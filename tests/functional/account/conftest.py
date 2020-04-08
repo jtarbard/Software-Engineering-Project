@@ -2,7 +2,7 @@ import pytest
 
 
 def pytest_generate_tests(metafunc):
-    if "basket_view_basic_data" in metafunc.fixturenames:
+    if "basket_view_data" in metafunc.fixturenames:
         metafunc.parametrize("basket_view_data", range(23), indirect=True,
                              ids=["[BASIC] no_basket_cookie",
                                   "[BASIC] A:1",
@@ -27,7 +27,7 @@ def pytest_generate_tests(metafunc):
                                   "[EXTRA] Floating point arithmetic test 1",
                                   "[EXTRA] Floating point arithmetic test 2",
                                   "[EXTRA] Floating point arithmetic test 3"])
-    if "basket_delete_activity_basic_data" in metafunc.fixturenames:
+    if "basket_delete_activity_data" in metafunc.fixturenames:
         metafunc.parametrize("basket_delete_activity_data", range(22), indirect=True,
                              ids=["[BASIC] basic increase",
                                   "[BASIC] basic decrease",
@@ -87,7 +87,7 @@ def basket_view_data(request):
     """
 
     from main.helper_functions.test_helpers.database_creation import activity_objs, activity_type_objs, membership_type_objs
-    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
+    from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
         return_customer_premium_with_no_response, \
         return_customer_standard_with_no_response, \
         return_not_logged_in_user_response
