@@ -44,7 +44,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # ------------------------------------------------------- #
 
     """
-    Login_Get_Basic_Test_2
+    Register_Get_Basic_Test_2
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
     UNDER CONDITIONS 1. User not logged in
@@ -85,7 +85,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # ------------------------------------------------------- #
 
     """
-    Login_Get_Basic_Test_3
+    Register_Get_Basic_Test_3
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
     UNDER CONDITIONS 1. User logged in
@@ -109,7 +109,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # ------------------------------------------------------- #
 
     """
-    Login_Get_Basic_Test_4
+    Register_Get_Basic_Test_4
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
     UNDER CONDITIONS 1. User logged in
