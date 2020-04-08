@@ -64,7 +64,7 @@ def create_activity_types():
 
 def create_activities():
     facility_ids = [1]
-    activity_type_ids = [1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 4, 4, 5, 5, 5]
+    activity_type_ids = [1, 2, 3, 1, 2, 3, 1, 2, 3, 4, 4, 4, 5, 5, 5, 1]
     start_times = [datetime.datetime.today()+datetime.timedelta(days=1)]
     end_times = [start_times[0]+datetime.timedelta(hours=1),
                  start_times[0]+datetime.timedelta(hours=2),
@@ -80,7 +80,8 @@ def create_activities():
                  start_times[0]+datetime.timedelta(hours=48+1),
                  start_times[0]+datetime.timedelta(hours=1),
                  start_times[0]+datetime.timedelta(hours=24+1),
-                 start_times[0]+datetime.timedelta(hours=48+1)]
+                 start_times[0]+datetime.timedelta(hours=48+1),
+                 start_times[0]+datetime.timedelta(hours=72+1),]
 
     return [ Activity(facility_id=facility_ids[0], activity_type_id=activity_type_ids[i],
                       start_time=start_times[0], end_time=end_times[i])
