@@ -69,12 +69,6 @@ body {
   line-height: 5vh;
 }
 
-.card {
-    border-color: #F2F2F2;
-    background-color: #1E1E1E;
-    color: #F2F2F2;
-}
-
 .alert {
     position: fixed;
     bottom: 0;

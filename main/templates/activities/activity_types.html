@@ -20,31 +20,31 @@ The Vertex classes!
             </a>
         </div>
     </div>
-    <div class="row no-gutters">
-            {% for activity in activity_types %}
-        <div class="col-md-2 c-img">
-            <img src="/static/imgs/activities-img/{{ activity.name }}.png" class="card-img" alt="Illustration of {{ activity.name }}">
-        </div>
-        <div class="col-md-4 c-body">
-            <div class="card-body">
-                <h2 class="card-title">{{ activity.name.title() }}</h2>
-                <p class="card-text">
-                    {{ activity.definition }}
-                    <br>
-                    Capacity: {{ activity.maximum_activity_capacity }}
-                </p>
-                <div class="tags">
-                    <p>Tags:</p>
-                    {% for tag in activity_types.tags %}
-                    <span class="badge badge-secondary">{{ tag }}</span>
-                    {% endfor %}
-                </div>
-                <div class="buttons">
-                    <form method="post">
-                    <input type="hidden" name="activity" value="{{ activity.activity_type_id }}">
-                    <button class="btn btn-dark" type="submit" name="amount" value="single">Book</button>
-                    <button class="btn btn-dark" type="submit" name="amount" value="multiple">Bulk Book</button>
-                    </form>
+    <div class="row row-cols-1 row-cols-md-2">
+        {% for activity in activity_types %}
+        <div class="col-12 col-md-6">
+            <div class="card">
+                <div class="media">
+                    <img src="/static/imgs/activities-img/{{ activity.name }}.png" class="align-self-center" alt="Illustration of {{ activity.name }}">
+                    <div class="media-body">
+                        <h2 class="">{{ activity.name.title() }}</h2>
+                        <p class="">
+                            {{ activity.definition }}
+                        </p>
+                        <div class="tags">
+                            <p>Tags:</p>
+                            {% for tag in activity_types.tags %}
+                            <span class="badge badge-secondary">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="buttons">
+                            <form method="post">
+                                <input type="hidden" name="activity" value="{{ activity.activity_type_id }}">
+                                <button class="btn btn-dark" type="submit" name="amount" value="single">Book</button>
+                                <button class="btn btn-dark" type="submit" name="amount" value="multiple">Bulk Book</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
