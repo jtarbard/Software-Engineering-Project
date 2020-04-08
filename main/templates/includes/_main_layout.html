@@ -38,30 +38,32 @@ as the basic body -->
 {% endif %}
 
 {% if not nav %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
-<nav class="navbar navbar-expand-sm navbar-dark bg-black main-nav" id="main-nav">
+<nav class="navbar navbar-expand-lg navbar-dark bg-black main-nav" id="main-nav">
 <!--    <div class="container justify-content-center">-->
-    <a class="d-xs-block d-md-none navbar-brand" base href="/">The Vertex</a>
+    <div class="d-block d-lg-none mx-auto" id="brand-mobile">
+        <a class="navbar-brand" base href="/">The Vertex</a>
+    </div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="nav navbar-nav flex-fill w-100 flex-nowrap">
+        <ul class="nav navbar-nav flex-fill w-100 flex-nowrap" id="nav-content-left">
             <li class="nav-item">
-               <a class="nav-link float-right" base href="{{ url_for('activities.view_activity_types')}}">Activities</a>
+               <a class="nav-link" base href="{{ url_for('activities.view_activity_types')}}">Activities</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link float-right" base href="{{ url_for('info.facilities_view')}}">Facilities</a>
+                <a class="nav-link" base href="{{ url_for('info.facilities_view')}}">Facilities</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link float-right" base href="{{ url_for('info.membership_view')}}">Membership</a>
+                <a class="nav-link" base href="{{ url_for('info.membership_view')}}">Membership</a>
             </li>
         </ul>
-        <ul class="nav navbar-nav flex-fill justify-content-center d-none d-md-block">
+        <ul class="nav navbar-nav flex-fill justify-content-center d-none d-lg-block">
             <li class="nav-item">
                 <a class="navbar-brand mx-auto" base href="/">The Vertex</a>
             </li>
         </ul>
-        <ul class="nav navbar-nav flex-fill w-100 justify-content-end" id="right-aligned-nav-content">
+        <ul class="nav navbar-nav flex-fill w-100 justify-content-end" id="nav-content-right">
             <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.about_func')}}">About</a></li>
             {% if not User %}
             <!--            <li class="nav-item"><a class="nav-link" base href="/account/log_out">Logout</a></li>-->
@@ -70,7 +72,8 @@ as the basic body -->
             <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base
                                                  href="{{ url_for('account.login_get')}}">Login</a></li>
             {% else %}
-            <li class="nav-item dropdown">
+            <li class="nav-item d-block d-lg-none"><a class="nav-link" href="{{ url_for('account.view_account')}}">Account</a></li>
+            <li class="nav-item dropdown d-none d-lg-block">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a href="{{ url_for('account.view_account')}}" class="nav-link pl-0">
@@ -101,8 +104,8 @@ as the basic body -->
                         <p>Log Out</p></a>
                 </div>
             </li>
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base
-                                                 href="{{ url_for('basket.basket_view')}}">Basket</a></li>
+            <li class="nav-item navbar-right">
+                <a class="nav-link glyphicon glyphicon-shopping-cart" base href="{{ url_for('basket.basket_view')}}">Basket</a></li>
             {% endif %}
         </ul>
     </div>
