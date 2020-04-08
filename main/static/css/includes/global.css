@@ -22,9 +22,29 @@ h2, h3, h4, h5, h6, .navbar {
     text-transform: uppercase;
 }
 
-.navbar {
-    float: none;
+.card {
+    border-radius: 0;
 }
+
+/*#main .navbar {*/
+/*    float: none;*/
+/*}*/
+
+/*#nav-items-left, #nav-items-right {*/
+/*    width: 40vw;*/
+/*    margin-left: 0;*/
+/*    margin-right: 0;*/
+/*}*/
+
+/*#nav-items-left .nav-link {*/
+/*    text-align: center;*/
+/*    padding-left: 2vw;*/
+/*}*/
+
+/*#nav-items-right .nav-link {*/
+/*    text-align: center;*/
+/*    padding-right: 2vw;*/
+/*}*/
 
 .card {
     border: solid 2px black;

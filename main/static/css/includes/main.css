@@ -59,9 +59,13 @@ html {
 
 /*Sets navbar height to a total of 10vh*/
 .navbar-brand {
-  height: 7.5vh;
+  height: 8vh;
   padding: 1vh 0 1vh;
-  line-height: 5vh;
+  line-height: 6vh;
+}
+
+#main-nav .dropdown-menu {
+    width: 12vw;
 }
 
 .alert {

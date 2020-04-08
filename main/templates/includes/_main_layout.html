@@ -9,9 +9,10 @@ as the basic body -->
     <meta name="author" content="Team 10">
     <meta name="keywords" content="Leisure centre, Gym, Swimming, Activities, Membership, Fitness">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{%  block title %} {% endblock %}</title> <!-- Lets each page have its own title-->
+    <title>{% block title %} {% endblock %}</title> <!-- Lets each page have its own title-->
     <!--  Import font  -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900|Open+Sans:300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900|Open+Sans:300,400,500&display=swap"
+          rel="stylesheet">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/includes/reset.css') }}">
     <link rel="stylesheet"
@@ -26,109 +27,138 @@ as the basic body -->
 <body>
 
 {% if has_cookie == False %}
-    <div id="cookies"> <!-- Defines the div for displaying cookie information-->
-        <h2>We love cookies!</h2>
-        <p>Our website uses cookies; these are vital for storing your account details and making
+<div id="cookies"> <!-- Defines the div for displaying cookie information-->
+    <h2>We love cookies!</h2>
+    <p>Our website uses cookies; these are vital for storing your account details and making
         sure that you can use the website as intended. Don't worry- we're not out to get you!
         Please accept below:</p>
-        <a class="btn-success" id="CookieAccept">Accept!</a>
-    </div>
-    <div id="invisible"></div>
+    <a class="btn-success" id="CookieAccept">Accept!</a>
+</div>
+<div id="invisible"></div>
 {% endif %}
 
 {% if not nav %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
-    <nav class="navbar navbar-expand-lg bg-black navbar-dark ">
-      <!-- brand text -->
-      <a class="navbar-brand" base href="/">Vertex</a>
-      <!-- dropdown button-->
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <!-- navbar links -->
-      <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
-            <li class="nav-item"><a class="nav-link" base href="{{ url_for('activities.view_activity_types')}}">Activities</a></li>
-            <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.facilities_view')}}">Facilities</a></li>
-            <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.membership_view')}}">Membership</a></li>
+<nav class="navbar navbar-expand-sm navbar-dark bg-black main-nav" id="main-nav">
+<!--    <div class="container justify-content-center">-->
+    <a class="d-xs-block d-md-none navbar-brand" base href="/">The Vertex</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="nav navbar-nav flex-fill w-100 flex-nowrap">
+            <li class="nav-item">
+               <a class="nav-link float-right" base href="{{ url_for('activities.view_activity_types')}}">Activities</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link float-right" base href="{{ url_for('info.facilities_view')}}">Facilities</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link float-right" base href="{{ url_for('info.membership_view')}}">Membership</a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav flex-fill justify-content-center d-none d-md-block">
+            <li class="nav-item">
+                <a class="navbar-brand mx-auto" base href="/">The Vertex</a>
+            </li>
+        </ul>
+        <ul class="nav navbar-nav flex-fill w-100 justify-content-end" id="right-aligned-nav-content">
             <li class="nav-item"><a class="nav-link" base href="{{ url_for('info.about_func')}}">About</a></li>
-            {%  if not User %}
+            {% if not User %}
             <!--            <li class="nav-item"><a class="nav-link" base href="/account/log_out">Logout</a></li>-->
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base href="{{ url_for('account.register_get')}}">Register</a></li>
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base href="{{ url_for('account.login_get')}}">Login</a></li>
+            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-out" base
+                                                 href="{{ url_for('account.register_get')}}">Register</a></li>
+            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-log-in" base
+                                                 href="{{ url_for('account.login_get')}}">Login</a></li>
             {% else %}
-            <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <a href="{{ url_for('account.view_account')}}" class="nav-link pl-0"><i class="fas fa-home fa-1x"></i><p>Home</p></a>
-                    <a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0"><i class="fas fa-calendar-alt fa-1x"></i><p>Bookings</p></a>
-                    <a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0"><i class="fas fa-file-invoice fa-1x"></i><p>Receipts</p></a>
+                    <a href="{{ url_for('account.view_account')}}" class="nav-link pl-0">
+                        <p>Home</p></a>
+                    <a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0">
+                        <p>Bookings</p></a>
+                    <a href="{{ url_for('account.view_account_receipts')}}" class="nav-link pl-0">
+                        <p>Receipts</p></a>
                     {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-                    <a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0"><i class="fas fa-id-card-alt fa-1x"></i><p>Membership</p></a>
+                    <a href="{{ url_for('account.view_account_membership')}}" class="nav-link pl-0">
+                        <p>Membership</p></a>
                     {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" %}
                     {% elif User.__mapper_args__['polymorphic_identity'] == "Manager" %}
-                    <a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0"><i class="far fa-chart-bar fa-1x"></i><p>Statistics</p></a>
+                    <a href="{{ url_for('account.view_usages')}}" class="nav-link pl-0">
+                        <p>Statistics</p></a>
                     {% endif %}
-                    <a href="{{ url_for('account.view_account_details')}}" class="nav-link pl-0"><i class="fas fa-user fa-1x"></i><p>Account</p></a>
+                    <a href="{{ url_for('account.view_account_details')}}" class="nav-link pl-0">
+                        <p>Account</p></a>
                     {% if User.__mapper_args__['polymorphic_identity'] == "Customer" %}
-                    <a href="{{ url_for('account.view_payment_details')}}" class="nav-link pl-0"><i class="fas fa-credit-card fa-1x"></i><p>Card Details</p></a>
-                    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or User.__mapper_args__['polymorphic_identity'] == "Manager" %}
-                    <a href="#" class="nav-link pl-0"><i class="fas fa-table fa-1x"></i><p>Rota</p></a>
+                    <a href="{{ url_for('account.view_payment_details')}}" class="nav-link pl-0">
+                        <p>Card Details</p></a>
+                    {% elif User.__mapper_args__['polymorphic_identity'] == "Employee" or
+                    User.__mapper_args__['polymorphic_identity'] == "Manager" %}
+                    <a href="#" class="nav-link pl-0">
+                        <p>Rota</p></a>
                     {% endif %}
-                    <a href="{{ url_for('account.log_out')}}" class="nav-link pl-0"><i class="fas fa-sign-out-alt fa-1x"></i><p>Log Out</p></a>
+                    <a href="{{ url_for('account.log_out')}}" class="nav-link pl-0">
+                        <p>Log Out</p></a>
                 </div>
             </li>
-            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base href="{{ url_for('basket.basket_view')}}">View Basket</a></li>
+            <li class="nav-item navbar-right"><a class="nav-link glyphicon glyphicon-shopping-cart" base
+                                                 href="{{ url_for('basket.basket_view')}}">Basket</a></li>
             {% endif %}
         </ul>
-      </div>
-    </nav>
+    </div>
+</nav>
 {% endif %}
 <div>
-{% if page_title is defined %} <!-- Page title is not empty -->
-<div id="page_title" class="fluid-container customer {{User.__mapper_args__['polymorphic_identity'].lower()}}">
-  <div class="container" id="page_title_container">
-    <h1 id="page_title_h1">{{ page_title }}</h1>
-<!--      <div id="page-description">{% block page_description %} {% endblock %}</div>-->
-  </div>
-</div>
-{% endif %}
+    {% if page_title is defined %} <!-- Page title is not empty -->
+    <div id="page_title" class="fluid-container">
+        <div class="container" id="page_title_container">
+            <h1 id="page_title_h1">{{ page_title }}</h1>
+            <!--      <div id="page-description">{% block page_description %} {% endblock %}</div>-->
+        </div>
+    </div>
+    {% endif %}
 
-<!--Defines the main content for the webpages, this is where allthe content is situated-->
-{% block main_content %} {% endblock %}
+    <!--Defines the main content for the webpages, this is where allthe content is situated-->
+    {% block main_content %} {% endblock %}
 
-{% with messages = get_flashed_messages(with_categories=True) %}
+    {% with messages = get_flashed_messages(with_categories=True) %}
     {% if messages %}
-        {% for message in messages %}
-            {% if message[0] == ("success") %}
-            <div class="alert alert-success fade show" role="alert">
-            {% elif message[0] == ("error") %}
-            <div class="alert alert-danger fade show" role="alert">
+    {% for message in messages %}
+    {% if message[0] == ("success") %}
+    <div class="alert alert-success fade show" role="alert">
+        {% elif message[0] == ("error") %}
+        <div class="alert alert-danger fade show" role="alert">
             {% else %}
             <div class="alert alert-primary fade show" role="alert">
-            {% endif %}
+                {% endif %}
                 {{ message[1] }}
-                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                  </button>
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-        {% endfor %}
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+    </div>
+
+    {% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->
+    <footer>
+    </footer>
     {% endif %}
-{% endwith %}
-</div>
-</div>
 
-{% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->
-<footer>
-</footer>
-{% endif %}
+    <!-- Imports CDNs for scripts that are used by every page, most importantly bootstrap -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+            crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+            crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/c8eac23e18.js" crossorigin="anonymous"></script>
+    <script src="../../static/js/main.js">
 
-<!-- Imports CDNs for scripts that are used by every page, most importantly bootstrap -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-<script src="https://kit.fontawesome.com/c8eac23e18.js" crossorigin="anonymous"></script>
-<script src="../../static/js/main.js">
-
-</script>
-{% block additional_js %} {% endblock %} <!--Lets the user input additional JavaScript -->
+    </script>
+    {% block additional_js %} {% endblock %} <!--Lets the user input additional JavaScript -->
 </body>
 </html>
