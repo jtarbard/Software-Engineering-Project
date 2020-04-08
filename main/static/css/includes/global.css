@@ -2,8 +2,16 @@
 
 /*TEMP STYLES FOR GREYSCALE*/
 body {
+    font-family: 'Oxygen', sans-serif;
     color: black;
     border: solid 2px black;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
 }
 
 .card {
