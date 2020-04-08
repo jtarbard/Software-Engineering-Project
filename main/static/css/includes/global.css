@@ -1,5 +1,24 @@
 /*The Vertex Global Styling*/
 
+/*TEMP STYLES FOR GREYSCALE*/
+body {
+    color: black;
+    border: solid 2px black;
+}
+
+.card {
+    border: solid 2px black;
+}
+
+#page_title {
+    border-bottom: solid 2px black;
+}
+
+.btn-primary, .btn-secondary, .btn-dark, .btn-light, .btn-danger {
+    background-color: black;
+    color: white;
+    border-color: black;
+}
 
 /*Bootstrap classes customisation*/
 
