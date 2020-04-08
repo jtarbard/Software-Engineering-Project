@@ -4,7 +4,7 @@ import pytest
 
 def pytest_generate_tests(metafunc):
     if "basket_view_basic_data" in metafunc.fixturenames:
-        metafunc.parametrize("basket_view_basic_data", range(23), indirect=True,
+        metafunc.parametrize("basket_view_data", range(23), indirect=True,
                              ids=["[BASIC] no_basket_cookie",
                                   "[BASIC] A:1",
                                   "[BASIC] A:1;A:2;A:3",
@@ -29,7 +29,7 @@ def pytest_generate_tests(metafunc):
                                   "[EXTRA] Floating point arithmetic test 2",
                                   "[EXTRA] Floating point arithmetic test 3"])
     if "basket_delete_activity_basic_data" in metafunc.fixturenames:
-        metafunc.parametrize("basket_delete_activity_basic_data", range(22), indirect=True,
+        metafunc.parametrize("basket_delete_activity_data", range(22), indirect=True,
                              ids=["[BASIC] basic increase",
                                   "[BASIC] basic decrease",
                                   "[BASIC] update specific activity among a bunch of bookings",
@@ -55,15 +55,9 @@ def pytest_generate_tests(metafunc):
 
 
 @pytest.fixture
-def basket_view_basic_data(request):
-    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
-    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
-        return_customer_premium_with_no_response, \
-        return_customer_standard_with_no_response, \
-        return_not_logged_in_user_response
-
+def basket_view_data(request):
     """
-    Basket_View_Basic_Test
+    Basket_View_Test
     GIVEN a Flask application
     WHEN the '/account/basket' page is requested (GET)
     VARYING CONDITIONS 1. User with/without membership is logged in / not logged in (vertex_account_cookie exists or not)
@@ -93,15 +87,18 @@ def basket_view_basic_data(request):
     TESTING FOR <Rule '/account/basket' (OPTIONS, HEAD, GET) -> basket.basket_view>
     """
 
+    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
+    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
+        return_customer_premium_with_no_response, \
+        return_customer_standard_with_no_response, \
+        return_not_logged_in_user_response
+
     # TODO: Consider refactoring the data in another function so that "data" doesn't need to be re-run n times.
     #       Have 2 functions as "Data Container" and "Data Retrieval"
-    # mocked_return_user_response,
-    # (create_basket_cookie, basket_cookie_value),
-    # (create_account_cookie, account_cookie_value),
-    # exp_activities,
-    # exp_membership, exp_basket_membership_duration, exp_membership_discount,
-    # exp_total_activity_price, exp_total_discounted_price, exp_final_price,
-    # exp_title, exp_url, exp_template_path, exp_exist_cookies = basket_view_basic_data
+
+    # -----------------------------------------| ============= |----------------------------------------- #
+    # -----------------------------------------|  Basic Tests  |----------------------------------------- #
+    # -----------------------------------------| ============= |----------------------------------------- #
 
     # Test_0
     # 1. vertex_account_cookie exists
@@ -613,13 +610,7 @@ def basket_view_basic_data(request):
 
 
 @pytest.fixture
-def basket_delete_activity_basic_data(request):
-    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
-    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
-        return_customer_premium_with_no_response, \
-        return_customer_standard_with_no_response, \
-        return_not_logged_in_user_response
-
+def basket_delete_activity_data(request):
     """
     Basket_Delete_Activity_Basic_Test
     GIVEN a Flask application
@@ -650,6 +641,12 @@ def basket_delete_activity_basic_data(request):
 
     TESTING FOR <Rule '/account/basket' (OPTIONS, POST) -> basket.basket_delete_activity>
     """
+
+    from tests.helper.database_creation import activity_objs, activity_type_objs, membership_type_objs
+    from tests.helper.mocked_functions import return_customer_no_membership_with_no_response, \
+        return_customer_premium_with_no_response, \
+        return_customer_standard_with_no_response, \
+        return_not_logged_in_user_response
 
     # -----------------------------------------| ============= |----------------------------------------- #
     # -----------------------------------------|  Basic Tests  |----------------------------------------- #
