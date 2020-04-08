@@ -11,7 +11,7 @@ as the basic body -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{%  block title %} {% endblock %}</title> <!-- Lets each page have its own title-->
     <!--  Import font  -->
-    <link href="https://fonts.googleapis.com/css?family=Poppins:400,500,600,700,800,900|Open+Sans:400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900|Open+Sans:300,400,500&display=swap" rel="stylesheet">
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/includes/reset.css') }}">
     <link rel="stylesheet"
@@ -39,7 +39,7 @@ as the basic body -->
 {% if not nav %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
     <nav class="navbar navbar-expand-lg bg-black navbar-dark ">
       <!-- brand text -->
-      <a class="navbar-brand" base href="/">The Vertex</a>
+      <a class="navbar-brand" base href="/">Vertex</a>
       <!-- dropdown button-->
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
         <span class="navbar-toggler-icon"></span>
@@ -87,7 +87,7 @@ as the basic body -->
 <div id="page_title" class="fluid-container customer {{User.__mapper_args__['polymorphic_identity'].lower()}}">
   <div class="container" id="page_title_container">
     <h1 id="page_title_h1">{{ page_title }}</h1>
-      <div id="page-description">{% block page_description %} {% endblock %}</div>
+<!--      <div id="page-description">{% block page_description %} {% endblock %}</div>-->
   </div>
 </div>
 {% endif %}

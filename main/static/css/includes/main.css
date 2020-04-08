@@ -33,21 +33,22 @@ html {
 
 #page_title {
     min-height: 15vh;
-    padding-top: 0.5vh;
     margin-bottom: 6vh;
     /*color: white;*/
 }
 
 #page_title h1 {
+    margin: 3vh 0;
     padding-bottom: 0;
-    margin-bottom: 0;
     line-height: 15vh;
+    text-align: center;
 }
 
 #page-description {
-    margin-top: -4vh;
+    /*margin-top: -3vh;*/
     padding-bottom: 2vh;
     z-index: 2;
+    text-align: center;
 }
 
 
