@@ -85,7 +85,7 @@ def template_checker():
         request = kwargs.get("request", None)
         templates = kwargs.get("templates", None)
         exp_status_code = kwargs.get("exp_status_code", 200)
-        exp_title = kwargs.get("exp_title", None)
+        exp_title = kwargs.get("exp_title", "")
         exp_url = kwargs.get("exp_url", None)
         exp_template_path = kwargs.get("exp_template_path", None)
         exp_template_context: dict = kwargs.get("exp_template_context", {})
