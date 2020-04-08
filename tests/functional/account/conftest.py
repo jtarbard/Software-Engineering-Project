@@ -12,7 +12,7 @@ def pytest_generate_tests(metafunc):
                                   "M:1:12",
                                   "A:1;M:1:1",
                                   "A:1;M:2:1",
-                                  "empty basket cookie",
+                                  "empty basket cookie", # TODO: Define behaviour when cookie failed to decode
                                   "Multi-buy: A:3;A:3;A:3",
                                   "Pure bulk buy: A:3;A:6;A:9",
                                   "Bulk buy mix normal buy: A:2;A:2;A:5;A:3;A:6;A:9",
@@ -29,7 +29,29 @@ def pytest_generate_tests(metafunc):
                                   "Floating point arithmetic test 2",
                                   "Floating point arithmetic test 3"])
     if "basket_delete_activity_basic_data" in metafunc.fixturenames:
-        metafunc.parametrize("basket_delete_activity_basic_data", range(1), indirect=True, ids=[])
+        metafunc.parametrize("basket_delete_activity_basic_data", range(22), indirect=True,
+                             ids=["[BASIC] basic increase",
+                                  "[BASIC] basic decrease",
+                                  "[BASIC] update specific activity among a bunch of bookings",
+                                  "[BASIC] Remove activity, basket non empty",
+                                  "[BASIC] Remove activity, empties basket as a result (expects basket cookie to be destroyed)",
+                                  "[BASIC] Remove activity, still retaining regular discount",
+                                  "[BASIC] Remove activity, disqualifying regular discount as a result (No membership)",
+                                  "[BASIC] Remove activity, disqualifying regular discount as a result (Basket membership)",
+                                  "[BASIC] Remove activity, disqualifying regular discount as a result (Pre-existing standard membership). 0.7x",
+                                  "[BASIC] Remove activity, disqualifying regular discount as a result (Pre-existing premium membership). 0.0x",
+                                  "[BASIC] Delete all items button",
+                                  "[BASIC] Negative number of bookings",
+                                  "[BASIC] Over 8 bookings for a single activity via Update",
+                                  "[BASIC] booking_id of invalid format",
+                                  "[BASIC] Change booking number so that it exceeds the maximum bookings per receipt allowed (15) - 2 activities",
+                                  "[BASIC] Change booking number so that it exceeds the maximum bookings per receipt allowed (15) - 15 activities",
+                                  "[EXTRA] Increases membership duration",
+                                  "[EXTRA] Decreases membership duration",
+                                  "[EXTRA] Setting membership duration as 0 in attempt to remove it",
+                                  "[EXTRA] creating new bookings via update",
+                                  "[EXTRA] replace membership via update (This is currently impossible)",
+                                  "[EXTRA] user not logged in. Expect to clear basket cookie and redirect to login page"])
 
 
 @pytest.fixture
@@ -577,10 +599,579 @@ def basket_delete_activity_basic_data(request):
     TESTING FOR <Rule '/account/basket' (OPTIONS, POST) -> basket.basket_delete_activity>
     """
 
+    # -----------------------------------------| ============= |----------------------------------------- #
+    # -----------------------------------------|  Basic Tests  |----------------------------------------- #
+    # -----------------------------------------| ============= |----------------------------------------- #
+
     # Test_0 - basic increase
     # 1. vertex_account_cookie exists
     # 2. User does not have a membership
     # 3. vertex_basket_cookie exists
     # 4. Basket cookie with 1 valid activity (type = 1, hourly price = 10, hour = 1) exist
     # 5. Basket cookie with NO memberships
-    pass
+    if request.param == 0:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:1",
+                "num_change_post": 2,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 2, 0)},
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 20.0,
+                "exp_total_discounted_price": 20.0,
+                "exp_final_price": 20.0,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_1 - basic decrease
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 2*1 valid activity (type = 1, hourly price = 10, hour = 1) exist
+    # 5. Basket cookie with NO memberships
+    elif request.param == 1:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:1",
+                "num_change_post": 1,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 1, 0)},
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 10.0,
+                "exp_total_discounted_price": 10.0,
+                "exp_final_price": 10.0,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_2 - update specific activity among a bunch of bookings
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 1 valid activity (type = 1, hourly price = 10, hour = 1) exist
+    # 5. Basket cookie with NO memberships
+    elif request.param == 2:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:2;A:3;A:5;A:6;A:9"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:1",
+                "num_change_post": 3,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 3, 0),
+                                   activity_objs[1]: (activity_type_objs[1].hourly_activity_price*2, 1, 0),
+                                   activity_objs[2]: (activity_type_objs[2].hourly_activity_price*3, 1, 0.15),
+                                   activity_objs[4]: (activity_type_objs[1].hourly_activity_price*2, 1, 0),
+                                   activity_objs[5]: (activity_type_objs[2].hourly_activity_price*3, 1, 0.15),
+                                   activity_objs[8]: (activity_type_objs[2].hourly_activity_price*3, 1, 0.15)},
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 339.5,  # 10*3 + 20*2*2 + 30*3 * 3 * 0.85
+                "exp_total_discounted_price": 339.5,
+                "exp_final_price": 339.5,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_3 - Remove activity, basket non empty
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 2 valid activity (type = 1, 2) exist
+    # 5. Basket cookie with NO memberships
+    elif request.param == 3:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:2"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:1",
+                "num_change_post": 0,
+
+                "exp_activities": {activity_objs[1]: (activity_type_objs[1].hourly_activity_price*2, 1, 0)},
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 40.0,  # 20*2
+                "exp_total_discounted_price": 40.0,
+                "exp_final_price": 40.0,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_4 - Remove activity, empties basket as a result (expects basket cookie to be destroyed)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 1 valid activity (type = 5) exist
+    # 5. Basket cookie with NO memberships
+    elif request.param == 4:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:5"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:5",
+                "num_change_post": 0,
+
+                "exp_activities": dict(),
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0.0,
+                "exp_total_discounted_price": 0.0,
+                "exp_final_price": 0.0,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_account_cookie"]}
+
+    # Test_5 - Remove activity, still retaining regular discount
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 4 valid activity (type = 1, 4, 7, 16) exist, activates 0.85x regular discount
+    # 5. Basket cookie with NO memberships
+    elif request.param == 5:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:4;A:7;A:16"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": 0,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 1, 0.15),
+                                   activity_objs[6]: (activity_type_objs[0].hourly_activity_price, 1, 0.15),
+                                   activity_objs[15]: (activity_type_objs[0].hourly_activity_price, 1, 0.15)},
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 25.5,  # 10*3 * 0.85
+                "exp_total_discounted_price": 25.5,
+                "exp_final_price": 25.5,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_6 - Remove activity, disqualifying regular discount as a result (No membership)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 1 valid activity (type = 1, 4, 7) exist, activates 0.85x regular discount (before update)
+    # 5. Basket cookie with NO memberships
+    elif request.param == 6:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:4;A:7"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": 0,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 1, 0),
+                                   activity_objs[6]: (activity_type_objs[0].hourly_activity_price, 1, 0)},
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 20.0,  # 10+10
+                "exp_total_discounted_price": 20.0,
+                "exp_final_price": 20.0,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_7 - Remove activity, disqualifying regular discount as a result (Basket membership)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 3 valid activity (type = 1, 4, 7) exist, activates 0.85x regular discount (before update)
+    # 5. Basket cookie with Standard memberships (discount = 30, monthly price = 3, duration = 1)
+    elif request.param == 7:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:4;A:7;M:1:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": 0,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 1, 0),
+                                   activity_objs[6]: (activity_type_objs[0].hourly_activity_price, 1, 0)},
+                "exp_membership": membership_type_objs[0], "exp_basket_membership_duration": 1,
+                "exp_membership_discount": membership_type_objs[0].discount,
+                "exp_total_activity_price": 20.0,  # 10+10
+                "exp_total_discounted_price": 14.0,  # 20*0.7
+                "exp_final_price": 17.0,  # 14+3*1
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_8 - Remove activity, disqualifying regular discount as a result (Pre-existing standard membership). 0.7x
+    # 1. vertex_account_cookie exists
+    # 2. User has pre-existing Standard membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 3 valid activity (type = 1, 4, 7) exist, activates 0.85x regular discount (before update)
+    # 5. Basket cookie with NO membership
+    elif request.param == 8:
+        return {"mocked_return_user_response": return_customer_standard_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:4;A:7"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": 0,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 1, 0),
+                                   activity_objs[6]: (activity_type_objs[0].hourly_activity_price, 1, 0)},
+                "exp_membership": None, "exp_basket_membership_duration": None,
+                "exp_membership_discount": membership_type_objs[0].discount,
+                "exp_total_activity_price": 20.0,  # 10+10
+                "exp_total_discounted_price": 14.0,  # 20*0.7
+                "exp_final_price": 14.0,  # no basket membership
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_9 - Remove activity, disqualifying regular discount as a result (Pre-existing premium membership). 0.0x
+    # 1. vertex_account_cookie exists
+    # 2. User has pre-existing Premium membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 3 valid activity (type = 1, 4, 7) exist, activates 0.85x regular discount (before update)
+    # 5. Basket cookie with NO memberships
+    elif request.param == 9:
+        return {"mocked_return_user_response": return_customer_premium_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:4;A:7"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": 0,
+
+                "exp_activities": {activity_objs[0]: (activity_type_objs[0].hourly_activity_price, 1, 0),
+                                   activity_objs[6]: (activity_type_objs[0].hourly_activity_price, 1, 0)},
+                "exp_membership": None, "exp_basket_membership_duration": None,
+                "exp_membership_discount": membership_type_objs[1].discount,
+                "exp_total_activity_price": 20.0,  # 10+10
+                "exp_total_discounted_price": 0.0,  # 20*0.0
+                "exp_final_price": 0.0,  # no basket membership
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_10 - Delete all items button
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 5 valid activity (type = 1, 2, 5, 7, 7) exist
+    # 5. Basket cookie with Standard memberships
+    elif request.param == 10:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;M:1:12;A:2;A:5;A:7;A:7"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "delete_basket_post": True,
+                "update_post": True,
+                "booking_id_post": "A:7",
+                "num_change_post": 2,
+
+                "exp_activities": dict(),
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0.0,
+                "exp_total_discounted_price": 0.0,
+                "exp_final_price": 0.0,
+                "exp_title": "Basket", "exp_url": "/account/basket",
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_account_cookie"]}
+
+    # Test_11 - Negative number of bookings
+    # (TODO: Define behaviour. Should the page throw up 500 or flash an error, then tries to remove that invalid row of booking?)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 4 valid activity (type = 4, 5, 5, 5) exist
+    # 5. Basket cookie with Standard memberships (duration 1)
+    elif request.param == 11:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:4;M:1:1;A:5;A:5;A:5"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": -1,
+
+                "exp_status_code": 500,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "", "exp_url": '/account/basket',
+                "exp_template_path": "/misc/server_error.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_12 - Over 8 bookings for a single activity via Update
+    # (TODO: Define behaviour. Should the page throw up 500 or flash an error, then tries to remove that invalid row of booking?)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 4 valid activity (type = 4, 5, 5, 5) exist
+    # 5. Basket cookie with NO membership
+    elif request.param == 12:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:4;A:5;A:5;A:5"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:4",
+                "num_change_post": 9,
+
+                "exp_status_code": 500,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "", "exp_url": '/account/basket',
+                "exp_template_path": "/misc/server_error.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_13 - booking_id of invalid format
+    # (TODO: Define behaviour. Should the page throw up 500 or flash an error, then tries to remove that invalid row of booking?)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 3 valid activity (type = 1, 2, 3) exist
+    # 5. Basket cookie with NO membership
+    elif request.param == 13:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:2;A:3"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:1:1",
+                "num_change_post": 9,
+
+                "exp_status_code": 500,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "", "exp_url": '/account/basket',
+                "exp_template_path": "/misc/server_error.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_14 - Change booking number so that it exceeds the maximum bookings per receipt allowed (15) - 2 activities
+    # (TODO: Define behaviour. Should the page throw up 500 or flash an error, then tries to remove that invalid row of booking?)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 8*1+1 valid activity (type = 8*1, 2) exist
+    # 5. Basket cookie with NO membership
+    elif request.param == 14:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:1;A:1;A:1;A:1;A:1;A:1;A:1;A:2"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:2",
+                "num_change_post": 8,
+
+                "exp_status_code": 500,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "", "exp_url": '/account/basket',
+                "exp_template_path": "/misc/server_error.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_15 - Change booking number so that it exceeds the maximum bookings per receipt allowed (15) - 15 activities
+    # (TODO: Define behaviour. Should the page throw up 500 or flash an error, then tries to remove that invalid row of booking?)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 15 valid activity (type = 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15) exist
+    # 5. Basket cookie with NO membership
+    elif request.param == 15:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:2;A:3;A:4;A:5;A:6;A:7;A:8;A:9;A:10;A:11;A:12;A:13;A:14;A:15"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:1",
+                "num_change_post": 2,
+
+                "exp_status_code": 500,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "", "exp_url": '/account/basket',
+                "exp_template_path": "/misc/server_error.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # *Test_0 - Updates multiple times - difficult to generalize
+
+    # -----------------------------------------/ ============= \----------------------------------------- #
+    # ----------------------------------------| - Extra Tests - |---------------------------------------- #
+    # -----------------------------------------\ ============= /----------------------------------------- #
+
+    # Test_16 - Increases membership duration
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with NO activity
+    # 5. Basket cookie with Standard membership (monthly = 3, duration = 1, discount = 30)
+    elif request.param == 16:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "M:1:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "M:1:1",
+                "num_change_post": 3,
+
+                "exp_activities": dict(),
+                "exp_membership": membership_type_objs[0], "exp_basket_membership_duration": 3,
+                "exp_membership_discount": membership_type_objs[0].discount,
+                "exp_total_activity_price": 0.0,
+                "exp_total_discounted_price": 0.0,
+                "exp_final_price": 9.0,  # 3*3
+                "exp_title": "Basket", "exp_url": '/account/basket',
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_17 - Decreases membership duration
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with NO activity
+    # 5. Basket cookie with Premium membership (monthly = 10, duration = 12, discount = 100)
+    elif request.param == 17:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "M:2:12"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "M:2:12",
+                "num_change_post": 6,
+
+                "exp_activities": dict(),
+                "exp_membership": membership_type_objs[1], "exp_basket_membership_duration": 6,
+                "exp_membership_discount": membership_type_objs[1].discount,
+                "exp_total_activity_price": 0.0,
+                "exp_total_discounted_price": 0.0,
+                "exp_final_price": 60.0,  # 10*6
+                "exp_title": "Basket", "exp_url": '/account/basket',
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_18 - Setting membership duration as 0 in attempt to remove it
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with NO activity
+    # 5. Basket cookie with Premium membership (monthly = 10, duration = 3, discount = 100)
+    elif request.param == 18:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "M:2:3"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "M:2:3",
+                "num_change_post": 0,
+
+                "exp_activities": dict(),
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0.0,
+                "exp_total_discounted_price": 0.0,
+                "exp_final_price": 0.0,
+                "exp_title": "Basket", "exp_url": '/account/basket',
+                "exp_template_path": "/account/basket.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_19 - creating new bookings via update
+    # TODO: Define behaviour. Throw error or allow?
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 1 valid activity (type = 1)
+    # 5. Basket cookie with NO membership
+    elif request.param == 19:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "update_post": True,
+                "booking_id_post": "A:2",
+                "num_change_post": 1,
+
+                "exp_status_code": 500,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "", "exp_url": '/account/basket',
+                "exp_template_path": "/misc/server_error.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_20 - replace membership via update (This is currently impossible)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with NO activity
+    # 5. Basket cookie with Premium membership (monthly = 10, duration = 3, discount = 100)
+    elif request.param == 20:
+        return False
+    #     return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+    #             "create_basket_cookie_and_value": (True, "M:2:3"),
+    #             "create_account_cookie_and_value": (True, "Account"),
+    #
+    #             "update_post": True,
+    #             "booking_id_post": "M:2:3",
+    #             "num_change_post": 0,
+    #
+    #             "exp_activities": dict(),
+    #             "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+    #             "exp_total_activity_price": 0.0,
+    #             "exp_total_discounted_price": 0.0,
+    #             "exp_final_price": 0.0,
+    #             "exp_title": "Basket", "exp_url": '/account/basket',
+    #             "exp_template_path": "/account/basket.html",
+    #             "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"]}
+
+    # Test_21 - user not logged in. Expect to clear basket cookie and redirect to login page
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie with 3 valid activities (type = 1, 2, 3)
+    # 5. Basket cookie with NO membership
+    elif request.param == 21:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:2;A:3"),
+                "create_account_cookie_and_value": (False, ""),
+
+                "update_post": True,
+                "booking_id_post": "A:1",
+                "num_change_post": 2,
+
+                "exp_status_code": 200,
+                "exp_activities": None,
+                "exp_membership": None, "exp_basket_membership_duration": None, "exp_membership_discount": 0,
+                "exp_total_activity_price": 0,
+                "exp_total_discounted_price": 0,
+                "exp_final_price": 0,
+                "exp_title": "Login", "exp_url": '/account/login',
+                "exp_template_path": "/account/login_register.html",
+                "exp_exist_cookies": []}
+
+    else:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "booking_id_post": "A:1",
+                "num_change_post": 1,
+                "exp_title": "Unknown Test Title",
+                "exp_url": "Unknown Test url",
+                "exp_template_path": "Unknown Test template path"}
