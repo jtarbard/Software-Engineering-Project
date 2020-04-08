@@ -12,13 +12,25 @@ from tests.helper.database_creation import populate_database
 
 
 def test_basket_view_basic(app, test_client, mocker, basket_template_checker, populate_database, basket_view_basic_data):
+    mocked_return_user_response = basket_view_basic_data.get("mocked_return_user_response")
+    create_basket_cookie, basket_cookie_value = basket_view_basic_data.get("create_basket_cookie_and_value",
+                                                                                      (False, ""))
+    create_account_cookie, account_cookie_value = basket_view_basic_data.get("create_account_cookie_and_value", (True, "Account"))
 
-    mocked_return_user_response, \
-        (create_basket_cookie, basket_cookie_value), \
-        (create_account_cookie, account_cookie_value), \
-        exp_activities, exp_membership, exp_basket_membership_duration, exp_membership_discount, \
-        exp_total_activity_price, exp_total_discounted_price, exp_final_price, \
-        exp_title, exp_url, exp_template_path, exp_exist_cookies = basket_view_basic_data
+    exp_status_code = basket_view_basic_data.get("exp_status_code", 200)
+    exp_activities = basket_view_basic_data.get("exp_activities", [])
+    exp_membership = basket_view_basic_data.get("exp_membership", None)
+    exp_basket_membership_duration = basket_view_basic_data.get("exp_basket_membership_duration", None)
+    exp_membership_discount = basket_view_basic_data.get("exp_membership_discount", 0)
+
+    exp_total_activity_price = basket_view_basic_data.get("exp_total_activity_price", 0.0)
+    exp_total_discounted_price = basket_view_basic_data.get("exp_total_discounted_price", 0.0)
+    exp_final_price = basket_view_basic_data.get("exp_final_price", 0.0)
+
+    exp_title = basket_view_basic_data.get("exp_title")
+    exp_url = basket_view_basic_data.get("exp_url")
+    exp_template_path = basket_view_basic_data.get("exp_template_path")
+    exp_exist_cookies = basket_view_basic_data.get("exp_exist_cookies", [])
 
     # ------------------------------------------------------- #
 
@@ -43,14 +55,14 @@ def test_basket_view_basic(app, test_client, mocker, basket_template_checker, po
         basket_template_checker(response=rv, request=flask.request, templates=templates, exp_title=exp_title,
                                 exp_url=exp_url, exp_template_path=exp_template_path,
                                 exp_exist_cookies=exp_exist_cookies,
+                                exp_status_code=exp_status_code,
                                 exp_activities=exp_activities,
                                 exp_membership=exp_membership,
                                 exp_basket_membership_duration=exp_basket_membership_duration,
                                 exp_membership_discount=exp_membership_discount,
                                 exp_total_activity_price=exp_total_activity_price,
                                 exp_total_discounted_price=exp_total_discounted_price,
-                                exp_final_price=exp_final_price
-                                )
+                                exp_final_price=exp_final_price)
 
     # ------------------------------------------------------- #
 
