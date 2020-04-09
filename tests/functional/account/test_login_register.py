@@ -5,8 +5,8 @@ import copy
 import flask
 from bs4 import BeautifulSoup
 
-from tests.helper.flask_signal_capturer import captured_templates
-from tests.helper.mocked_functions import return_logged_in_user_response, return_not_logged_in_user_response
+from main.helper_functions.test_helpers.flask_signal_capturer import captured_templates
+from main.helper_functions.test_helpers.mocked_functions import return_logged_in_user_response, return_not_logged_in_user_response
 
 
 def test_register_get_basic(app, test_client, mocker, template_checker):
@@ -43,7 +43,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # ------------------------------------------------------- #
 
     """
-    Login_Get_Basic_Test_2
+    Register_Get_Basic_Test_2
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
     UNDER CONDITIONS 1. User not logged in
@@ -84,7 +84,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # ------------------------------------------------------- #
 
     """
-    Login_Get_Basic_Test_3
+    Register_Get_Basic_Test_3
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
     UNDER CONDITIONS 1. User logged in
@@ -108,7 +108,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # ------------------------------------------------------- #
 
     """
-    Login_Get_Basic_Test_4
+    Register_Get_Basic_Test_4
     GIVEN a Flask application
     WHEN the '/account/register' page is requested (GET)
     UNDER CONDITIONS 1. User logged in
@@ -138,7 +138,7 @@ def test_register_get_basic(app, test_client, mocker, template_checker):
     # --------------------------------- END OF THIS TEST: test_register_get_basic --------------------------------- #
 
 
-def test_register_post_basic(app, test_client, mocker, template_checker, new_user):
+def test_register_post_basic(app, test_client, mocker, template_checker, populate_database):
 
     def assert_html_renders(exp_fields: dict):
         soup = BeautifulSoup(rv.data, 'html.parser')
@@ -161,11 +161,8 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
     + Employee = new_user
     + Manager = new_user
     """
-    from main.data.db_session import database
     from main.data.db_classes.user_db_class import User
-    database.session.add(new_user("customer"))
-    database.session.add(new_user("employee"))
-    database.session.add(new_user("manager"))
+    populate_database(["customer", "employee", "manager"])
 
     # Valid data:
     valid_title = "Mrs"
@@ -755,8 +752,6 @@ def test_register_post_basic(app, test_client, mocker, template_checker, new_use
 
     # ------------------------------------------------------- #
 
-    database.session.rollback()  # Cleaning test database.
-
     # --------------------------------- END OF THIS TEST: test_register_post_basic --------------------------------- #
 
 
@@ -891,17 +886,14 @@ def test_login_get_basic(app, test_client, mocker, template_checker):
     # --------------------------------- END OF THIS TEST: test_login_get_basic --------------------------------- #
 
 
-def test_login_post_basic(app, test_client, new_user, template_checker):
+def test_login_post_basic(app, test_client, populate_database, template_checker):
     """
     PRELIMINARY DATABASE CONDITIONS:
     + Customer = new_user
     + Employee = new_user
     + Manager = new_user
     """
-    from main.data.db_session import database
-    database.session.add(new_user("customer"))
-    database.session.add(new_user("employee"))
-    database.session.add(new_user("manager"))
+    populate_database(["customer", "employee", "manager"])
 
     # ------------------------------------------------------- #
 
@@ -1150,8 +1142,6 @@ def test_login_post_basic(app, test_client, new_user, template_checker):
     # TODO: Potentially add 3 more tests: Non-Existent email, invalid password format -> should throw error says invalid password "without connecting to database".
 
     # ------------------------------------------------------- #
-
-    database.session.rollback()  # Cleaning test database.
 
     # --------------------------------- END OF THIS TEST: test_login_post_basic --------------------------------- #
 

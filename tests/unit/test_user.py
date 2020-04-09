@@ -1,13 +1,15 @@
 import datetime
 
 
-def test_new_customer_legal(new_user):
+def test_new_customer_legal():
     """
     GIVEN a Customer object
     WHEN a new Customer is created
     THEN check all fields are defined correctly
     """
-    types = ["customer", "employee", "manager"]
+    from main.helper_functions.test_helpers.database_creation import customer_objs, employee_objs, manager_objs
+
+    objs = [customer_objs[0], employee_objs[0], manager_objs[0]]
 
     exp_titles = ["mr", "mr", "mrs"]
     exp_passwords = ["passw0rD", "oai9*(13jiovn__eiqf9OIJqlk", "Admin666"]
@@ -21,7 +23,7 @@ def test_new_customer_legal(new_user):
     exp_countries = ["gb", "us", "cn"]
 
     for i in range(3):
-        user = new_user(types[i])
+        user = objs[i]
         assert user.title == exp_titles[i]
         assert not user.password == exp_passwords[i]
         assert user.password_match(exp_passwords[i])

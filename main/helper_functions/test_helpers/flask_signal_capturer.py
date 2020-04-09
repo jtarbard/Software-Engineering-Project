@@ -14,3 +14,12 @@ def captured_templates(app):
         yield recorded
     finally:
         template_rendered.disconnect(record, app)
+
+
+# Testing messages are flashed
+# recorded = []
+# def record(sender, message, category, **extra):
+#     recorded.append((message, category))
+#
+# from flask import message_flashed
+# message_flashed.connect(record, app)

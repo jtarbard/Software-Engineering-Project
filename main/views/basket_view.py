@@ -12,7 +12,7 @@ blueprint = flask.Blueprint("basket", __name__)
 
 
 @blueprint.route("/misc/add_booking_to_basket", methods=["POST"])
-def view_classes_post():
+def add_booking_to_basket_post():
     user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
@@ -27,6 +27,8 @@ def view_classes_post():
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
+    # TODO: Discuss if this is the desired behaviour
+    #       In Test_4,Test_5, it's expected to render general_error page
     if not is_valid:
         return cl.destroy_account_cookie(flask.redirect("/"))
 
@@ -99,7 +101,7 @@ def basket_view():
         total_activity_price += current_price - (current_price * bulk_discount)
 
     current_membership_discount = 0
-    total_discounted_price = 0
+    # total_discounted_price = 0  # can uncomment but this is not needed (why is python weird)
     if basket_membership:
         total_discounted_price = (total_activity_price - basket_membership.discount / 100 * total_activity_price)
 
@@ -115,6 +117,7 @@ def basket_view():
             current_membership_discount = customer_membership.membership_type.discount
             final_price = total_discounted_price
         else:
+            total_discounted_price = total_activity_price
             final_price = total_activity_price
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,
