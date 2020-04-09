@@ -27,6 +27,8 @@ def add_booking_to_basket_post():
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
+    # TODO: Discuss if this is the desired behaviour
+    #       In Test_4,Test_5, it's expected to render general_error page
     if not is_valid:
         return cl.destroy_account_cookie(flask.redirect("/"))
 
