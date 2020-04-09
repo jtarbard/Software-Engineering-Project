@@ -173,3 +173,22 @@ def basket_template_checker(template_checker):
         assert context.get("final_price", 0) == exp_final_price, "Mismatching final_price"
 
     return _basket_template_checker
+
+
+@pytest.fixture(scope="function")
+def memberships_template_checker(template_checker):
+
+    def _memberships_template_checker(**kwargs):
+        exp_standard_price = kwargs.get("exp_standard_price", -1)
+        exp_premium_price = kwargs.get("exp_premium_price", -1)
+        exp_standard_id = kwargs.get("exp_standard_id", -1)
+        exp_premium_id = kwargs.get("exp_premium_id", -1)
+
+        context = template_checker(**kwargs)
+
+        assert context.get("standard_price", -1) == exp_standard_price, "Mismatching standard_price"
+        assert context.get("premium_price", -1) == exp_premium_price, "Mismatching premium_price"
+        assert context.get("standard_id", -1) == exp_standard_id, "Mismatching standard_id"
+        assert context.get("premium_id", -1) == exp_premium_id, "Mismatching premium_id"
+
+    return _memberships_template_checker
