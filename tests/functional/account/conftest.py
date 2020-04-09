@@ -51,6 +51,19 @@ def pytest_generate_tests(metafunc):
                                   "[EXTRA] creating new bookings via update",
                                   "[EXTRA] replace membership via update (This is currently impossible)",
                                   "[EXTRA] user not logged in. Expect to clear basket cookie and redirect to login page"])
+    if "add_booking_to_basket_post_data" in metafunc.fixturenames:
+        metafunc.parametrize("add_booking_to_basket_post_data", range(11), indirect=True,
+                             ids=["[BASIC] No basket, add activity for 1. Cooke should be created",
+                                  "[BASIC] A:1 basket, increase by 2",
+                                  "[BASIC] M:1:1 basket, add <Activity 2> * 2",
+                                  "[BASIC] Empty basket, add <Activity 3> * 1",
+                                  "[BASIC] Empty basket, add <Activity 4> * 9 (Invalid)",
+                                  "[BASIC] A:1 basket, add <Activity 4> * 9 (Invalid)",
+                                  "[BASIC] Basket with 15 items, add 1 activity (Invalid)",
+                                  "[BASIC] Add negative booking (Invalid)",
+                                  "[BASIC] Add 0 booking (Valid)",
+                                  "[BASIC] user not logged in, expect redirect to login and delete basket cookie",
+                                  "[EXTRA] Has invalid basket cookie, tries to add more (Invalid)"])
 
 
 @pytest.fixture
@@ -611,12 +624,16 @@ def basket_view_data(request):
 @pytest.fixture
 def basket_delete_activity_data(request):
     """
-    Basket_Delete_Activity_Basic_Test
+    Basket_Delete_Activity_Test
     GIVEN a Flask application
     WHEN delete/update button is clicked on the '/account/basket' page (POST)
     VARYING CONDITIONS 1. User with/without membership is logged in / not logged in (vertex_account_cookie exists or not)
                        2. Basket cookie with ? valid activity
                        3. Basket cookie with ? membership
+                       4. Whether user issued "update"
+                       5. The booking id of the desired update booking/membership
+                       6. The new number of that booking
+                       7. Whether user issued "delete_basket"
     THEN check 1. Valid status code (200)
                2. The redirected url
                3. page_title (rendered template parameter) or actual page title
@@ -1222,3 +1239,238 @@ def basket_delete_activity_data(request):
                 "exp_title": "Unknown Test Title",
                 "exp_url": "Unknown Test url",
                 "exp_template_path": "Unknown Test template path"}
+
+
+@pytest.fixture
+def add_booking_to_basket_post_data(request):
+    """
+    Add_Booking_To_Basket_Post_Test
+    GIVEN a Flask application
+    WHEN new ACTIVITY is added to the '/account/basket' page (POST)
+    VARYING CONDITIONS 1. User without membership is logged in / not logged in (vertex_account_cookie exists or not)
+                       2. Basket cookie with ? valid activity
+                       3. Basket cookie with ? membership
+                       4. The new booking activity & the number of booking
+    THEN check 1. Status code
+               2. The redirected url
+               3. page_title (rendered template parameter) or actual page title
+               4. name of the rendered template
+               5. Existing cookies
+               6. Whether new cookie has new booking correctly appended
+    TESTING FOR <Rule '/misc/add_booking_to_basket' (OPTIONS, POST) -> basket.view_classes_post>
+    """
+
+    from main.helper_functions.test_helpers.database_creation import activity_objs, activity_type_objs, \
+        membership_type_objs
+    from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
+        return_not_logged_in_user_response
+
+    # -----------------------------------------| ============= |----------------------------------------- #
+    # -----------------------------------------|  Basic Tests  |----------------------------------------- #
+    # -----------------------------------------| ============= |----------------------------------------- #
+
+    # Test_0 - No basket, add activity for 1. Cooke should be created
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie DOES NOT exist
+    if request.param == 0:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 1,
+                "amount_of_people": 1,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/activities/activity_types.html",
+                "exp_exist_cookies": ["session", "vertex_basket_cookie", "vertex_account_cookie"],
+                "exp_cookie_values": {"vertex_basket_cookie": "A:1"}}
+
+    # Test_1 - A:1 basket, increase by 2
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 1 valid activity (type = 1)
+    # 5. Basket cookie has NO membership
+    if request.param == 1:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 1,
+                "amount_of_people": 2,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/activities/activity_types.html",
+                "exp_exist_cookies": ["session", "vertex_basket_cookie", "vertex_account_cookie"],
+                "exp_cookie_values": {"vertex_basket_cookie": "A:1;A:1;A:1"}}
+
+    # Test_2 - M:1:1 basket, add <Activity 2> * 2
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains NO activity
+    # 5. Basket cookie has standard membership (type = 1, duration = 1)
+    if request.param == 2:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "M:1:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 2,
+                "amount_of_people": 2,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/activities/activity_types.html",
+                "exp_exist_cookies": ["session", "vertex_basket_cookie", "vertex_account_cookie"],
+                "exp_cookie_values": {"vertex_basket_cookie": "M:1:1;A:2;A:2"}}
+
+    # Test_3 - Empty basket, add <Activity 3> * 1
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains NO activity
+    # 5. Basket cookie has NO membership
+    if request.param == 3:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 3,
+                "amount_of_people": 1,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/activities/activity_types.html",
+                "exp_exist_cookies": ["session", "vertex_basket_cookie", "vertex_account_cookie"],
+                "exp_cookie_values": {"vertex_basket_cookie": "A:3"}}
+
+    # Test_4 - Empty basket, add <Activity 4> * 9 (Invalid)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains NO activity
+    # 5. Basket cookie has NO membership
+    if request.param == 4:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 4,
+                "amount_of_people": 9,
+
+                "exp_status_code": 500,
+                "exp_title": "", "exp_url": "/activities/types",
+                "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session", "vertex_account_cookie"]}
+
+    # Test_5 - A:1 basket, add <Activity 4> * 9 (Invalid)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 1 valid activity (type = 1)
+    # 5. Basket cookie has NO membership
+    if request.param == 5:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 4,
+                "amount_of_people": 9,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session", "vertex_account_cookie"]}
+
+    # Test_6 - Basket with 15 items, add 1 activity (Invalid)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 15 valid activities (8 * type 6, 7 * type 8)
+    # 5. Basket cookie has NO membership
+    if request.param == 6:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:6;A:6;A:6;A:6;A:6;A:6;A:6;A:6;A:8;A:8;A:8;A:8;A:8;A:8;A:8"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 1,
+                "amount_of_people": 1,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session", "vertex_account_cookie"]}
+
+    # Test_7 - Add negative booking (Invalid)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 1 valid activity (type = 7)
+    # 5. Basket cookie has NO membership
+    if request.param == 7:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:7"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 1,
+                "amount_of_people": -1,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session", "vertex_account_cookie"]}
+
+    # Test_8 - Add 0 booking (Valid)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 1 valid activity (type = 9)
+    # 5. Basket cookie has NO membership
+    if request.param == 8:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:9"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 1,
+                "amount_of_people": 0,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session", "vertex_account_cookie"]}
+
+    # Test_9 - user not logged in, expect redirect to login and delete basket cookie
+    # 1. vertex_account_cookie DOES NOT exist
+    # 2. vertex_basket_cookie exists
+    # 3. Basket cookie contains 1 valid activity (type = 1)
+    # 4. Basket cookie has NO membership
+    if request.param == 9:
+        return {"mocked_return_user_response": return_not_logged_in_user_response,
+                "create_basket_cookie_and_value": (True, "A:1"),
+                "create_account_cookie_and_value": (False, ""),
+
+                "activity": 1,
+                "amount_of_people": 1,
+
+                "exp_title": "Login", "exp_url": "/account/login",
+                "exp_template_path": "/account/login_register.html",
+                "exp_exist_cookies": ["session"]}
+
+    # -----------------------------------------/ ============= \----------------------------------------- #
+    # ----------------------------------------| - Extra Tests - |---------------------------------------- #
+    # -----------------------------------------\ ============= /----------------------------------------- #
+
+    # Test_10 - Has invalid basket cookie, tries to add more (Invalid)
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 9 activities (9 * type = 1)
+    # 5. Basket cookie has NO membership
+    if request.param == 10:
+        return {"mocked_return_user_response": return_not_logged_in_user_response,
+                "create_basket_cookie_and_value": (True, "A:1;A:1;A:1;A:1;A:1;A:1;A:1;A:1;A:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "activity": 2,
+                "amount_of_people": 1,
+
+                "exp_title": "Activities", "exp_url": "/activities/types",
+                "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session"]}
+
+
