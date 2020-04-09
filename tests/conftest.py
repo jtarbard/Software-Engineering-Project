@@ -36,6 +36,7 @@ def db_setup_rollback():
 @pytest.yield_fixture(scope='session')
 def app():
     local_app = flask.Flask("main.app", instance_relative_config=True)
+    local_app.secret_key = "it's everyday bro"
     # configure
     # TODO: Change actual persisting file to tempfiles
     create_logging(local_app, transaction_filename="test_transactions.log", server_error_filename="test_server_error.log")
@@ -115,9 +116,9 @@ def template_checker():
         exp_title = kwargs.get("exp_title", "")
         exp_url = kwargs.get("exp_url", None)
         exp_template_path = kwargs.get("exp_template_path", None)
-        exp_template_context: dict = kwargs.get("exp_template_context", {})
-        exp_exist_cookies: list = kwargs.get("exp_exist_cookies", [])
-        exp_non_exist_cookies: list = kwargs.get("exp_non_exist_cookies", [])
+        exp_template_context: dict = kwargs.get("exp_template_context", dict())
+        exp_exist_cookies: list = kwargs.get("exp_exist_cookies", list())
+        exp_cookie_values: dict = kwargs.get("exp_cookie_values", dict())
 
         soup = BeautifulSoup(response.data, 'html.parser')
 
@@ -136,7 +137,7 @@ def template_checker():
                   for (exp_key, exp_val) in exp_template_context.items()
                 ]), "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + "\nActual:\n" + str(context)
         assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist: " + str(request.cookies)
-        assert all([ (out_cookie not in request.cookies) for out_cookie in exp_non_exist_cookies ]), "Expected non-existent cookies exist"
+        assert all([ request.cookies[key] == val for (key, val) in exp_cookie_values.items() ]), "Some cookies have unexpected values. Actual: " + str(request.cookies) + ", expected: " + str(exp_cookie_values)
 
         return context
 
