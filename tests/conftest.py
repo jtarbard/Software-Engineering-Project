@@ -112,11 +112,17 @@ def template_checker():
         response = kwargs.get("response", None)
         request = kwargs.get("request", None)
         templates = kwargs.get("templates", None)
+        flash_messages = kwargs.get("flash_messages", None)
+
         exp_status_code = kwargs.get("exp_status_code", 200)
         exp_title = kwargs.get("exp_title", "")
         exp_url = kwargs.get("exp_url", None)
         exp_template_path = kwargs.get("exp_template_path", None)
         exp_template_context: dict = kwargs.get("exp_template_context", dict())
+
+        exp_flash_message = kwargs.get("exp_flash_message", "")
+        exp_flash_category = kwargs.get("exp_flash_category", "")
+
         exp_exist_cookies: list = kwargs.get("exp_exist_cookies", list())
         exp_cookie_values: dict = kwargs.get("exp_cookie_values", dict())
 
@@ -125,21 +131,44 @@ def template_checker():
         template, context = templates[0]
         print("Context obtained:")
         pprint(context)
-        assert response.status_code == exp_status_code, "Invalid status code"
-        assert request.path == exp_url, "Mismatching url (usually this indicates wrong redirection)"
-        assert len(templates) == 1, "Returned not enough / too many templates. Expected 1 (This should never happen in theory)"
-        assert exp_title in soup.title.string or exp_title in context.get("page_title", ""), "Expected title not found"
-        assert template.name == exp_template_path, "Rendered wrong template"
+        assert response.status_code == exp_status_code, \
+            "Invalid status code"
+        assert request.path == exp_url, \
+            "Mismatching url (usually this indicates wrong redirection)"
+        assert len(templates) == 1, \
+            "Returned not enough / too many templates. Expected 1 (This should never happen in theory)"
+        assert exp_title in soup.title.string or exp_title in context.get("page_title", ""), \
+            "Expected title not found"
+        assert template.name == exp_template_path, \
+            "Rendered wrong template"
         # pythonic :)
         assert \
             all([ any([ context.get(exp_key, "") == val for val in exp_val ]) if type(exp_val) == list
                   else context.get(exp_key, "") == exp_val
                   for (exp_key, exp_val) in exp_template_context.items()
-                ]), "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + "\nActual:\n" + str(context)
-        assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), "Some existing cookies should not exist: " + str(request.cookies)
-        assert all([ request.cookies[key] == val for (key, val) in exp_cookie_values.items() ]), "Some cookies have unexpected values. Actual: " + str(request.cookies) + ", expected: " + str(exp_cookie_values)
+                ]), \
+            "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + \
+            "\nActual:\n" + str(context)
 
-        return context
+        message, category = None, None
+        if len(flash_messages) > 0:
+            message, category = flash_messages[0]
+            print("Flash message obtained:")
+            print("Message:", message)
+            print("Category:", category)
+            assert category == exp_flash_category, \
+                f"Expected category is {exp_flash_category}, but got {category}"
+            assert exp_flash_message in message, \
+                f"Expected {exp_flash_message} to be in {message}"
+
+        print("Cookies:")
+        pprint(request.cookies)
+        assert all([ (cookie in exp_exist_cookies) for cookie in request.cookies ]), \
+            "Some existing cookies should not exist: " + str(request.cookies)
+        assert all([ request.cookies[key] == val for (key, val) in exp_cookie_values.items() ]), \
+            "Some cookies have unexpected values. Actual: " + str(request.cookies) + ", expected: " + str(exp_cookie_values)
+
+        return context, message, category
 
     return _template_checker
 
@@ -156,21 +185,32 @@ def basket_template_checker(template_checker):
         exp_total_discounted_price = kwargs.get("exp_total_discounted_price", 0)
         exp_final_price = kwargs.get("exp_final_price", 0)
 
-        context = template_checker(**kwargs)
+        context, message, category = template_checker(**kwargs)
 
-        assert all( actual_activity in list(exp_activities.keys()) for actual_activity in context.get("basket_activities", []) ), "Found unexpected activitiies in rendered page"
-        assert context.get("basket_membership", None) == exp_membership, "Mismatching basket_membership"
-        assert context.get("basket_membership_duration", None) == exp_basket_membership_duration, "Mismatching basket_membership_duration"
-        assert context.get("current_membership_discount", 0) == exp_membership_discount, "Mismatching current_membership_discount"
-        assert context.get("total_activity_price", 0) == exp_total_activity_price, "Mismatching total_activity_price"
-        assert context.get("total_discounted_price", 0) == exp_total_discounted_price, "Mismatching total_discounted_price"
+        assert all( actual_activity in list(exp_activities.keys()) for actual_activity in context.get("basket_activities", []) ), \
+            "Found unexpected activitiies in rendered page"
+        assert context.get("basket_membership", None) == exp_membership, \
+            "Mismatching basket_membership"
+        assert context.get("basket_membership_duration", None) == exp_basket_membership_duration, \
+            "Mismatching basket_membership_duration"
+        assert context.get("current_membership_discount", 0) == exp_membership_discount, \
+            "Mismatching current_membership_discount"
+        assert context.get("total_activity_price", 0) == exp_total_activity_price, \
+            "Mismatching total_activity_price"
+        assert context.get("total_discounted_price", 0) == exp_total_discounted_price, \
+            "Mismatching total_discounted_price"
         for ctx_activity_obj, (session_price, num_bookings, bulk_discount) in context.get("activity_and_price", dict()).items():
-            assert ctx_activity_obj in exp_activities, "Rendered with an unexpected activity in activity_and_price"
+            assert ctx_activity_obj in exp_activities, \
+                "Rendered with an unexpected activity in activity_and_price"
             exp_session_price, exp_num_bookings, exp_bulk_discount = exp_activities.get(ctx_activity_obj, (None, None, None))
-            assert session_price == exp_session_price, "Mismatching session_price for activity " + str(ctx_activity_obj)
-            assert num_bookings == exp_num_bookings, "Mismatching num_bookings for activity " + str(ctx_activity_obj)
-            assert bulk_discount == exp_bulk_discount, "Mismatching bulk_discount for activity " + str(ctx_activity_obj)
-        assert context.get("final_price", 0) == exp_final_price, "Mismatching final_price"
+            assert session_price == exp_session_price, \
+                "Mismatching session_price for activity " + str(ctx_activity_obj)
+            assert num_bookings == exp_num_bookings, \
+                "Mismatching num_bookings for activity " + str(ctx_activity_obj)
+            assert bulk_discount == exp_bulk_discount, \
+                "Mismatching bulk_discount for activity " + str(ctx_activity_obj)
+        assert context.get("final_price", 0) == exp_final_price, \
+            "Mismatching final_price"
 
     return _basket_template_checker
 
@@ -184,11 +224,15 @@ def memberships_template_checker(template_checker):
         exp_standard_id = kwargs.get("exp_standard_id", -1)
         exp_premium_id = kwargs.get("exp_premium_id", -1)
 
-        context = template_checker(**kwargs)
+        context, message, category = template_checker(**kwargs)
 
-        assert context.get("standard_price", -1) == exp_standard_price, "Mismatching standard_price"
-        assert context.get("premium_price", -1) == exp_premium_price, "Mismatching premium_price"
-        assert context.get("standard_id", -1) == exp_standard_id, "Mismatching standard_id"
-        assert context.get("premium_id", -1) == exp_premium_id, "Mismatching premium_id"
+        assert context.get("standard_price", -1) == exp_standard_price, \
+            "Mismatching standard_price"
+        assert context.get("premium_price", -1) == exp_premium_price, \
+            "Mismatching premium_price"
+        assert context.get("standard_id", -1) == exp_standard_id, \
+            "Mismatching standard_id"
+        assert context.get("premium_id", -1) == exp_premium_id, \
+            "Mismatching premium_id"
 
     return _memberships_template_checker

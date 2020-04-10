@@ -1,6 +1,7 @@
 # https://stackoverflow.com/questions/23987564/test-flask-render-template-context
-from flask import template_rendered
+from flask import template_rendered, message_flashed
 from contextlib import contextmanager
+
 
 @contextmanager
 def captured_templates(app):
@@ -17,9 +18,15 @@ def captured_templates(app):
 
 
 # Testing messages are flashed
-# recorded = []
-# def record(sender, message, category, **extra):
-#     recorded.append((message, category))
-#
-# from flask import message_flashed
-# message_flashed.connect(record, app)
+@contextmanager
+def captured_flashes(app):
+    recorded = []
+
+    def record(sender, message, category, **extra):
+        recorded.append((message, category))
+
+    message_flashed.connect(record, app)
+    try:
+        yield recorded
+    finally:
+        message_flashed.disconnect(record, app)
