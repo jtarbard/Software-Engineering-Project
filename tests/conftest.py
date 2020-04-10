@@ -102,6 +102,8 @@ def populate_database():
             for obj in table_dict[table]:
                 database.session.add(obj)
 
+        database.session.flush()
+
     return _add
 
 
@@ -151,15 +153,17 @@ def template_checker():
             "\nActual:\n" + str(context)
 
         message, category = None, None
-        if len(flash_messages) > 0:
+        if exp_flash_message != "" or exp_flash_category != "":
+            assert len(flash_messages) == 1, \
+                "Did not flash message" if len(flash_messages) == 0 else "Flashed too many messages"
             message, category = flash_messages[0]
             print("Flash message obtained:")
             print("Message:", message)
             print("Category:", category)
             assert category == exp_flash_category, \
-                f"Expected category is {exp_flash_category}, but got {category}"
-            assert exp_flash_message in message, \
-                f"Expected {exp_flash_message} to be in {message}"
+                f"Expected category to be {exp_flash_category}, but got {category}"
+            assert exp_flash_message.lower() in message.lower(), \
+                f"Expected {exp_flash_message.lower()} to be in {message.lower()}"
 
         print("Cookies:")
         pprint(request.cookies)
