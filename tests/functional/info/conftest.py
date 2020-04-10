@@ -9,6 +9,13 @@ def pytest_generate_tests(metafunc):
                                   "[Basic] Logged in, standard membership",
                                   "[Basic] Logged in, premium membership",
                                   "[Extra] Basket cookie is retained and unmodified"])
+    if "cancel_membership_data" in metafunc.fixturenames:
+        metafunc.parametrize("cancel_membership_data", range(5), indirect=True,
+                             ids=["[Basic] Not logged in, No membership",
+                                  "[Basic] Logged in, No membership",
+                                  "[Basic] Logged in, standard membership",
+                                  "[Basic] Logged in, premium membership",
+                                  "[Extra] Basket cookie is retained and unmodified"])
     if "buy_membership_data" in metafunc.fixturenames:
         metafunc.parametrize("buy_membership_data", range(10), indirect=True,
                              ids=["[Basic] No basket, add membership. Cooke should be created",
@@ -43,8 +50,6 @@ def membership_view_data(request):
     TESTING FOR <Rule '/info/memberships' (OPTIONS, HEAD, GET) -> info.membership_view>
     """
 
-    from main.helper_functions.test_helpers.database_creation import activity_objs, activity_type_objs, \
-        membership_type_objs
     from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
         return_customer_premium_with_no_response, \
         return_customer_standard_with_no_response, \
@@ -61,7 +66,6 @@ def membership_view_data(request):
     # Not logged in, No membership
     # ------
     # 1. vertex_account_cookie does NOT exist
-    # 2. User does not have a membership
     if request.param == 0:
         return {"mocked_return_user_response": return_not_logged_in_user_response,
                 "create_basket_cookie_and_value": (False, ""),
@@ -138,6 +142,133 @@ def membership_view_data(request):
 
 
 @pytest.fixture
+def cancel_membership_data(request):
+    """
+    Cancel_Membership_Test
+    GIVEN a Flask application
+    WHEN the '/info/memberships' page is requested (GET)
+    VARYING CONDITIONS 1. User with/without membership is logged in / not logged in
+    THEN check 1. Valid status code (200)
+               2. The redirected url
+               3. page_title (rendered template parameter) or actual page title
+               4. name of the rendered template
+               5. Existing cookies
+
+    TESTING FOR <Rule '/info/memberships/cancel' (OPTIONS, HEAD, GET) -> info.cancel_membership>
+    """
+
+    from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
+        return_customer_premium_with_no_response, \
+        return_customer_standard_with_no_response, \
+        return_not_logged_in_user_response
+
+    # TODO: Consider refactoring the data in another function so that "data" doesn't need to be re-run n times.
+    #       Have 2 functions as "Data Container" and "Data Retrieval"
+
+    # -----------------------------------------| ============= |----------------------------------------- #
+    # -----------------------------------------|  Basic Tests  |----------------------------------------- #
+    # -----------------------------------------| ============= |----------------------------------------- #
+
+    # Test 0
+    # Not logged in, No membership
+    # Expect Redirect to login
+    # Expect flash error telling user to login
+    # ------
+    # 1. vertex_account_cookie does NOT exist
+    if request.param == 0:
+        return {"mocked_return_user_response": return_not_logged_in_user_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (False, ""),
+
+                "exp_title": "Login", "exp_url": "/account/login",
+                "exp_template_path": "/account/login_register.html",
+                "exp_exist_cookies": [],
+
+                "exp_flash_category": "error",
+                "exp_flash_message": "login"}
+
+    # Test 1
+    # Logged in, No membership
+    # Expect flash message telling user he does not have a membership (and hence can't cancel)
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    elif request.param == 1:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Membership", "exp_url": "/account/membership",
+                "exp_template_path": "/account/membership.html",
+                "exp_exist_cookies": ["vertex_account_cookie"],
+
+                "exp_flash_category": "error",
+                "exp_flash_message": "membership"}
+
+    # Test 2
+    # Logged in, standard membership
+    # Expect flash message indicating successful cancel
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User has standard membership
+    elif request.param == 2:
+        return {"mocked_return_user_response": return_customer_standard_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Membership", "exp_url": "/account/membership",
+                "exp_template_path": "/account/membership.html",
+                "exp_exist_cookies": ["vertex_account_cookie"],
+
+                "exp_flash_category": "success",
+                "exp_flash_message": "cancel"}
+
+    # Test 3
+    # Logged in, premium membership
+    # Expect flash message indicating successful cancel
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User has premium membership
+    elif request.param == 3:
+        return {"mocked_return_user_response": return_customer_premium_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Membership", "exp_url": "/account/membership",
+                "exp_template_path": "/account/membership.html",
+                "exp_exist_cookies": ["vertex_account_cookie"],
+
+                "exp_flash_category": "success",
+                "exp_flash_message": "cancel"}
+
+    # -----------------------------------------/ ============= \----------------------------------------- #
+    # ----------------------------------------| - Extra Tests - |---------------------------------------- #
+    # -----------------------------------------\ ============= /----------------------------------------- #
+
+    # Test 4
+    # Basket cookie is retained and unmodified
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. Basket cookie exists
+    elif request.param == 4:
+        return {"mocked_return_user_response": return_customer_standard_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;M:2:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Membership", "exp_url": "/account/membership",
+                "exp_template_path": "/account/membership.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"],
+                "exp_cookie_values": {"vertex_basket_cookie": "A:1;M:2:1"},
+
+                "exp_flash_category": "success",
+                "exp_flash_message": "cancel"}
+
+    else:
+        return False
+
+
+@pytest.fixture
 def buy_membership_data(request):
     """
     Buy_Membership_Test
@@ -158,11 +289,7 @@ def buy_membership_data(request):
     TESTING FOR <Rule '/info/memberships/buy' (OPTIONS, POST) -> info.buy_membership>
     """
 
-    from main.helper_functions.test_helpers.database_creation import activity_objs, activity_type_objs, \
-        membership_type_objs
     from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
-        return_customer_premium_with_no_response, \
-        return_customer_standard_with_no_response, \
         return_not_logged_in_user_response
 
     # -----------------------------------------| ============= |----------------------------------------- #
