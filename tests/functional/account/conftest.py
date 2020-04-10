@@ -1462,7 +1462,7 @@ def add_booking_to_basket_post_data(request):
     # 4. Basket cookie contains 9 activities (9 * type = 1)
     # 5. Basket cookie has NO membership
     if request.param == 10:
-        return {"mocked_return_user_response": return_not_logged_in_user_response,
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
                 "create_basket_cookie_and_value": (True, "A:1;A:1;A:1;A:1;A:1;A:1;A:1;A:1;A:1"),
                 "create_account_cookie_and_value": (True, "Account"),
 
@@ -1471,6 +1471,28 @@ def add_booking_to_basket_post_data(request):
 
                 "exp_title": "Activities", "exp_url": "/activities/types",
                 "exp_template_path": "/misc/general_error.html",
+                "exp_exist_cookies": ["session"]}
+
+    # Test 11
+    # A:1 basket. User not logged in, tries to add <Activity 2> to basket (Invalid)
+    # TODO: (Expect basket cookie to be deleted and error flashed as message)
+    # Expect redirection to login page
+    # -------
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. vertex_basket_cookie exists
+    # 4. Basket cookie contains 9 activities (9 * type = 1)
+    # 5. Basket cookie has NO membership
+    if request.param == 11:
+        return {"mocked_return_user_response": return_not_logged_in_user_response(),
+                "create_basket_cookie_and_value": (True, "A:1"),
+                "create_account_cookie_and_value": (False, ""),
+
+                "activity": 2,
+                "amount_of_people": 1,
+
+                "exp_title": "Login", "exp_url": "/account/login",
+                "exp_template_path": "/account/login_register.html",
                 "exp_exist_cookies": ["session"]}
 
 

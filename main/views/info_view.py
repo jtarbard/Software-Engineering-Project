@@ -24,7 +24,7 @@ def contact_us_view():
 @blueprint.route('/info/facilities', methods=["GET"])
 def facilities_view():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
-    return flask.render_template("info/facilities.html", has_cookie=has_cookie,
+    return flask.render_template("/info/facilities.html", has_cookie=has_cookie,
                                  facilities=Facility.query.all(), page_title="Facilities", User=user)
 
 
@@ -36,7 +36,7 @@ def membership_view():
     standard_price = MembershipType.query.filter_by(membership_type_id=standard_id).first().monthly_price
     premium_price = MembershipType.query.filter_by(membership_type_id=premium_id).first().monthly_price
 
-    return flask.render_template("info/memberships.html", page_title="Memberships", has_cookie=has_cookie,
+    return flask.render_template("/info/memberships.html", page_title="Memberships", has_cookie=has_cookie,
                                  User=user, premium_price=premium_price, standard_price=standard_price,
                                  standard_id=standard_id, premium_id=premium_id)
 
