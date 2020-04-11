@@ -251,7 +251,7 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
     Generic test for routes.
     :param request_type: "POST" or "GET"
     :param data: basic actual & expected data, returned from the test_route GET request
-    :param extra_data: extra data expected from the test_route GET request
+    :param extra_exp_data: extra data expected from the test_route GET request
 
     :param app: fixture
     :param test_client:  fixture
@@ -261,7 +261,7 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
     :return: None
     """
 
-    def _generic_route_test(request_type: str, data: dict, extra_data: dict, post_data: dict = {}):
+    def _generic_route_test(request_type: str, data: dict, extra_exp_data: dict = {}, post_data: dict = {}):
         import main.helper_functions.test_helpers.flask_signal_capturer as signal_capturer
         import main.helper_functions.test_helpers.mocked_functions as mocked_functions
 
@@ -300,13 +300,14 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
         with signal_capturer.captured_templates(app) as templates:
             with signal_capturer.captured_flashes(app) as flash_messages:
 
+                # TODO: Generalize
                 if create_basket_cookie:
                     test_client.set_cookie("localhost", "vertex_basket_cookie", basket_cookie_value)
                 if create_account_cookie:
                     test_client.set_cookie("localhost", "vertex_account_cookie", account_cookie_value)
 
                 if request_type.upper() == "POST":
-                    rv = test_client.get(test_route, follow_redirects=True, data=post_data)
+                    rv = test_client.post(test_route, follow_redirects=True, data=post_data)
                 elif request_type.upper() == "GET":
                     rv = test_client.get(test_route, follow_redirects=True)
                 else:
@@ -321,7 +322,7 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
                                                               exp_cookie_values=exp_cookie_values,
                                                               exp_status_code=exp_status_code)
 
-                for (key, val) in extra_data.items():
+                for (key, val) in extra_exp_data.items():
                     assert context.get(key, None) == val, \
                         f"Expected {key} to be {val} but got {context.get(key, None)}"
 
