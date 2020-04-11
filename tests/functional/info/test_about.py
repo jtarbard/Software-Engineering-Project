@@ -1,7 +1,6 @@
-from bs4 import BeautifulSoup
 
 
-def test_about_get(test_client, page_title_dict):
+def test_about_get(generic_route_test, about_get_data):
     """
     GIVEN a Flask application
     WHEN the '/info/about' page is requested (GET)
@@ -9,9 +8,11 @@ def test_about_get(test_client, page_title_dict):
 
     TESTING FOR <Rule '/info/about' (OPTIONS, HEAD, GET) -> info.about_view>
     """
-    response = test_client.get("/info/about")
 
-    soup = BeautifulSoup(response.data, 'html.parser')
+    about_get_data["test_route"] = "/info/about"
+    about_get_data["database_tables"] = ["facility", "activity_type", "activity", "membership_type",
+                                         "customer", "customer_with_membership", "membership_receipt",
+                                         "membership"]
 
-    assert response.status_code == 200
-    assert soup.title.string.strip() == page_title_dict["about.html"].strip()  # for simple pages, this suffices
+    generic_route_test(request_type="GET",
+                       data=about_get_data)

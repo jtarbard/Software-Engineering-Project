@@ -223,29 +223,6 @@ def basket_template_checker(template_checker):
 
 
 @pytest.fixture(scope="function")
-def memberships_template_checker(template_checker):
-
-    def _memberships_template_checker(**kwargs):
-        exp_standard_price = kwargs.get("exp_standard_price", -1)
-        exp_premium_price = kwargs.get("exp_premium_price", -1)
-        exp_standard_id = kwargs.get("exp_standard_id", -1)
-        exp_premium_id = kwargs.get("exp_premium_id", -1)
-
-        context, message, category = template_checker(**kwargs)
-
-        assert context.get("standard_price", -1) == exp_standard_price, \
-            "Mismatching standard_price"
-        assert context.get("premium_price", -1) == exp_premium_price, \
-            "Mismatching premium_price"
-        assert context.get("standard_id", -1) == exp_standard_id, \
-            "Mismatching standard_id"
-        assert context.get("premium_id", -1) == exp_premium_id, \
-            "Mismatching premium_id"
-
-    return _memberships_template_checker
-
-
-@pytest.fixture(scope="function")
 def generic_route_test(app, test_client, mocker, template_checker, populate_database):
     """
     Generic test for routes.
@@ -329,3 +306,114 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
         # --------------------------------- END OF THIS TEST: _generic_route_test --------------------------------- #
 
     return _generic_route_test
+
+
+@pytest.fixture
+def generic_route_data():
+    """
+    Generic_Route_Test
+    GIVEN a Flask application
+    WHEN the <supplied_url> page is requested (GET)
+    VARYING CONDITIONS 1. User with/without membership is logged in / not logged in
+    THEN check 1. Valid status code (200)
+               2. The redirected url
+               3. page_title (rendered template parameter) or actual page title
+               4. name of the rendered template
+               5. Existing cookies
+
+    DATA for generic GET rule.
+    This is meant to be extended.
+    """
+
+    def _generic_route_data(request, exp_title, exp_url, exp_template_path):
+        from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
+            return_customer_premium_with_no_response, \
+            return_customer_standard_with_no_response, \
+            return_not_logged_in_user_response
+
+        # TODO: Consider refactoring the data in another function so that "data" doesn't need to be re-run n times.
+        #       Have 2 functions as "Data Container" and "Data Retrieval"
+
+        # -----------------------------------------| ============= |----------------------------------------- #
+        # -----------------------------------------|  Basic Tests  |----------------------------------------- #
+        # -----------------------------------------| ============= |----------------------------------------- #
+
+        # Test 0
+        # Not logged in, No membership
+        # ------
+        # 1. vertex_account_cookie does NOT exist
+        if request.param == 0:
+            return {"mocked_return_user_response": return_not_logged_in_user_response,
+                    "create_basket_cookie_and_value": (False, ""),
+                    "create_account_cookie_and_value": (False, ""),
+
+                    "exp_title": exp_title, "exp_url": exp_url,
+                    "exp_template_path": exp_template_path,
+                    "exp_exist_cookies": []}
+
+        # Test 1
+        # Logged in, No membership
+        # ------
+        # 1. vertex_account_cookie exists
+        # 2. User does not have a membership
+        elif request.param == 1:
+            return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                    "create_basket_cookie_and_value": (False, ""),
+                    "create_account_cookie_and_value": (True, "Account"),
+
+                    "exp_title": exp_title, "exp_url": exp_url,
+                    "exp_template_path": exp_template_path,
+                    "exp_exist_cookies": ["vertex_account_cookie"]}
+
+        # Test 2
+        # Logged in, standard membership
+        # ------
+        # 1. vertex_account_cookie exists
+        # 2. User has standard membership
+        elif request.param == 2:
+            return {"mocked_return_user_response": return_customer_standard_with_no_response,
+                    "create_basket_cookie_and_value": (False, ""),
+                    "create_account_cookie_and_value": (True, "Account"),
+
+                    "exp_title": exp_title, "exp_url": exp_url,
+                    "exp_template_path": exp_template_path,
+                    "exp_exist_cookies": ["vertex_account_cookie"]}
+
+        # Test 3
+        # Logged in, premium membership
+        # ------
+        # 1. vertex_account_cookie exists
+        # 2. User has premium membership
+        elif request.param == 3:
+            return {"mocked_return_user_response": return_customer_premium_with_no_response,
+                    "create_basket_cookie_and_value": (False, ""),
+                    "create_account_cookie_and_value": (True, "Account"),
+
+                    "exp_title": exp_title, "exp_url": exp_url,
+                    "exp_template_path": exp_template_path,
+                    "exp_exist_cookies": ["vertex_account_cookie"]}
+
+        # -----------------------------------------/ ============= \----------------------------------------- #
+        # ----------------------------------------| - Extra Tests - |---------------------------------------- #
+        # -----------------------------------------\ ============= /----------------------------------------- #
+
+        # Test 4
+        # Basket cookie is retained and unmodified
+        # ------
+        # 1. vertex_account_cookie exists
+        # 2. User does not have a membership
+        # 3. Basket cookie exists
+        elif request.param == 4:
+            return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                    "create_basket_cookie_and_value": (True, "A:1;M:1:1"),
+                    "create_account_cookie_and_value": (True, "Account"),
+
+                    "exp_title": exp_title, "exp_url": exp_url,
+                    "exp_template_path": exp_template_path,
+                    "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"],
+                    "exp_cookie_values": {"vertex_basket_cookie": "A:1;M:1:1"}}
+
+        else:
+            return False
+
+    return _generic_route_data

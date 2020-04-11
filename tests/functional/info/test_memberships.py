@@ -1,4 +1,3 @@
-import flask
 
 
 def test_membership_view(generic_route_test, membership_view_data):
