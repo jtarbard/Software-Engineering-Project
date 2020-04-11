@@ -27,10 +27,13 @@ def pytest_runtest_setup(item):
 # Automatically run for every test.
 # Rolls the database back to the initial state (empty) so each test database is independent.
 @pytest.yield_fixture(scope="function", autouse=True)
-def db_setup_rollback():
+def db_setup_rollback(test_client):
     database.session.begin_nested()
     yield
+    test_client.delete_cookie("localhost", "vertex_basket_cookie")
+    test_client.delete_cookie("localhost", "vertex_account_cookie")
     database.session.rollback()
+
 
 
 @pytest.yield_fixture(scope='session')
@@ -240,3 +243,88 @@ def memberships_template_checker(template_checker):
             "Mismatching premium_id"
 
     return _memberships_template_checker
+
+
+@pytest.fixture(scope="function")
+def generic_route_test(app, test_client, mocker, template_checker, populate_database):
+    """
+    Generic test for routes.
+    :param request_type: "POST" or "GET"
+    :param data: basic actual & expected data, returned from the test_route GET request
+    :param extra_data: extra data expected from the test_route GET request
+
+    :param app: fixture
+    :param test_client:  fixture
+    :param mocker: pytest supplied fixture
+    :param template_checker: fixture
+    :param populate_database: fixture
+    :return: None
+    """
+
+    def _generic_route_test(request_type: str, data: dict, extra_data: dict, post_data: dict = {}):
+        import main.helper_functions.test_helpers.flask_signal_capturer as signal_capturer
+        import main.helper_functions.test_helpers.mocked_functions as mocked_functions
+
+        database_tables = data.get("database_tables", [])
+        test_route = data.get("test_route", "/")
+
+        mocked_return_user_response = data.get("mocked_return_user_response")
+        create_basket_cookie, basket_cookie_value = data.get("create_basket_cookie_and_value",
+                                                             (False, ""))
+        create_account_cookie, account_cookie_value = data.get("create_account_cookie_and_value",
+                                                               (True, "Account"))
+
+        exp_status_code = data.get("exp_status_code", 200)
+        exp_title = data.get("exp_title")
+        exp_url = data.get("exp_url")
+        exp_template_path = data.get("exp_template_path")
+
+        exp_flash_message = data.get("exp_flash_message", "")
+        exp_flash_category = data.get("exp_flash_category", "")
+
+        exp_exist_cookies = data.get("exp_exist_cookies", list())
+        exp_cookie_values = data.get("exp_cookie_values", dict())
+
+        # ------------------------------------------------------- #
+
+        # Get objects after database is populated (and they are created)
+        mocker.patch('main.view_lib.cookie_lib.return_user_response', side_effect=mocked_return_user_response)
+        # Do not commit any database change
+        mocker.patch("main.data.db_session.add_to_database", side_effect=mocked_functions.add_to_database)
+        mocker.patch("main.data.db_session.add_to_database", side_effect=mocked_functions.delete_from_database)
+        # Populate database with simple dummy data
+        populate_database(database_tables)
+
+        # ------------------------------------------------------- #
+
+        with signal_capturer.captured_templates(app) as templates:
+            with signal_capturer.captured_flashes(app) as flash_messages:
+
+                if create_basket_cookie:
+                    test_client.set_cookie("localhost", "vertex_basket_cookie", basket_cookie_value)
+                if create_account_cookie:
+                    test_client.set_cookie("localhost", "vertex_account_cookie", account_cookie_value)
+
+                if request_type.upper() == "POST":
+                    rv = test_client.get(test_route, follow_redirects=True, data=post_data)
+                elif request_type.upper() == "GET":
+                    rv = test_client.get(test_route, follow_redirects=True)
+                else:
+                    assert False, f"Invalid request type \"{request_type}\". Can only be \"POST\" or \"GET\"."
+
+                context, message, category = template_checker(response=rv, request=flask.request, templates=templates,
+                                                              flash_messages=flash_messages,
+                                                              exp_title=exp_title,
+                                                              exp_url=exp_url, exp_template_path=exp_template_path,
+                                                              exp_flash_message=exp_flash_message, exp_flash_category=exp_flash_category,
+                                                              exp_exist_cookies=exp_exist_cookies,
+                                                              exp_cookie_values=exp_cookie_values,
+                                                              exp_status_code=exp_status_code)
+
+                for (key, val) in extra_data.items():
+                    assert context.get(key, None) == val, \
+                        f"Expected {key} to be {val} but got {context.get(key, None)}"
+
+        # --------------------------------- END OF THIS TEST: _generic_route_test --------------------------------- #
+
+    return _generic_route_test
