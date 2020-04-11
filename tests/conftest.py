@@ -334,11 +334,11 @@ def generic_route_data():
     This is meant to be extended.
     """
 
-    def _generic_route_data(request, exp_title, exp_url, exp_template_path):
+    def _generic_route_data(request, exp_title, exp_url, exp_template_path, needs_login=True):
         from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
             return_customer_premium_with_no_response, \
             return_customer_standard_with_no_response, \
-            return_not_logged_in_user_response
+            return_not_logged_in_user_response, return_not_logged_in_user_with_no_response
 
         # TODO: Consider refactoring the data in another function so that "data" doesn't need to be re-run n times.
         #       Have 2 functions as "Data Container" and "Data Retrieval"
@@ -352,7 +352,8 @@ def generic_route_data():
         # ------
         # 1. vertex_account_cookie does NOT exist
         if request.param == 0:
-            return {"mocked_return_user_response": return_not_logged_in_user_response,
+            return {"mocked_return_user_response": return_not_logged_in_user_response if needs_login
+                                                   else return_not_logged_in_user_with_no_response,
                     "create_basket_cookie_and_value": (False, ""),
                     "create_account_cookie_and_value": (False, ""),
 
