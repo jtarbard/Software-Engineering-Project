@@ -131,6 +131,8 @@ def template_checker():
         exp_exist_cookies: list = kwargs.get("exp_exist_cookies", list())
         exp_cookie_values: dict = kwargs.get("exp_cookie_values", dict())
 
+        exp_text: list = kwargs.get("exp_text", [])
+
         soup = BeautifulSoup(response.data, 'html.parser')
 
         template, context = templates[0]
@@ -154,6 +156,9 @@ def template_checker():
                 ]), \
             "Template rendered with wrong parameters. Expected:\n" + str(exp_template_context) + \
             "\nActual:\n" + str(context)
+
+        for text in exp_text:
+            assert text.lower() in soup.get_text().lower()
 
         message, category = None, None
         if exp_flash_message != "" or exp_flash_category != "":
@@ -229,6 +234,7 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
     :param request_type: "POST" or "GET"
     :param data: basic actual & expected data, returned from the test_route GET request
     :param extra_exp_data: extra data expected from the test_route GET request
+    :param post_data: data to pass in POST request
 
     :param app: fixture
     :param test_client:  fixture
@@ -261,6 +267,8 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
 
         exp_exist_cookies = data.get("exp_exist_cookies", list())
         exp_cookie_values = data.get("exp_cookie_values", dict())
+
+        exp_text = data.get("exp_text", [])
 
         # ------------------------------------------------------- #
 
@@ -297,7 +305,8 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
                                                               exp_flash_message=exp_flash_message, exp_flash_category=exp_flash_category,
                                                               exp_exist_cookies=exp_exist_cookies,
                                                               exp_cookie_values=exp_cookie_values,
-                                                              exp_status_code=exp_status_code)
+                                                              exp_status_code=exp_status_code,
+                                                              exp_text=exp_text)
 
                 for (key, val) in extra_exp_data.items():
                     assert context.get(key, None) == val, \
