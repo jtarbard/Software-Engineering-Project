@@ -2,20 +2,18 @@ import pytest
 
 
 def pytest_generate_tests(metafunc):
+    generic_test_ids = ["[Basic] Not logged in, No membership",
+                        "[Basic] Logged in, No membership",
+                        "[Basic] Logged in, standard membership",
+                        "[Basic] Logged in, premium membership",
+                        "[Extra] Basket cookie is retained and unmodified"]
+
     if "membership_view_data" in metafunc.fixturenames:
         metafunc.parametrize("membership_view_data", range(5), indirect=True,
-                             ids=["[Basic] Not logged in, No membership",
-                                  "[Basic] Logged in, No membership",
-                                  "[Basic] Logged in, standard membership",
-                                  "[Basic] Logged in, premium membership",
-                                  "[Extra] Basket cookie is retained and unmodified"])
+                             ids=generic_test_ids)
     if "cancel_membership_data" in metafunc.fixturenames:
         metafunc.parametrize("cancel_membership_data", range(5), indirect=True,
-                             ids=["[Basic] Not logged in, No membership",
-                                  "[Basic] Logged in, No membership",
-                                  "[Basic] Logged in, standard membership",
-                                  "[Basic] Logged in, premium membership",
-                                  "[Extra] Basket cookie is retained and unmodified"])
+                             ids=generic_test_ids)
     if "buy_membership_data" in metafunc.fixturenames:
         metafunc.parametrize("buy_membership_data", range(10), indirect=True,
                              ids=["[Basic] No basket, add membership. Cooke should be created",
@@ -28,6 +26,10 @@ def pytest_generate_tests(metafunc):
                                   "[Basic] M:1:1 basket. Add membership with negative duration (Invalid)",
                                   "[Extra] Has invalid basket cookie, tries to add more (Invalid)",
                                   "[Extra] A:1 basket. User not logged in, tries to add <Activity 2> to basket (Invalid)"])
+
+    if "facilities_view_data" in metafunc.fixturenames:
+        metafunc.parametrize("facilities_view_data", range(5), indirect=True,
+                             ids=generic_test_ids)
 
 
 @pytest.fixture
@@ -535,3 +537,111 @@ def buy_membership_data(request):
 
                 "exp_flash_category": "error",
                 "exp_flash_message": "login"}
+
+# ---------------------------------------------------------------------- #
+
+@pytest.fixture
+def facilities_view_data(request):
+    """
+    Facilities_View_Test
+    GIVEN a Flask application
+    WHEN the '/info/facilities' page is requested (GET)
+    VARYING CONDITIONS 1. User with/without membership is logged in / not logged in
+    THEN check 1. Valid status code (200)
+               2. The redirected url
+               3. page_title (rendered template parameter) or actual page title
+               4. name of the rendered template
+               5. Existing cookies
+
+    TESTING FOR <Rule '/info/facilities' (OPTIONS, HEAD, GET) -> info.facilities_view>
+    """
+
+    from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
+        return_customer_premium_with_no_response, \
+        return_customer_standard_with_no_response, \
+        return_not_logged_in_user_response
+
+    # TODO: Consider refactoring the data in another function so that "data" doesn't need to be re-run n times.
+    #       Have 2 functions as "Data Container" and "Data Retrieval"
+
+    # -----------------------------------------| ============= |----------------------------------------- #
+    # -----------------------------------------|  Basic Tests  |----------------------------------------- #
+    # -----------------------------------------| ============= |----------------------------------------- #
+
+    # Test 0
+    # Not logged in, No membership
+    # ------
+    # 1. vertex_account_cookie does NOT exist
+    if request.param == 0:
+        return {"mocked_return_user_response": return_not_logged_in_user_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (False, ""),
+
+                "exp_title": "Facilities", "exp_url": "/info/facilities",
+                "exp_template_path": "/info/facilities.html",
+                "exp_exist_cookies": []}
+
+    # Test 1
+    # Logged in, No membership
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    elif request.param == 1:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Facilities", "exp_url": "/info/facilities",
+                "exp_template_path": "/info/facilities.html",
+                "exp_exist_cookies": ["vertex_account_cookie"]}
+
+    # Test 2
+    # Logged in, standard membership
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User has standard membership
+    elif request.param == 2:
+        return {"mocked_return_user_response": return_customer_standard_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Facilities", "exp_url": "/info/facilities",
+                "exp_template_path": "/info/facilities.html",
+                "exp_exist_cookies": ["vertex_account_cookie"]}
+
+    # Test 3
+    # Logged in, premium membership
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User has premium membership
+    elif request.param == 3:
+        return {"mocked_return_user_response": return_customer_premium_with_no_response,
+                "create_basket_cookie_and_value": (False, ""),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Facilities", "exp_url": "/info/facilities",
+                "exp_template_path": "/info/facilities.html",
+                "exp_exist_cookies": ["vertex_account_cookie"]}
+
+    # -----------------------------------------/ ============= \----------------------------------------- #
+    # ----------------------------------------| - Extra Tests - |---------------------------------------- #
+    # -----------------------------------------\ ============= /----------------------------------------- #
+
+    # Test 4
+    # Basket cookie is retained and unmodified
+    # ------
+    # 1. vertex_account_cookie exists
+    # 2. User does not have a membership
+    # 3. Basket cookie exists
+    elif request.param == 4:
+        return {"mocked_return_user_response": return_customer_no_membership_with_no_response,
+                "create_basket_cookie_and_value": (True, "A:1;M:1:1"),
+                "create_account_cookie_and_value": (True, "Account"),
+
+                "exp_title": "Facilities", "exp_url": "/info/facilities",
+                "exp_template_path": "/info/facilities.html",
+                "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"],
+                "exp_cookie_values": {"vertex_basket_cookie": "A:1;M:1:1"}}
+
+    else:
+        return False
