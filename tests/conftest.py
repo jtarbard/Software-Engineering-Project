@@ -19,7 +19,6 @@ from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
 # TODO: Investigate what a hook is... https://pytest.org/en/latest/reference.html#hook-reference
 def pytest_runtest_setup(item):
-    """ called before ``pytest_runtest_call(item). """
     import main.helper_functions.test_helpers.database_creation as creation
     creation.create_all()
 
@@ -131,15 +130,22 @@ def template_checker():
         exp_exist_cookies: list = kwargs.get("exp_exist_cookies", list())
         exp_cookie_values: dict = kwargs.get("exp_cookie_values", dict())
 
-        exp_text: list = kwargs.get("exp_text", [])
+        exp_text: list = kwargs.get("exp_text", list())
+        exp_args: dict = kwargs.get("exp_args", dict())
 
         soup = BeautifulSoup(response.data, 'html.parser')
+
+        assert response.status_code == exp_status_code, \
+            "Invalid status code"
+        for (arg_name, arg_val) in exp_args:
+            assert arg_name in response.args.keys(), \
+                f"Url does not have the argument {arg_name}"
+            assert arg_val == response.args.get(arg_name, None), \
+                f"{arg_name} argument expected to be {arg_val} but got {response.args.get(arg_name, None)}"
 
         template, context = templates[0]
         print("Context obtained:")
         pprint(context)
-        assert response.status_code == exp_status_code, \
-            "Invalid status code"
         assert request.path == exp_url, \
             "Mismatching url (usually this indicates wrong redirection)"
         assert len(templates) == 1, \
@@ -269,6 +275,7 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
         exp_cookie_values = data.get("exp_cookie_values", dict())
 
         exp_text = data.get("exp_text", [])
+        exp_args = data.get("exp_args", [])
 
         # ------------------------------------------------------- #
 
@@ -306,7 +313,8 @@ def generic_route_test(app, test_client, mocker, template_checker, populate_data
                                                               exp_exist_cookies=exp_exist_cookies,
                                                               exp_cookie_values=exp_cookie_values,
                                                               exp_status_code=exp_status_code,
-                                                              exp_text=exp_text)
+                                                              exp_text=exp_text,
+                                                              exp_args=exp_args)
 
                 for (key, val) in extra_exp_data.items():
                     assert context.get(key, None) == val, \
@@ -334,7 +342,7 @@ def generic_route_data():
     This is meant to be extended.
     """
 
-    def _generic_route_data(request, exp_title, exp_url, exp_template_path, needs_login=True):
+    def _generic_route_data(request, exp_title, exp_url, exp_template_path, exp_args=dict(), needs_login=True):
         from main.helper_functions.test_helpers.mocked_functions import return_customer_no_membership_with_no_response, \
             return_customer_premium_with_no_response, \
             return_customer_standard_with_no_response, \
@@ -359,6 +367,7 @@ def generic_route_data():
 
                     "exp_title": exp_title, "exp_url": exp_url,
                     "exp_template_path": exp_template_path,
+                    "exp_args": exp_args,
                     "exp_exist_cookies": []}
 
         # Test 1
@@ -373,6 +382,7 @@ def generic_route_data():
 
                     "exp_title": exp_title, "exp_url": exp_url,
                     "exp_template_path": exp_template_path,
+                    "exp_args": exp_args,
                     "exp_exist_cookies": ["vertex_account_cookie"]}
 
         # Test 2
@@ -387,6 +397,7 @@ def generic_route_data():
 
                     "exp_title": exp_title, "exp_url": exp_url,
                     "exp_template_path": exp_template_path,
+                    "exp_args": exp_args,
                     "exp_exist_cookies": ["vertex_account_cookie"]}
 
         # Test 3
@@ -401,6 +412,7 @@ def generic_route_data():
 
                     "exp_title": exp_title, "exp_url": exp_url,
                     "exp_template_path": exp_template_path,
+                    "exp_args": exp_args,
                     "exp_exist_cookies": ["vertex_account_cookie"]}
 
         # -----------------------------------------/ ============= \----------------------------------------- #
@@ -420,6 +432,7 @@ def generic_route_data():
 
                     "exp_title": exp_title, "exp_url": exp_url,
                     "exp_template_path": exp_template_path,
+                    "exp_args": exp_args,
                     "exp_exist_cookies": ["vertex_basket_cookie", "vertex_account_cookie"],
                     "exp_cookie_values": {"vertex_basket_cookie": "A:1;M:1:1"}}
 
