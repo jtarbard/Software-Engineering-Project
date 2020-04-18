@@ -215,3 +215,9 @@ def view_activity(activity_id: int):
                                  spaces_left=spaces_left, membership=membership, total_bookings=total_bookings,
                                  final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8),
                                  activity_cost=activity_cost, activity_income=activity_income)
+
+
+# -------------------------------------------------- Ajax routes -------------------------------------------------- #
+@blueprint.route("/activities/booking/query_sessions", methods=["GET"])
+def query_sessions():
+    pass

@@ -5,8 +5,12 @@
 <!-- datetime picker -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
 
-<!-- AlloyUI Stylesheet. Used for scheduler -->
-{#<link href="https://cdn.alloyui.com/3.0.1/aui-css/css/bootstrap.min.css" rel="stylesheet" />#}
+<!-- FullCalender Stylesheet. Used for scheduler -->
+<link href='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/daygrid@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.css' rel='stylesheet' />
+
 {% endblock %}
 
 {% block title %}
@@ -70,9 +74,8 @@ Booking Page
 {#                        <!-- date picker -->#}
 
                         <!-- Scheduler -->
-                        <div id="wrapper">
-                          <div id={{ "scheduler" + activity.name.title() | replace(" ", "") }}></div>
-                        </div>
+                        <div id='calendar'></div>
+{#                        <div id={{ "scheduler" + activity.name.title() | replace(" ", "") }}></div>#}
                         <!-- Scheduler -->
                     </div>
                 </div>
@@ -158,7 +161,11 @@ Booking Page
 
 {% block additional_js %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-<script src="https://cdn.alloyui.com/3.0.1/aui/aui-min.js"></script>
+<script src='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/interaction@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/daygrid@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
 
 <script>
     function afterEventMoved(event, scheduler) {
@@ -211,148 +218,170 @@ Booking Page
         }).on('hide.bs.collapse', function(){
         	$(this).prev(".card-header").find(".fa").removeClass("fa-chevron-up pull-right").addClass("fa-chevron-down pull-right");
         });
-
-        var schedulerFootball = document.getElementById('schedulerFootball');
-        schedulerFootball.setAttribute("disabled", "disabled");
-        console.log(schedulerFootball);
-
-        var items = document.getElementsByClassName("scheduler-view-day-table-col-shim");
-        for (item in items) {
-            console.log(item);
-        }
     });
 
     $(".multidate input").datepicker({
         multidate: true
     });
 
-    {% for activity_type in activity_types %}
-        YUI().use(
-            'aui-scheduler',
-            function(Y) {
-                var scheduler = null;
-                var viewConfig = {
-                    after: {
-                        "click": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        },
-
-                        "hide": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        },
-
-                        "mousedown": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        },
-
-                        "orientationchange": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        },
-
-                        "reset": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        },
-
-                        "resize": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        },
-
-                        "show": function(event) {
-                            event.halt();
-                            console.log(typeof event, event.type, event);
-                        }
-
+{#    {% for activity_type in activity_types %}#}
+{#        YUI().use(#}
+{#            'aui-scheduler',#}
+{#            function(Y) {#}
+{#                var schedulerName = "#scheduler{{ activity_type.name.title() | string | replace(" ", "") }}";#}
+{##}
+{#                var scheduler = null;#}
+{#                var viewConfig = {#}
+{#                    on: {#}
+{#                        "click": function(event) {#}
+{#                            event.halt();#}
+{#                            console.log(typeof event, event.type, event);#}
+{#                        },#}
+{##}
+{#                        "mousedown": function(event) {#}
+{#                            event.halt();#}
+{#                            console.log(typeof event, event.type, event);#}
+{#                        },#}
+{##}
                         {#"drag": function(event) {#}
                         {#    event.halt();#}
                         {#    console.log(event);#}
-                        {#},#}
+                        {# },#}
                         {#'drag:start': function(event) {#}
                         {#    event.halt();#}
                         {#    console.log(event);#}
-                            {#event.preventDefault();#}
-                            {#event.detach("drag");#}
-                        {#},#}
-                        {#'drag:end': function(event) {#}
-                        {#    event.halt();#}
-                        {#    console.log(event);#}
-                        {#}#}
-                    }
-                };
+                        {# },#}
+{#                        'drag:end': function(event) {#}
+{#                            // can get new startTime / endTime at here. If it's changed then reset it to original?#}
+{#                            // although the much better solution would be to disable the ability to change the session time completely#}
+{#                            event.halt();#}
+{#                            console.log(event);#}
+{#                        }#}
+{#                    }#}
+{#                };#}
+{#                var weekView = new Y.SchedulerWeekView(viewConfig);#}
+{##}
+{#                let sessions = [#}
+{#                    {% if activity_type.activity_type_id | int == request_activity_type_id | int %}#}
+{#                        {% for session in session_availabilities %}#}
+{#                            {#}
+{#                                content: "{{ activity_type.name | string }}",#}
+{#                                startDate: new Date({{ session.start_time.year }}, {{ session.start_time.month - 1 }}, {{ session.start_time.day }}, {{ session.start_time.hour }}, {{ session.start_time.minute }}),#}
+{#                                endDate: new Date({{ session.end_time.year }}, {{ session.end_time.month - 1 }}, {{ session.end_time.day }}, {{ session.end_time.hour }}, {{ session.end_time.minute }})#}
+{#                            },#}
+{#                        {% endfor %}#}
+{#                    {% endif %}#}
+{#                ];#}
+{##}
+{#                var eventRecorder = new Y.SchedulerEventRecorder({#}
+{#                    on: {#}
+{#                        click: function(event) {#}
+{#                            alert("clicked");#}
+{#                        },#}
+{#                        change: function(event) {#}
+{#                            alert("change");#}
+{#                        },#}
+{#                        drag: function(event) {#}
+{#                            alert("dragging");#}
+{#                            event.halt();#}
+{#                        }#}
+{#                    }#}
+{#                });#}
+{##}
+{#                scheduler = new Y.Scheduler({#}
+{#                    activeView: weekView,#}
+{#                    boundingBox: schedulerName,#}
+{#                    eventRecorder: eventRecorder,#}
+{#                    items: sessions,#}
+{#                    render: true,#}
+{#                    views: [weekView]#}
+{#                });#}
+{##}
+{#                // Disable:#}
+{#                // - drag:start - changing existing session duration#}
+{#                // ? - changing session time#}
+{#                // ? - create new session#}
+{#                weekView.detachAll("drag:start");#}
+                {#weekView.detachAll("drag");#}
+{#                weekView.detachAll("click"); // just testing#}
+                {#scheduler.detachAll("drag");#}
+{#                console.log(scheduler.items);#}
+{##}
+{#                Y.Do.after(function(e) {#}
+{#                    $('.popover').hide();#}
+{#                    // user tried to create an event#}
+{#                    if (typeof e == "undefined") {#}
+{#                        // halt the action#}
+{#                        Y.Do.Halt("not allowed to create session");#}
+{#                        alert("not allowed to create session");#}
+{#                    } else {#}
+{#                        var evt = e.getData('scheduler-event');#}
+{#                        console.log(evt.type, evt);#}
+{##}
+{#                        // Show session info#}
+{#                        $('#exampleModal').modal('show');#}
+{#                    }#}
+{#                }, eventRecorder, 'showPopover');#}
+{##}
+{#                // If user clicked on PREV, TODAY, NEXT, Query the week's worth of sessions and add to the scheduler's items#}
+{#                Y.one(schedulerName).on('focus', function (e) {#}
+{#                    console.log(this, "focus", e);#}
+{#                    console.log(e._currentTarget.className);#}
+{##}
+{#                    var request = new XMLHttpRequest();#}
+{#                    request.onload = function() {#}
+{#                        // We could do more interesting things with the response, or, we could ignore it entirely#}
+{#                        alert(request.responseText);#}
+{#                    };#}
+{#                    // We point the request at the appropriate command#}
+{#                    request.open("GET", "/" + command, true);#}
+{#                    // and then we send it off#}
+{#                    request.send();#}
+{#                });#}
+{##}
+                {#Y.one("#scheduler{{ activity_type.name.title() | string | replace(" ", "") }}").destroy();#}
+{#            }#}
+{#        );#}
+{#    {% endfor %}#}
 
-                let sessions = [
-                    {% if activity_type.activity_type_id | int == request_activity_type_id | int %}
-                        {% for session in session_availabilities %}
-                            {
-                                content: "{{ activity_type.name | string }}",
-                                startDate: new Date({{ session.start_time.year }}, {{ session.start_time.month - 1 }}, {{ session.start_time.day }}, {{ session.start_time.hour }}, {{ session.start_time.minute }}),
-                                endDate: new Date({{ session.end_time.year }}, {{ session.end_time.month - 1 }}, {{ session.end_time.day }}, {{ session.end_time.hour }}, {{ session.end_time.minute }})
-                            },
-                        {% endfor %}
-                    {% endif %}
-                ];
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
 
-                var eventRecorder = new Y.SchedulerEventRecorder({
-                    on: {
-                        click: function(event) {
-                            alert("clicked");
-                        },
-                        change: function(event) {
-                            alert("change");
-                        },
-                        drag: function(event) {
-                            alert("dragging");
-                            {#event.preventDefault();#}
-                            event.halt();
-                        }
-                    }
-                });
-                {#console.log("Event Recorder", eventRecorder.getListeners());#}
-                {#console.log("Scheduler", scheduler.getListeners());#}
-                {#console.log("Y", Y.getListeners());#}
-                var weekView = new Y.SchedulerWeekView(viewConfig);
-                {#weekView.disable();#}
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
+            defaultView: 'dayGridMonth',
+            defaultDate: Date.now(),
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: [
+                {#{#}
+                {#  title: 'Meeting',#}
+                {#  start: '2020-04-12T10:30:00',#}
+                {#  end: '2020-04-12T12:30:00'#}
+                {# },#}
+                {#{#}
+                {#  title: 'Click for Google',#}
+                {#  url: 'http://google.com/',#}
+                {#  start: '2020-04-28'#}
+                {# }#}
 
-                scheduler = new Y.Scheduler({
-                    activeView: weekView,
-                    boundingBox: "#scheduler{{ activity_type.name.title() | string | replace(" ", "") }}",
-                    eventRecorder: eventRecorder,
-                    items: sessions,
-                    render: true,
-                    views: [weekView]
-                });
-                weekView.detachAll("drag");
-                {#weekView.detachAll("drag:start");#}
-                {#weekView.detachAll("drag:end");#}
+                {% for session in session_availabilities %}
+                    {
+                        {#title: "{{ activity_type.name | string }}",#}
+                        title: "football",
+                        start: "{{ session.start_time }}",
+                        end: "{{ session.end_time }}"
+                        {#start: new Date({{ session.start_time.year }}, {{ session.start_time.month - 1 }}, {{ session.start_time.day }}, {{ session.start_time.hour }}, {{ session.start_time.minute }}),#}
+                        {#end: new Date({{ session.end_time.year }}, {{ session.end_time.month - 1 }}, {{ session.end_time.day }}, {{ session.end_time.hour }}, {{ session.end_time.minute }})#}
+                    },
+                {% endfor %}
+            ]
+        });
 
-                {#Y.Do.before(function (e) {#}
-                {#    alert("before?");#}
-                {#});#}
-
-                Y.Do.after(function(e) {
-                    $('.popover').hide();
-                    // user tried to create an event
-                    if (typeof e == "undefined") {
-                        // halt the action
-                        Y.Do.Halt("not allowed to create session");
-                        alert("not allowed to create session");
-                    } else {
-                        var evt = e.getData('scheduler-event');
-                        console.log(evt.type, evt);
-
-                        // Show session info
-                        $('#exampleModal').modal('show');
-                    }
-                }, eventRecorder, 'showPopover');
-            }
-        );
-    {% endfor %}
-
-
+        calendar.render();
+    });
 </script>
 {% endblock %}
