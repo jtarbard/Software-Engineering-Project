@@ -10,6 +10,7 @@ def return_customer_no_membership_with_no_response(request, needs_login):
 
 def return_customer_standard_with_no_response(request, needs_login):
     from main.helper_functions.test_helpers.database_creation import customer_with_membership_objs
+    print("Mock", User.query.filter_by(user_id=customer_with_membership_objs[0].user_id).first())
     return User.query.filter_by(user_id=customer_with_membership_objs[0].user_id).first(), None, True
 
 
@@ -25,6 +26,10 @@ def return_logged_in_user_response(request, needs_login):
 
 def return_not_logged_in_user_response(request, needs_login):
     return False, flask.redirect("/account/login"), True
+
+
+def return_not_logged_in_user_with_no_response(request, needs_login):
+    return False, None, True
 
 
 # Same as add_to_database but does not commit

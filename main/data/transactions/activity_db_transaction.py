@@ -15,6 +15,7 @@ TAGS_CSV = "main/data/transactions/valid_tags.csv"
 def return_activity_type_with_id(activity_type_id: int):
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
+
 # Attempts to return the name of an activity type with a specific activity type ID, this is to combat
 # lazy loading errors
 # [Lewis S]
@@ -229,7 +230,7 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
     return new_activity
 
 
-# Simply returns all activity instances between two datetimes
+# Simply returns all activity instances between two datetimes AND in the specified facility_id
 # [Lewis S]
 def return_activities_between_dates_with_facility_and_activity(start_date: datetime.datetime, end_time: datetime.datetime,
                                                                activity_type_id="Any", facility_id="Any"):
@@ -243,7 +244,24 @@ def return_activities_between_dates_with_facility_and_activity(start_date: datet
                                      Activity.activity_type_id == activity_type_id).all()
     else:
         return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
-                                     Activity.activity_id == activity_type_id, Activity.facility_id == facility_id).all()
+                                     Activity.activity_type_id == activity_type_id, Activity.facility_id == facility_id).all()
+
+
+def return_weekly_activities_of_type(day: datetime.datetime, activity_type_id: int):
+    """
+    :param day: a date that indicates the week of activities desired
+    :param activity_type_id: The type of the desired activities
+    :return: A list containing activities in "day"'s week with the specified activity_type_id
+    """
+    start_date = day - datetime.timedelta(days=day.weekday())
+    end_date = start_date + datetime.timedelta(days=6)
+
+    if activity_type_id == "Any":
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time <= end_date).all()
+    else:
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time <= end_date,
+                                     Activity.activity_type_id == activity_type_id).all()
+
 
 # Simply returns an activity with an specific id
 # [Lewis S]
@@ -254,8 +272,16 @@ def return_activity_with_id(activity_id: int):
 # Returns the max capacity for an activity of a specific type- this is used for combatting lazy loading
 # [Lewis S]
 def return_activity_capacity_with_activity_type_id(activity_type_id):
-    activity_type: ActivityType= ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+    activity_type: ActivityType = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
     return int(activity_type.maximum_activity_capacity)
+
+
+def return_activity_type_capacities():
+    """
+    :return: a dict of (activity_type_id: activity_type maximum capacity) for all activity types
+    """
+    return {activity_type.activity_type_id: activity_type.maximum_activity_capacity for activity_type in ActivityType.query.filter().all()}
+
 
 def return_facilities(facility_id):
     if facility_id == "Any":

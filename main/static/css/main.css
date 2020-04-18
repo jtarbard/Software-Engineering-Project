@@ -22,19 +22,19 @@ body {
     background-color: #E1234B;
 }
 
-.dropdown-menu {
-    color: #F2F2F2;
-    background-color: #1E1E1E;
-}
+/*.dropdown-menu {*/
+/*    color: #F2F2F2;*/
+/*    background-color: #1E1E1E;*/
+/*}*/
 
-.dropdown-menu a i {
-    padding-left: 1vw;
-}
+/*.dropdown-menu a i {*/
+/*    padding-left: 1vw;*/
+/*}*/
 
-.dropdown-menu a p {
-    display: inline;
-    padding-left: 1vw;
-}
+/*.dropdown-menu a p {*/
+/*    display: inline;*/
+/*    padding-left: 1vw;*/
+/*}*/
 
 #page_title {
     height: 15vh;
@@ -68,11 +68,11 @@ body {
   line-height: 6vh;
 }
 
-.card {
-    border-color: #F2F2F2;
-    background-color: #1E1E1E;
-    color: #F2F2F2;
-}
+/*.card {*/
+/*    border-color: #F2F2F2;*/
+/*    background-color: #1E1E1E;*/
+/*    color: #F2F2F2;*/
+/*}*/
 
 .alert {
     position: fixed;

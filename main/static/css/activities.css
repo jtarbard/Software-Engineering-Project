@@ -1,4 +1,25 @@
-.form-inline {
-    width: 80%
+/*.card {*/
+/*    background-color: initial;*/
+/*    color: initial;*/
+/*}*/
+
+/*.dropdown-menu {*/
+/*    color: initial;*/
+/*    background-color: initial;*/
+/*}*/
+
+.card {
+    z-index: 1;
 }
 
+.datetimepicker-input .input-group-append {
+    z-index: -1;
+}
+
+input {
+  border: 2px solid whitesmoke;
+  border-radius: 20px;
+  padding: 12px 10px;
+  text-align: center;
+  width: 250px;
+}

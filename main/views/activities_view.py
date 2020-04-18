@@ -16,18 +16,19 @@ blueprint = flask.Blueprint("activities", __name__)
 def view_activity_types():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
 
+    print(user, response, has_cookie)
+
     if response:
         return response
 
+    # View a chosen activity type's booking
     if flask.request.method == "POST":
         data_form = flask.request.form
-        activity = data_form.get("activity")
-        amount = data_form.get("amount")
+        request_activity_type_id = data_form.get("request_activity_type_id")
 
-        if amount == "single":
-            return flask.redirect(flask.url_for("activities.view_activities", _method='GET', multiple=False, sent_activity=activity))
-        elif amount == "multiple":
-            return flask.redirect(flask.url_for("activities.view_activities", _method='GET', multiple=True, sent_activity=activity))
+        return flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=request_activity_type_id))
+
+    # = GET. View activity_types page (url is /activities/types)
     else:
         facilities = adf.return_facilities("Any")
         activity_types = adf.return_all_activity_types()
@@ -36,94 +37,94 @@ def view_activity_types():
                                      activity_types=activity_types, facilities=facilities, page_title="Activities")
 
 
-@blueprint.route('/activities/view_activities', methods=["POST", "GET"], defaults={'multiple': False, 'sent_activity': 0})
-@blueprint.route('/activities/<sent_activity>_<multiple>', methods=["POST", "GET"])
-def view_activities(multiple, sent_activity: int):
-    sent_activity = int(sent_activity)
-
+@blueprint.route('/activities/booking', methods=["POST", "GET"])
+def view_booking():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
     if response:
         return response
 
-    data_form = flask.request.form
-
-    bulk_activities = data_form.getlist("bulk_activity")
+    # Get data from request
+    # data_form = flask.request.form
+    # bulk_activities = data_form.getlist("bulk_activity")
+    # start_time = data_form.get("start_time")
+    # start_date = data_form.get("start_date")
+    request_activity_type_id = flask.request.args.get("request_activity_type_id")
+    print("args", flask.request.args)
+    # facility_id = data_form.get("facility")
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
-    if bulk_activities:
+    # TODO: Hasn't this check already been done misc/add_to_booking???
+    # if bulk_activities:
+    #
+    #     if not is_valid:
+    #         return cl.destroy_account_cookie(flask.redirect("/"))
+    #
+    #     if basket_activities:
+    #         if (basket_membership and len(basket_activities) > 14) or len(basket_activities) > 15:
+    #             return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
+    #
+    #     try:
+    #         activity_type = adf.return_activity_with_id(bulk_activities[0]).activity_type
+    #     except:
+    #         return flask.abort(500)
+    #
+    #     added_activities = []
+    #     for activity_id in bulk_activities:
+    #         added_activity: Activity = adf.return_activity_with_id(activity_id)
+    #         if not added_activity:
+    #             return flask.abort(500)
+    #
+    #         if activity_type != added_activity.activity_type:
+    #             return flask.abort(500)
+    #
+    #         if added_activity in added_activities:
+    #             return flask.abort(500)
+    #
+    #         added_activities.append(added_activity)
+    #         spaces_left = activity_type.maximum_activity_capacity - len(
+    #             tdf.return_bookings_with_activity_id(activity_id))
+    #
+    #         if spaces_left <= 0:
+    #             return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
+    #                                          User=user, has_cookie=has_cookie)
+    #
+    #     response = cl.add_activities(added_activities, flask.request)
+    #
+    #     if not response:
+    #         return flask.abort(500)
+    #
+    #     bulk_activity_type = adf.return_activity_type_name_with_activity_type_id(sent_activity)
+    #     flask.flash(bulk_activity_type.title() + " sessions have been added to your basket.", category="success")
+    #     return response
 
-        if not is_valid:
-            return cl.destroy_account_cookie(flask.redirect("/"))
+    # Filter check
+    # if type(start_date) is str:
+    #     start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+    # if type(start_time) is str:
+    #     try:
+    #         start_time = datetime.datetime.strptime(start_time, "%H:%M").time()
+    #     except:
+    #         start_time = datetime.datetime.strptime(start_time, "%H:%M:%S").time()
 
-        if basket_activities:
-            if (basket_membership and len(basket_activities) > 14) or len(basket_activities) > 15:
-                return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
+    # if not start_time:
+    #     start_time = datetime.datetime.now().time()
+    # if not start_date:
+    #     start_date = datetime.date.today()
+    # if not activity_type_id:
+    #     activity_type_id = "Any"
+    # elif activity_type_id != "Any":
+    #     activity_type_id = int(activity_type_id)
+    # if not facility_id:
+    #     facility_id = "Any"
+    # elif facility_id != "Any":
+    #     facility_id = int(facility_id)
 
-        try:
-            activity_type = adf.return_activity_with_id(bulk_activities[0]).activity_type
-        except:
-            return flask.abort(500)
+    # start_search = datetime.datetime.combine(start_date, start_time)
 
-        added_activities = []
-        for activity_id in bulk_activities:
-            added_activity: Activity = adf.return_activity_with_id(activity_id)
-            if not added_activity:
-                return flask.abort(500)
-
-            if activity_type != added_activity.activity_type:
-                return flask.abort(500)
-
-            if added_activity in added_activities:
-                return flask.abort(500)
-
-            added_activities.append(added_activity)
-            spaces_left = activity_type.maximum_activity_capacity - len(
-                tdf.return_bookings_with_activity_id(activity_id))
-
-            if spaces_left <= 0:
-                return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
-                                             User=user, has_cookie=has_cookie)
-
-        response = cl.add_activities(added_activities, flask.request)
-
-        if not response:
-            return flask.abort(500)
-
-        bulk_activity_type = adf.return_activity_type_name_with_activity_type_id(sent_activity)
-        flask.flash(bulk_activity_type.title() + " sessions have been added to your basket.", category="success")
-        return response
-
-    start_time = data_form.get("start_time")
-    start_date = data_form.get("start_date")
-    if type(start_date) is str:
-        start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-    if type(start_time) is str:
-        try:
-            start_time = datetime.datetime.strptime(start_time, "%H:%M").time()
-        except:
-            start_time = datetime.datetime.strptime(start_time, "%H:%M:%S").time()
-    activity_type_id = data_form.get("activity")
-    facility_id = data_form.get("facility")
-
-    if not start_time:
-        start_time = datetime.datetime.now().time()
-    if not start_date:
-        start_date = datetime.date.today()
-    if not activity_type_id:
-        activity_type_id = "Any"
-    elif activity_type_id != "Any":
-        activity_type_id = int(activity_type_id)
-    if not facility_id:
-        facility_id = "Any"
-    elif facility_id != "Any":
-        facility_id = int(facility_id)
-
-    start_search = datetime.datetime.combine(start_date, start_time)
-
-    if start_search < datetime.datetime.now():
-        start_search = datetime.datetime.now()
+    # if start_search < datetime.datetime.now():
+    #     start_search = datetime.datetime.now()
 
     activity_types = adf.return_activity_types("Any")
 
@@ -132,45 +133,48 @@ def view_activities(multiple, sent_activity: int):
     if not facilities or not activity_types:
         flask.abort(500)
 
-    activity_dict = {}
+    session_availabilities = dict()
 
-    if (flask.request.method == "POST") or (flask.request.method == "GET" and sent_activity == 0):
-        activity_list = adf.return_activities_between_dates_with_facility_and_activity(start_search, datetime.datetime.today() + datetime.timedelta(days=14),
-                                                                                   activity_type_id=activity_type_id, facility_id=facility_id)
-    else:
-        activity_list = adf.return_activities_between_dates_with_facility_and_activity(start_search, datetime.datetime.today() + datetime.timedelta(days=14),
-                                                                                    activity_type_id=sent_activity, facility_id=facility_id)
+    weekly_activities = adf.return_weekly_activities_of_type(
+        datetime.datetime.today(),
+        activity_type_id=request_activity_type_id
+    )
 
-    for i, activity in enumerate(activity_list):
-        activity_capacity = adf.return_activity_capacity_with_activity_type_id(activity.activity_type_id)
+    activity_capacities = adf.return_activity_type_capacities()
+    for session in weekly_activities:
         if basket_activities:
-            amount_in_basket = basket_activities.count(activity)
+            amount_in_basket = basket_activities.count(session)
             if amount_in_basket >= 8:
                 continue
         else:
             amount_in_basket = 0
 
-        avaliability = (activity_capacity - len(tdf.return_bookings_with_activity_id(activity.activity_id)) - amount_in_basket)
-        if avaliability <= 0:
+        availability = activity_capacities[session.activity_type_id] - len(tdf.return_bookings_with_activity_id(session.activity_id)) - amount_in_basket
+        if availability <= 0:
             continue
 
-        activity_dict[activity_list[i]] = avaliability
+        session_availabilities[session] = availability
 
-    search_field_data = {}
-    search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
-    search_field_data["min_date"] = datetime.date.today()
-    search_field_data["max_date"] = datetime.date.today() + datetime.timedelta(days=14)
-    if start_date == datetime.date.today():
-        search_field_data["min_time"] = datetime.datetime.now().strftime("%H:00:00")
-    else:
-        search_field_data["min_time"] = datetime.datetime.now().strftime("00:00:00")
-    search_field_data["from_time"] = start_time.strftime("%H:00:00")
-    search_field_data["facility"] = facility_id
-    search_field_data["activity"] = activity_type_id
+    # search_field_data = dict(start_date=start_date.strftime("%Y-%m-%d"),
+    #                          min_date=datetime.date.today(),
+    #                          max_date=datetime.date.today() + datetime.timedelta(days=14),  # ????????????
+    #                          facility=facility_id,
+    #                          activity=activity_type_id)
+    # if start_date == datetime.date.today():
+    #     search_field_data["min_time"] = datetime.datetime.now().strftime("%H:00:00")
+    # else:
+    #     search_field_data["min_time"] = datetime.datetime.now().strftime("00:00:00")
+    # search_field_data["from_time"] = start_time.strftime("%H:00:00")
 
-    return flask.render_template("/activities/activities.html", User=user, activity_dict=activity_dict,
-                                 activity_types=activity_types, facilities=facilities, has_cookie=has_cookie,
-                                 search_field_data=search_field_data, multiple=multiple, sent_activity=sent_activity)
+    return flask.render_template("/activities/booking.html",
+                                 User=user,
+                                 session_availabilities=session_availabilities,
+                                 activity_types=activity_types,
+                                 facilities=facilities,
+                                 has_cookie=has_cookie,
+                                 # search_field_data=search_field_data,
+                                 request_activity_type_id=request_activity_type_id,
+                                 page_title="Booking")
 
 
 @blueprint.route("/activities/view_activity/<int:activity_id>", methods=["GET"])
