@@ -74,8 +74,8 @@ Booking Page
 {#                        <!-- date picker -->#}
 
                         <!-- Scheduler -->
-                        <div id='calendar'></div>
-{#                        <div id={{ "scheduler" + activity.name.title() | replace(" ", "") }}></div>#}
+{#                        <div id='calendar'></div>#}
+                        <div id={{ "calendar" + activity.name.title() | replace(" ", "") }}></div>
                         <!-- Scheduler -->
                     </div>
                 </div>
@@ -168,42 +168,6 @@ Booking Page
 <script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
 
 <script>
-    function afterEventMoved(event, scheduler) {
-
-        var startDate;
-        var endDate;
-
-        // Obtain the new start and end dates in the month view.
-        if (event.currentTarget.originalDragNode) {
-            var eventNodeId = event.currentTarget.originalDragNode.get('id');
-            var eventsArray = scheduler.getEvents();
-            var movedEvent = null;
-            for (var i = 0; i < eventsArray.length; i++) {
-
-                if (eventNodeId === eventsArray[i].get('node').get('id')[0]) {
-                    movedEvent = eventsArray[i];
-                    break;
-                }
-            }
-
-            startDate = movedEvent.get('startDate');
-            endDate = movedEvent.get('endDate');
-        }
-
-        // Obtain the new start and end dates in the day and week views.
-
-        // Unfortunately, there seems to be a bug and the time of these dates
-        // seems to be incorrect (it seems to be the time before the event was dragged).
-        // The day, month, and year seem to be correct though.
-        else {
-            startDate = event.currentTarget.draggingEventStartDate;
-            endDate = event.currentTarget.draggingEventEndDate;
-        }
-
-        console.log(startDate);
-        console.log(endDate);
-    }
-
     $(document).ready(function(){
         // Add chevron-up icon for collapse element which is open by default
         $(".collapse.show").each(function(){
@@ -220,168 +184,102 @@ Booking Page
         });
     });
 
+    // TODO: Maybe remove
     $(".multidate input").datepicker({
         multidate: true
     });
 
-{#    {% for activity_type in activity_types %}#}
-{#        YUI().use(#}
-{#            'aui-scheduler',#}
-{#            function(Y) {#}
-{#                var schedulerName = "#scheduler{{ activity_type.name.title() | string | replace(" ", "") }}";#}
-{##}
-{#                var scheduler = null;#}
-{#                var viewConfig = {#}
-{#                    on: {#}
-{#                        "click": function(event) {#}
-{#                            event.halt();#}
-{#                            console.log(typeof event, event.type, event);#}
-{#                        },#}
-{##}
-{#                        "mousedown": function(event) {#}
-{#                            event.halt();#}
-{#                            console.log(typeof event, event.type, event);#}
-{#                        },#}
-{##}
-                        {#"drag": function(event) {#}
-                        {#    event.halt();#}
-                        {#    console.log(event);#}
-                        {# },#}
-                        {#'drag:start': function(event) {#}
-                        {#    event.halt();#}
-                        {#    console.log(event);#}
-                        {# },#}
-{#                        'drag:end': function(event) {#}
-{#                            // can get new startTime / endTime at here. If it's changed then reset it to original?#}
-{#                            // although the much better solution would be to disable the ability to change the session time completely#}
-{#                            event.halt();#}
-{#                            console.log(event);#}
-{#                        }#}
-{#                    }#}
-{#                };#}
-{#                var weekView = new Y.SchedulerWeekView(viewConfig);#}
-{##}
-{#                let sessions = [#}
-{#                    {% if activity_type.activity_type_id | int == request_activity_type_id | int %}#}
-{#                        {% for session in session_availabilities %}#}
-{#                            {#}
-{#                                content: "{{ activity_type.name | string }}",#}
-{#                                startDate: new Date({{ session.start_time.year }}, {{ session.start_time.month - 1 }}, {{ session.start_time.day }}, {{ session.start_time.hour }}, {{ session.start_time.minute }}),#}
-{#                                endDate: new Date({{ session.end_time.year }}, {{ session.end_time.month - 1 }}, {{ session.end_time.day }}, {{ session.end_time.hour }}, {{ session.end_time.minute }})#}
-{#                            },#}
-{#                        {% endfor %}#}
-{#                    {% endif %}#}
-{#                ];#}
-{##}
-{#                var eventRecorder = new Y.SchedulerEventRecorder({#}
-{#                    on: {#}
-{#                        click: function(event) {#}
-{#                            alert("clicked");#}
-{#                        },#}
-{#                        change: function(event) {#}
-{#                            alert("change");#}
-{#                        },#}
-{#                        drag: function(event) {#}
-{#                            alert("dragging");#}
-{#                            event.halt();#}
-{#                        }#}
-{#                    }#}
-{#                });#}
-{##}
-{#                scheduler = new Y.Scheduler({#}
-{#                    activeView: weekView,#}
-{#                    boundingBox: schedulerName,#}
-{#                    eventRecorder: eventRecorder,#}
-{#                    items: sessions,#}
-{#                    render: true,#}
-{#                    views: [weekView]#}
-{#                });#}
-{##}
-{#                // Disable:#}
-{#                // - drag:start - changing existing session duration#}
-{#                // ? - changing session time#}
-{#                // ? - create new session#}
-{#                weekView.detachAll("drag:start");#}
-                {#weekView.detachAll("drag");#}
-{#                weekView.detachAll("click"); // just testing#}
-                {#scheduler.detachAll("drag");#}
-{#                console.log(scheduler.items);#}
-{##}
-{#                Y.Do.after(function(e) {#}
-{#                    $('.popover').hide();#}
-{#                    // user tried to create an event#}
-{#                    if (typeof e == "undefined") {#}
-{#                        // halt the action#}
-{#                        Y.Do.Halt("not allowed to create session");#}
-{#                        alert("not allowed to create session");#}
-{#                    } else {#}
-{#                        var evt = e.getData('scheduler-event');#}
-{#                        console.log(evt.type, evt);#}
-{##}
-{#                        // Show session info#}
-{#                        $('#exampleModal').modal('show');#}
-{#                    }#}
-{#                }, eventRecorder, 'showPopover');#}
-{##}
-{#                // If user clicked on PREV, TODAY, NEXT, Query the week's worth of sessions and add to the scheduler's items#}
-{#                Y.one(schedulerName).on('focus', function (e) {#}
-{#                    console.log(this, "focus", e);#}
-{#                    console.log(e._currentTarget.className);#}
-{##}
-{#                    var request = new XMLHttpRequest();#}
-{#                    request.onload = function() {#}
-{#                        // We could do more interesting things with the response, or, we could ignore it entirely#}
-{#                        alert(request.responseText);#}
-{#                    };#}
-{#                    // We point the request at the appropriate command#}
-{#                    request.open("GET", "/" + command, true);#}
-{#                    // and then we send it off#}
-{#                    request.send();#}
-{#                });#}
-{##}
-                {#Y.one("#scheduler{{ activity_type.name.title() | string | replace(" ", "") }}").destroy();#}
-{#            }#}
-{#        );#}
-{#    {% endfor %}#}
+    // ----- Booking Calendars ----- //
+    // The id/key separates each list into "buckets" for performance
+    // If the list is a heap, then each insert is O(log n) so it's performant still
+    var queryHistory = {}; // { activity_type_id: [{query} object literals] }. If this object literal exists, then the retrieved events must exist
+    var existingSessions = {}; // { activity_type_id: [{session} object literals] }.
 
     document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
+        var calendars = {}; // { activity_type_id: calendarObject}
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
-            defaultView: 'dayGridMonth',
-            defaultDate: Date.now(),
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            events: [
-                {#{#}
-                {#  title: 'Meeting',#}
-                {#  start: '2020-04-12T10:30:00',#}
-                {#  end: '2020-04-12T12:30:00'#}
-                {# },#}
-                {#{#}
-                {#  title: 'Click for Google',#}
-                {#  url: 'http://google.com/',#}
-                {#  start: '2020-04-28'#}
-                {# }#}
+        {% for activity_type in activity_types %}
 
-                {% for session in session_availabilities %}
-                    {
-                        {#title: "{{ activity_type.name | string }}",#}
-                        title: "football",
-                        start: "{{ session.start_time }}",
-                        end: "{{ session.end_time }}"
-                        {#start: new Date({{ session.start_time.year }}, {{ session.start_time.month - 1 }}, {{ session.start_time.day }}, {{ session.start_time.hour }}, {{ session.start_time.minute }}),#}
-                        {#end: new Date({{ session.end_time.year }}, {{ session.end_time.month - 1 }}, {{ session.end_time.day }}, {{ session.end_time.hour }}, {{ session.end_time.minute }})#}
-                    },
-                {% endfor %}
-            ]
-        });
+            // initialize
+            queryHistory[{{ activity_type.activity_type_id }}] = [];
+            existingSessions[{{ activity_type.activity_type_id }}] = [];
 
-        calendar.render();
+            var calendarEl = document.getElementById("calendar{{ activity_type.name.title() | string | replace(" ", "") }}");
+
+            calendars[{{ activity_type.activity_type_id }}] = new FullCalendar.Calendar(calendarEl, {
+                plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
+                defaultView: 'dayGridWeek',
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: [
+{#                    {% for session in session_availabilities %}#}
+{#                        {#}
+{#                            title: "{{ activity_type.name.title() }}",#}
+{#                            start: "{{ session.start_time.strftime("%Y-%m-%dT%H:%M:%S") }}",#}
+{#                            end: "{{ session.end_time.strftime("%Y-%m-%dT%H:%M:%S") }}"#}
+{#                        },#}
+{#                    {% endfor %}#}
+                ],
+
+                // ----- Event Handlers ----- //
+                // Click on an session
+                eventClick: function(info) {
+                    // Show session info
+                    $('#exampleModal').modal('show');
+                },
+
+                // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
+                datesRender: function(info) {
+                    let query = {
+                        activity_type_id: {{ activity_type.activity_type_id }},
+                        start_date: info.view.activeStart,
+                        end_date: info.view.activeEnd
+                    };
+                    query = JSON.stringify(query);
+
+                    // check against cache
+                    if (!queryHistory[{{ activity_type.activity_type_id }}].includes(query)) {
+                        queryHistory[{{ activity_type.activity_type_id }}].push(query);
+
+                        $.ajax({
+                            type : "POST",
+                            url : "{{ url_for("activities.query_sessions") }}",
+                            data: query,
+                            contentType: 'application/json;charset=UTF-8',
+                            success: function(results) {
+                                results = JSON.parse(results);
+                                for (let i = 0; i < results.length; i++) {
+                                    var session = {
+                                        title: results[i].name,
+                                        start: results[i].start,
+                                        end: results[i].end
+                                    };
+                                    var sessionStr = JSON.stringify(session);
+
+                                    // if event doesn't exist in existingSessions, add to existingSessions and add to calendar
+                                    if (!existingSessions[{{ activity_type.activity_type_id }}].includes(sessionStr)) {
+                                        existingSessions[{{ activity_type.activity_type_id }}].push(sessionStr);
+                                        calendars[{{ activity_type.activity_type_id }}].addEvent(session);
+                                    }
+                                }
+                            }
+                        });
+                    }
+                },
+
+                // don't rerender everytime an event is added
+                // TODO: Not sure how to use this
+                batchRendering: function() {
+
+                }
+            });
+
+            calendars[{{ activity_type.activity_type_id }}].render();
+
+        {% endfor %}
     });
 </script>
 {% endblock %}

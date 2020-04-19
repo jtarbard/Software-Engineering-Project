@@ -1,5 +1,6 @@
 import flask
 import datetime
+import json
 
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
@@ -136,7 +137,7 @@ def view_booking():
     session_availabilities = dict()
 
     weekly_activities = adf.return_weekly_activities_of_type(
-        datetime.datetime.today(),
+        day=datetime.datetime.today(),
         activity_type_id=request_activity_type_id
     )
 
@@ -218,6 +219,31 @@ def view_activity(activity_id: int):
 
 
 # -------------------------------------------------- Ajax routes -------------------------------------------------- #
-@blueprint.route("/activities/booking/query_sessions", methods=["GET"])
+@blueprint.route("/activities/query_sessions", methods=["POST"])
 def query_sessions():
-    pass
+    """
+    TODO: comment
+    This route should only be accessible via the booking.html Ajax (method).
+
+    :return: the sessions within the supplied date range
+    """
+
+    activity_type = flask.request.json.get("activity_type")
+    activity_type_id = flask.request.json.get("activity_type_id")
+    start_date = flask.request.json.get("start_date")
+    end_date = flask.request.json.get("end_date")  # note: exclusive
+
+    sessions = adf.return_activities_between_dates_of_type(start_date, end_date,
+                                                           activity_type=activity_type,
+                                                           activity_type_id=activity_type_id)
+    data = list()
+    for session in sessions:
+        data.append(dict(name=session.activity_type.name.title(),
+                         description=session.activity_type.description,
+                         facility=session.facility.name,
+                         start=session.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
+                         end=session.end_time.strftime("%Y-%m-%dT%H:%M:%S")))
+    response = flask.make_response(json.dumps(data))
+    response.status_code = 200
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
