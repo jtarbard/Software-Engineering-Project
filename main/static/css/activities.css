@@ -47,3 +47,23 @@ input {
 #membershipDisplay p {
     margin-bottom: 0px;
 }
+
+.fc-left .fc-button-group {
+    /*justify-content: flex-start;*/
+    float: left;
+}
+.fc-center h2 {
+    text-align: center;
+}
+.fc-right .fc-button-group {
+    /*justify-content: flex-end;*/
+    float: right;
+}
+
+@media (max-width: 768px){
+    .fc-left, .fc-center h2, .fc-right {
+        display: flex;
+        justify-content: center;
+        float: none;
+    }
+}
