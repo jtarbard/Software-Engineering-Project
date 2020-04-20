@@ -308,8 +308,6 @@ def return_facilities(facility_id):
     return Facility.query.filter(Facility.facility_id == facility_id).all()
 
 
-def return_activity_types(activity_type_id):
-    if activity_type_id == "Any":
-        return ActivityType.query.all()
-    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).all()
+def return_activity_type(activity_type_id):
+    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 

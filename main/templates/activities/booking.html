@@ -62,106 +62,17 @@ Booking Page
 </div>
 <!-- Modal -->
 
-
 <div class="container">
-    <!-- Accordion Wrapper -->
-    <div class="accordion" id="bookingAccordion">
+    <!-- activity info -->
+    <p>{{ activity_type.description }}</p>
+    <!-- activity info -->
 
-        <div class="container">
-                        <!-- activity info -->
-                        <p>{{ activity.description }}</p>
-                        <!-- activity info -->
-
-                        <h6>Book for a session:</h6>
-{#                        <!-- date picker -->#}
-{#                        <div class="form-group multidate" id={{ "multidate" + activity.name.title() }} name={{ "multidate" + activity.name.title() }}>#}
-{#                            <input type="text" class="form-control">#}
-{#                        </div>#}
-{#                        <!-- date picker -->#}
-
-                        <!-- Scheduler -->
-{#                        <div id='calendar'></div>#}
-                        <div id={{ "calendar" + activity.name.title() | replace(" ", "") }}></div>
-                        <!-- Scheduler -->
-                    </div>
-                </div>
-            </div>
-            <!-- Accordion Card -->
-
-    </div>
-    <!-- Accordion Wrapper -->
+    <h6>Book for a session:</h6>
+    <!-- Scheduler -->
+    <div id="calendar"></div>
+    <!-- Scheduler -->
 </div>
-
-    <!-- original stuff -->
-{#        <form class="form-inline" method="post">#}
-{#        <label for="start_date">Start date:</label>#}
-{#        <input type="date" name="start_date" required value="{{search_field_data["start_date"]}}"#}
-{#            max="{{search_field_data["max_date"]}}" min="{{search_field_data["min_date"]}}">#}
-{#        <label for="start_time">From:</label>#}
-{#        <input type="time" name="start_time" required step="3600"#}
-{#               value="{{search_field_data["from_time"]}}" min="{{search_field_data["min_time"]}}">#}
-{#        <label for="activity">Activity:</label>#}
-{#        <select name="activity">#}
-{#            <option value="Any" {% if search_field_data["activity"] == "Any" %} selected {% endif %} >Any</option>#}
-{#            {% for actvitiy_type in activity_types %}#}
-{#                {% if actvitiy_type.activity_type_id == search_field_data["activity"] or actvitiy_type.activity_type_id == sent_activity %}#}
-{#                    <option value="{{actvitiy_type.activity_type_id}}" selected="selected">{{actvitiy_type.name.capitalize()}}</option>#}
-{#                {% else %}#}
-{#                    <option value="{{actvitiy_type.activity_type_id}}" >{{actvitiy_type.name.capitalize()}}</option>#}
-{#                {% endif %}#}
-{#            {% endfor %}#}
-{#        </select>#}
-{#        <label for="facility">Facility:</label>#}
-{#        <select name="facility">#}
-{#            <option value="Any"#}
-{#            {% if search_field_data["facility"] == "Any" %} selected="selected" {% endif %} >Any</option>#}
-{#            {% for facility in facilities %}#}
-{#                {% if facility.facility_id == search_field_data["facility"] %}#}
-{#                    <option value="{{facility.facility_id}}" selected>{{facility.name.capitalize()}}</option>#}
-{#                {% else %}#}
-{#                    <option value="{{facility.facility_id}}" >{{facility.name.capitalize()}}</option>#}
-{#                {% endif %}#}
-{#            {% endfor %}#}
-{#        </select>#}
-{#        <input type="submit" name="reload_search" value="Refresh results">#}
-{#    </form>#}
-{#    <form method="post">#}
-{#        {% if multiple == 'True' %}#}
-{#            <button class="btn btn-primary" type="submit" name="book">Book</button>#}
-{#        {% endif %}#}
-{#    <div class="table-responsive">#}
-{#        <table class="table">#}
-{#            <thead>#}
-{#                <tr><td colspan="6"> Time Table </td></tr>#}
-{#            </thead>#}
-{#            <tbody>#}
-{#                <tr>#}
-{#                    <td>Class name</td>#}
-{#                    <td>Class Start Time </td>#}
-{#                    <td>Class End Time</td>#}
-{#                    <td>Facility</td>#}
-{#                    <td>Availability left</td>#}
-{#                    <td>Book</td>#}
-{#                </tr>#}
-{#                {% for activity, availability in activity_dict.items() %}#}
-{#                    <tr>#}
-{#                        <td>{{ activity.activity_type.name.title() }}</td>#}
-{#                        <td>{{ activity.start_time }}</td>#}
-{#                        <td>{{ activity.end_time }}</td>#}
-{#                        <td><a href="/info/facilities#{{ activity.facility.facility_id }}">{{ activity.facility.name.title()}}</a></td>#}
-{#                        <td>{{ availability }}</td>#}
-{#                        {% if multiple == 'True' %}#}
-{#                                <td>#}
-{#                                    <input type="checkbox" id="{{activity.activity_id}}" name="bulk_activity" value="{{activity.activity_id}}">#}
-{#                                </td>#}
-{#                        {% else %}#}
-{#                            <td><a class="btn btn-danger" href="/activities/view_activity/{{ activity.activity_id }}">Book</a></td>#}
-{#                        {% endif %}#}
-{#                    </tr>#}
-{#                {% endfor %}#}
-{#            </tbody>#}
-{#        </table>#}
-{#    </form>#}
+</div>
 {% endblock %}
 
 {% block additional_js %}
@@ -173,147 +84,139 @@ Booking Page
 <script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
 
 <script>
-
     // ----- Booking Calendars ----- //
-    // The id/key separates each list into "buckets" for performance
     // If the list is a heap, then each insert is O(log n) so it's performant still
     var queryHistory = {}; // { activity_type_id: [{query} object literals] }. If this object literal exists, then the retrieved events must exist
     var existingSessions = {}; // { activity_type_id: [{session} object literals] }.
 
     document.addEventListener('DOMContentLoaded', function() {
-        var calendars = {}; // { activity_type_id: calendarObject}
+        // initialize
+        queryHistory = [];
+        existingSessions = [];
 
-        {% for activity_type in activity_types %}
+        var calendarEl = document.getElementById("calendar");
 
-            // initialize
-            queryHistory[{{ activity_type.activity_type_id }}] = [];
-            existingSessions[{{ activity_type.activity_type_id }}] = [];
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
+            defaultView: 'timeGridWeek',
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            events: [],
 
-            var calendarEl = document.getElementById("calendar{{ activity_type.name.title() | string | replace(" ", "") }}");
+            // ----- Event Handlers ----- //
+            // Click on an session
+            eventClick: function(info) {
+                // Show session info
+                var modal = $('#bookingModal');
+                modal.modal('show');
 
-            calendars[{{ activity_type.activity_type_id }}] = new FullCalendar.Calendar(calendarEl, {
-                plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
-                defaultView: 'timeGridWeek',
-                header: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                events: [],
+                $("#activityID").val(info.event.extendedProps.id);
 
-                // ----- Event Handlers ----- //
-                // Click on an session
-                eventClick: function(info) {
-                    // Show session info
-                    var modal = $('#bookingModal');
-                    modal.modal('show');
+                // Perform an ajax request to get all the session info
+                $.ajax({
+                    type : "POST",
+                    url : "{{ url_for("activities.query_session") }}",
+                    data: JSON.stringify(info.event.extendedProps),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function(session) {
+                        session = JSON.parse(session);
 
-                    $("#activityID").val(info.event.extendedProps.id);
+                        var modal = $('#bookingModal');
+                        var sessionInfoList = modal.find("#sessionInfoList");
 
-                    // Perform an ajax request to get all the session info
+                        sessionInfoList.html(
+                            "<li>Start time: " + info.event.start + "</li>\n" +
+                            "<li>End time: " + info.event.end + "</li>\n" +
+                            "<li>Minimum age: " + session.minimum_age + "</li>\n" +
+                            "<li>Spaces left: " + session.spaces_left + "</li>\n" +
+                            "<li>Price for one: £" + session.session_price + "</li>"
+                        );
+                        modal.find("#sessionNumPeopleSlider").attr("max", session.max_booking);
+                        modal.find("#sessionPrice").val(session.session_price);
+                        modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
+
+                        {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                        sessionInfoList.append(
+                            "<li><b>Manager Info:</b></li>",
+                            "<li>Total bookings: " + session.total_bookings + "</li>",
+                            "<li>Income: " + session.activity_income + "</li>",
+                            "<li>Cost: " + session.activity_cost + "</li>"
+                        );
+                        {% endif %}
+
+                        if (session.membership_name !== undefined) {
+                            modal.find("#membershipDisplay p").html(
+                                session.membership_discount + "% Off discount applied for your " + session.membership_name + " membership."
+                            );
+                            modal.find("#membershipDiscount").val(session.membership_discount);
+                        } else {
+                            modal.find("#membershipDisplay").attr("hidden", "hidden");
+                        }
+                    },
+                    error: function(jqXHR) {
+                        alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
+                    }
+                });
+
+                modal.find(".modal-title").text("Book for " + info.event.title);
+            },
+
+            // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
+            datesRender: function(info) {
+                let query = {
+                    activity_type_id: {{ activity_type.activity_type_id }},
+                    start_date: info.view.activeStart,
+                    end_date: info.view.activeEnd
+                };
+                query = JSON.stringify(query);
+
+                // check against cache
+                if (!queryHistory.includes(query)) {
+                    queryHistory.push(query);
+
                     $.ajax({
                         type : "POST",
-                        url : "{{ url_for("activities.query_session") }}",
-                        data: JSON.stringify(info.event.extendedProps),
+                        url : "{{ url_for("activities.query_sessions") }}",
+                        data: query,
                         contentType: 'application/json;charset=UTF-8',
-                        success: function(session) {
-                            session = JSON.parse(session);
+                        success: function(results) {
+                            results = JSON.parse(results);
+                            for (let i = 0; i < results.length; i++) {
+                                var session = {
+                                    title: results[i].name,
+                                    start: results[i].start,
+                                    end: results[i].end,
+                                    extendedProps: {
+                                        id: results[i].id
+                                    }
+                                };
+                                var sessionStr = JSON.stringify(session);
 
-                            var modal = $('#bookingModal');
-                            var sessionInfoList = modal.find("#sessionInfoList");
-
-                            sessionInfoList.html(
-                                "<li>Start time: " + info.event.start + "</li>\n" +
-                                "<li>End time: " + info.event.end + "</li>\n" +
-                                "<li>Minimum age: " + session.minimum_age + "</li>\n" +
-                                "<li>Spaces left: " + session.spaces_left + "</li>\n" +
-                                "<li>Price for one: £" + session.session_price + "</li>"
-                            );
-                            modal.find("#sessionNumPeopleSlider").attr("max", session.max_booking);
-                            modal.find("#sessionPrice").val(session.session_price);
-                            modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
-
-                            {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
-                            sessionInfoList.append(
-                                "<li><b>Manager Info:</b></li>",
-                                "<li>Total bookings: " + session.total_bookings + "</li>",
-                                "<li>Income: " + session.activity_income + "</li>",
-                                "<li>Cost: " + session.activity_cost + "</li>"
-                            );
-                            {% endif %}
-
-                            if (session.membership_name !== undefined) {
-                                modal.find("#membershipDisplay p").html(
-                                    session.membership_discount + "% Off discount applied for your " + session.membership_name + " membership."
-                                );
-                                modal.find("#membershipDiscount").val(session.membership_discount);
-                            } else {
-                                modal.find("#membershipDisplay").attr("hidden", "hidden");
+                                // if event doesn't exist in existingSessions, add to existingSessions and add to calendar
+                                if (!existingSessions.includes(sessionStr)) {
+                                    existingSessions.push(sessionStr);
+                                    calendar.addEvent(session);
+                                }
                             }
                         },
                         error: function(jqXHR) {
                             alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
                         }
                     });
-
-                    modal.find(".modal-title").text("Book for " + info.event.title);
-                },
-
-                // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
-                datesRender: function(info) {
-                    let query = {
-                        activity_type_id: {{ activity_type.activity_type_id }},
-                        start_date: info.view.activeStart,
-                        end_date: info.view.activeEnd
-                    };
-                    query = JSON.stringify(query);
-
-                    // check against cache
-                    if (!queryHistory[{{ activity_type.activity_type_id }}].includes(query)) {
-                        queryHistory[{{ activity_type.activity_type_id }}].push(query);
-
-                        $.ajax({
-                            type : "POST",
-                            url : "{{ url_for("activities.query_sessions") }}",
-                            data: query,
-                            contentType: 'application/json;charset=UTF-8',
-                            success: function(results) {
-                                results = JSON.parse(results);
-                                for (let i = 0; i < results.length; i++) {
-                                    var session = {
-                                        title: results[i].name,
-                                        start: results[i].start,
-                                        end: results[i].end,
-                                        extendedProps: {
-                                            id: results[i].id
-                                        }
-                                    };
-                                    var sessionStr = JSON.stringify(session);
-
-                                    // if event doesn't exist in existingSessions, add to existingSessions and add to calendar
-                                    if (!existingSessions[{{ activity_type.activity_type_id }}].includes(sessionStr)) {
-                                        existingSessions[{{ activity_type.activity_type_id }}].push(sessionStr);
-                                        calendars[{{ activity_type.activity_type_id }}].addEvent(session);
-                                    }
-                                }
-                            },
-                            error: function(jqXHR) {
-                                alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
-                            }
-                        });
-                    }
-                },
-
-                // don't rerender everytime an event is added
-                // TODO: Not sure how to use this
-                batchRendering: function() {
-
                 }
-            });
+            },
 
-            calendars[{{ activity_type.activity_type_id }}].render();
+            // don't rerender everytime an event is added
+            // TODO: Not sure how to use this
+            batchRendering: function() {
 
-        {% endfor %}
+            }
+        });
+
+        calendar.render();
     });
 
     // Add to basket button
