@@ -22,6 +22,7 @@ def add_booking_to_basket_post():
     booking_amount: int = int(data_form.get("amount_of_people"))
 
     if not activity or not booking_amount:
+        flask.flash("Not checked out or booked activity", category="error")
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity", has_cookie=has_cookie)
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
@@ -35,11 +36,13 @@ def add_booking_to_basket_post():
     if basket_activities:
         if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(
                 basket_activities) + booking_amount > 15:
+            flask.flash("Basket full", category="error")
             return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
 
     spaces_left = activity.activity_type.maximum_activity_capacity - len(
         tdf.return_bookings_with_activity_id(activity.activity_id))
     if spaces_left <= 0:
+        flask.flash("Not enough spaces left on activity", category="error")
         return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
                                      User=user, has_cookie=has_cookie)
 

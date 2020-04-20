@@ -18,48 +18,50 @@ Booking Page
 {% endblock %}
 
 {% block main_content %}
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bookingModal">
-  Launch demo modal
-</button>
-
 <!-- Modal -->
 <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body" id="sessionInfo">
-          <ul id="sessionInfoList">
-            <!-- Session info elements added on click -->
-          </ul>
-
-          <!-- Number of people slider -->
-          <div class="row" id="sessionNumPeople">
-            <div class="col-md-4">
-                <label for="sessionNumPeopleSlider">Number of people: </label>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
             </div>
-            <div class="col-md-7">
-                <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider">
-            </div>
-            <div class="col-md-1">
-                <b id="sessionNumPeopleVal">1</b>
-            </div>
-          </div>
+            <div class="modal-body" id="sessionInfo">
+                <input type="hidden" name="activity_id" id="activityID">
 
-          <p hidden id="sessionPrice"></p>
-          <p id="subtotal">Subtotal: £0.0</p>
+                <ul id="sessionInfoList">
+                    <!-- Session info elements added on click -->
+                </ul>
 
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="addToBasket">Add to basket</button>
-      </div>
+                <!-- Number of people slider -->
+                <div class="row" id="sessionNumPeople">
+                    <div class="col-md-4">
+                        <label for="sessionNumPeopleSlider">Number of people: </label>
+                    </div>
+                    <div class="col-md-7">
+                        <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider" name="num_people">
+                    </div>
+                    <div class="col-md-1">
+                        <b id="sessionNumPeopleVal">1</b>
+                    </div>
+                </div>
+
+                <p hidden id="membershipDiscount">0</p> <!-- 0-100. Indicates how much should be discounted, i.e. X/100 off -->
+                <p hidden id="sessionPrice"></p>
+                <p id="subtotal">Subtotal: £0.0</p>
+
+                <div class="card-body" id="membershipDisplay"> <!-- TODO: Try jumbotron. I didn't know how to resize it, but on smaller size i'd imagine it to look good -->
+                    <p class="display-12">No membership.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="addToBasket">Add to Basket</button>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <!-- Modal -->
 
@@ -72,12 +74,10 @@ Booking Page
             <!-- Accordion Card -->
             <div class="card">
                 <div class="card-header" id={{ "heading" + activity.name.title() }}>
-                    <h2 class="mb-0">
-                        <button type="button" class="btn btn-link" data-toggle="collapse" data-target={{ "#collapse" + activity.name.title() }}>
-                            {{ activity.name.title() }}
-                            <i class="fa fa-chevron-down pull-right"></i>
-                        </button>
-                    </h2>
+                    <button type="button" class="btn btn-link" data-toggle="collapse" data-target={{ "#collapse" + activity.name.title() }}>
+                        {{ activity.name.title() }}
+                        <i class="fa fa-chevron-down pull-right"></i>
+                    </button>
                 </div>
                 <div id={{ "collapse" + activity.name.title() }} class="collapse" aria-labelledby={{ "heading" + activity.name.title() }} data-parent="#bookingAccordion">
                     <div class="card-body">
@@ -242,6 +242,8 @@ Booking Page
                     var modal = $('#bookingModal');
                     modal.modal('show');
 
+                    $("#activityID").val(info.event.extendedProps.id);
+
                     // Perform an ajax request to get all the session info
                     $.ajax({
                         type : "POST",
@@ -263,22 +265,30 @@ Booking Page
                             );
                             modal.find("#sessionNumPeopleSlider").attr("max", session.max_booking);
                             modal.find("#sessionPrice").val(session.session_price);
-                            modal.find("#subtotal").html("Subtotal: £" + session.session_price);
+                            modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
 
                             {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
                             sessionInfoList.append(
+                                "<li><b>Manager Info:</b></li>",
                                 "<li>Total bookings: " + session.total_bookings + "</li>",
                                 "<li>Income: " + session.activity_income + "</li>",
                                 "<li>Cost: " + session.activity_cost + "</li>"
                             );
-                            modal.find("#sessionNumPeopleSlider").attr("hidden", "hidden"); // hide the number of people slider for manager
-                            modal.find("#subtotalDisplay").attr("hidden", "hidden");
                             {% endif %}
+
+                            if (session.membership_name !== undefined) {
+                                modal.find("#membershipDisplay p").html(
+                                    session.membership_discount + "% Off discount applied for your " + session.membership_name + " membership."
+                                );
+                                modal.find("#membershipDiscount").val(session.membership_discount);
+                            } else {
+                                modal.find("#membershipDisplay").attr("hidden", "hidden");
+                            }
                         },
                         error: function(jqXHR) {
                             // TODO: Make this user friendly
                             alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.")
-                            alert(jqXHR);
+                            console.log(jqXHR);
                         }
                     });
 
@@ -326,7 +336,7 @@ Booking Page
                             error: function(jqXHR) {
                                 // TODO: Make this user friendly
                                 alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
-                                alert(jqXHR);
+                                console.log(jqXHR);
                             }
                         });
                     }
@@ -346,17 +356,21 @@ Booking Page
 
     // Add to basket button
     $("#addToBasket").on("click", function(e) {
-        alert("hi this works");
+        console.log("hi posting data");
+        $.post("/misc/add_booking_to_basket", {
+            "activity": $("#activityID").val(),
+            "amount_of_people": $("#sessionNumPeopleSlider").val()
+        });
     });
 
     // Number of people slider
     var slider = $("#sessionNumPeopleSlider");
     slider.val(1);
-    // TODO: Add tooltip
+    // TODO: Add tooltip. Also make it change on slide ("slide" should've been an event but it doesn't work. Check https://seiyria.com/bootstrap-slider/#example-2 <<<<< also .slider is not a function)
     slider.on("change", function(e) {
         $("#sessionNumPeopleVal").html($(this).val());
         // Also update the subtotal price   TODO: Bad #135
-        $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() + "</p>");
+        $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() * (100-$("#membershipDiscount").val())/100 + "</p>");
     });
 </script>
 {% endblock %}

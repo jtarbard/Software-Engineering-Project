@@ -56,7 +56,7 @@ def view_booking():
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
-    # TODO: Hasn't this check already been done misc/add_to_booking???
+    # TODO: Hasn't this check already been done in /misc/add_to_booking???
     # if bulk_activities:
     #
     #     if not is_valid:
@@ -100,33 +100,6 @@ def view_booking():
     #     flask.flash(bulk_activity_type.title() + " sessions have been added to your basket.", category="success")
     #     return response
 
-    # Filter check
-    # if type(start_date) is str:
-    #     start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d")
-    # if type(start_time) is str:
-    #     try:
-    #         start_time = datetime.datetime.strptime(start_time, "%H:%M").time()
-    #     except:
-    #         start_time = datetime.datetime.strptime(start_time, "%H:%M:%S").time()
-
-    # if not start_time:
-    #     start_time = datetime.datetime.now().time()
-    # if not start_date:
-    #     start_date = datetime.date.today()
-    # if not activity_type_id:
-    #     activity_type_id = "Any"
-    # elif activity_type_id != "Any":
-    #     activity_type_id = int(activity_type_id)
-    # if not facility_id:
-    #     facility_id = "Any"
-    # elif facility_id != "Any":
-    #     facility_id = int(facility_id)
-
-    # start_search = datetime.datetime.combine(start_date, start_time)
-
-    # if start_search < datetime.datetime.now():
-    #     start_search = datetime.datetime.now()
-
     activity_types = adf.return_activity_types("Any")
 
     facilities = adf.return_facilities("Any")
@@ -155,17 +128,6 @@ def view_booking():
             continue
 
         session_availabilities[session] = availability
-
-    # search_field_data = dict(start_date=start_date.strftime("%Y-%m-%d"),
-    #                          min_date=datetime.date.today(),
-    #                          max_date=datetime.date.today() + datetime.timedelta(days=14),  # ????????????
-    #                          facility=facility_id,
-    #                          activity=activity_type_id)
-    # if start_date == datetime.date.today():
-    #     search_field_data["min_time"] = datetime.datetime.now().strftime("%H:00:00")
-    # else:
-    #     search_field_data["min_time"] = datetime.datetime.now().strftime("00:00:00")
-    # search_field_data["from_time"] = start_time.strftime("%H:00:00")
 
     return flask.render_template("/activities/booking.html",
                                  User=user,
@@ -246,14 +208,14 @@ def query_session():
     duration: datetime.timedelta = session.end_time - session.start_time
     session_price = (duration.seconds // 3600 * session.activity_type.hourly_activity_price)  # TODO: Bad #135
 
-    final_price = session_price
+    subtotal = session_price
 
     session_dict = dict(
         user_role=user.__mapper_args__['polymorphic_identity'],
         minimum_age=session.activity_type.minimum_age,
         spaces_left=spaces_left,
         session_price=round(session_price, 2),  # TODO: Bad #135
-        final_price=round(final_price, 2),  # TODO: Bad #135
+        subtotal=round(subtotal, 2),  # TODO: Bad #135
         max_booking=min(spaces_left, 8)
     )
 
@@ -276,12 +238,12 @@ def query_session():
         membership = customer.current_membership
         if membership is not None:
             membership_type = Membership.query.filter_by(membership_id=membership.membership_id).first().membership_type
-            final_price = session_price * (1 - membership_type.discount / float(100))  # TODO: Bad #135
+            subtotal = session_price * (1 - membership_type.discount / float(100))  # TODO: Bad #135
 
             session_dict.update(dict(
-                final_price=round(final_price, 2),  # TODO: Bad #135
-                membership_name=membership.name.title(),
-                membership_discount=membership.discount
+                subtotal=round(subtotal, 2),  # TODO: Bad #135
+                membership_name=membership_type.name.title(),
+                membership_discount=membership_type.discount
             ))
 
     # Don't check here. Check in js; also don't return sessions before today's date FOR CUSTOMER.
