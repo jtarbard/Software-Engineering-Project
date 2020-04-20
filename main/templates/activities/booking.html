@@ -52,7 +52,7 @@ Booking Page
                 <p hidden id="sessionPrice"></p>
                 <p id="subtotal">Subtotal: £0.0</p>
 
-                <div class="card-body" id="membershipDisplay"> <!-- TODO: Try jumbotron. I didn't know how to resize it, but on smaller size i'd imagine it to look good -->
+                <div class="alert-success" role="alert" id="membershipDisplay"> <!-- TODO: Try jumbotron. I didn't know how to resize it, but on smaller size i'd imagine it to look good -->
                     <p class="display-12">No membership.</p>
                 </div>
             </div>
@@ -70,17 +70,7 @@ Booking Page
     <!-- Accordion Wrapper -->
     <div class="accordion" id="bookingAccordion">
 
-        {% for activity in activity_types %}
-            <!-- Accordion Card -->
-            <div class="card">
-                <div class="card-header" id={{ "heading" + activity.name.title() }}>
-                    <button type="button" class="btn btn-link activity_btn" data-toggle="collapse" data-target={{ "#collapse" + activity.name.title() }}>
-                        <p>{{ activity.name.title() }}</p>
-                        <i class="fa fa-chevron-down pull-right"></i>
-                    </button>
-                </div>
-                <div id={{ "collapse" + activity.name.title() }} class="collapse" aria-labelledby={{ "heading" + activity.name.title() }} data-parent="#bookingAccordion">
-                    <div class="card-body">
+        <div class="container">
                         <!-- activity info -->
                         <p>{{ activity.description }}</p>
                         <!-- activity info -->
@@ -100,7 +90,6 @@ Booking Page
                 </div>
             </div>
             <!-- Accordion Card -->
-        {% endfor %}
 
     </div>
     <!-- Accordion Wrapper -->
@@ -187,21 +176,6 @@ Booking Page
 <script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
 
 <script>
-    $(document).ready(function(){
-        // Add chevron-up icon for collapse element which is open by default
-        $(".collapse.show").each(function(){
-        	$(this).prev(".card-header").find(".fa").addClass("fa-chevron-up pull-right").removeClass("fa-chevron-up pull-right");
-        });
-
-        // Toggle chevron icon on show hide of collapse element
-        $(".collapse").on('show.bs.collapse', function(){
-        	$(this).prev(".card-header").find(".fa").removeClass("fa-chevron-down pull-right").addClass("fa-chevron-up pull-right");
-
-        	// TODO: And also query a week worth's session availability for the opened activity type
-        }).on('hide.bs.collapse', function(){
-        	$(this).prev(".card-header").find(".fa").removeClass("fa-chevron-up pull-right").addClass("fa-chevron-down pull-right");
-        });
-    });
 
     // TODO: Maybe remove
     $(".multidate input").datepicker({

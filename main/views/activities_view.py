@@ -114,6 +114,9 @@ def view_booking():
         activity_type_id=request_activity_type_id
     )
 
+    #NEW CODE
+    activity = adf.return_activity_types(request_activity_type_id)[0]
+
     activity_capacities = adf.return_activity_type_capacities()
     for session in weekly_activities:
         if basket_activities:
@@ -136,7 +139,7 @@ def view_booking():
                                  facilities=facilities,
                                  has_cookie=has_cookie,
                                  # search_field_data=search_field_data,
-                                 request_activity_type_id=request_activity_type_id,
+                                 activity=activity,
                                  page_title="Booking")
 
 
