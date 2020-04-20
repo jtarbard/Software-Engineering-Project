@@ -186,6 +186,12 @@ Booking Page
 
             // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
             datesRender: function(info) {
+                // add the responsive classes back
+                $(".fc-toolbar").addClass("row no-gutters");
+                $(".fc-left").addClass("col-12 col-md-4");
+                $(".fc-center").addClass("col-12 col-md-4");
+                $(".fc-right").addClass("col-12 col-md-4");
+
                 let query = {
                     activity_type_id: {{ activity_type.activity_type_id }},
                     start_date: info.view.activeStart,
