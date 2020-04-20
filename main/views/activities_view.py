@@ -79,7 +79,7 @@ def view_booking():
                                  session_availabilities=session_availabilities,
                                  has_cookie=has_cookie,
                                  activity_type=activity_type,
-                                 page_title="Booking")
+                                 page_title="Book " + activity_type.name.title())
 
 
 # -------------------------------------------------- Ajax routes -------------------------------------------------- #
