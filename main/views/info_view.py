@@ -15,12 +15,6 @@ def about_func():
     return flask.render_template("/info/about.html", page_title="About", User=user, has_cookie=has_cookie)
 
 
-@blueprint.route('/info/contact_us', methods=["GET"])
-def contact_us_view():
-    user, response, has_cookie = cl.return_user_response(flask.request, False)
-    return flask.render_template("/info/contact_us.html", User=user, has_cookie=has_cookie)
-
-
 @blueprint.route('/info/facilities', methods=["GET"])
 def facilities_view():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
