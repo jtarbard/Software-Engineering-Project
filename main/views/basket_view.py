@@ -53,6 +53,8 @@ def add_booking_to_basket_post():
 
     activity_type = adf.return_activity_type_name_with_activity_type_id(activity.activity_type_id)
     flask.flash(activity_type.title()+" session has been added to your basket.", category="success")
+
+    response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
 

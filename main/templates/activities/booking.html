@@ -55,7 +55,11 @@ Booking Page
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="addToBasket">Add to Basket</button>
+                <form action="/misc/add_booking_to_basket" method="post">
+                    <input type="hidden" name="amount_of_people" value="1" id="amountOfPeopleSubmit">
+                    <input name="activity" type="hidden" value="" id="activitySubmit">
+                    <input type="submit" class="btn btn-primary" id="addToBasket" value="Add to Basket">
+                </form>
             </div>
         </div>
     </div>
@@ -124,6 +128,11 @@ Booking Page
                     success: function(session) {
                         session = JSON.parse(session);
 
+                        // need to flash a message (due to 300 or 404)
+                        if (session.flash) {
+                            document.location.href = session.redirect_route;
+                        }
+
                         var modal = $('#bookingModal');
                         var sessionInfoList = modal.find("#sessionInfoList");
 
@@ -138,7 +147,7 @@ Booking Page
                         modal.find("#sessionPrice").val(session.session_price);
                         modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
 
-                        {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                        {% if User is not defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
                         sessionInfoList.append(
                             "<li><b>Manager Info:</b></li>",
                             "<li>Total bookings: " + session.total_bookings + "</li>",
@@ -155,6 +164,8 @@ Booking Page
                         } else {
                             modal.find("#membershipDisplay").attr("hidden", "hidden");
                         }
+
+                        $("#activitySubmit").attr("value", info.event.extendedProps.id);
                     },
                     error: function(jqXHR) {
                         alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
@@ -221,11 +232,7 @@ Booking Page
 
     // Add to basket button
     $("#addToBasket").on("click", function(e) {
-        console.log("hi posting data");
-        $.post("/misc/add_booking_to_basket", {
-            "activity": $("#activityID").val(),
-            "amount_of_people": $("#sessionNumPeopleSlider").val()
-        });
+        $('#bookingModal').modal("hide");
     });
 
     // Number of people slider
@@ -233,6 +240,7 @@ Booking Page
     slider.val(1);
     slider.on("input change", function(e) {
         $("#sessionNumPeopleVal").html($(this).val());
+        $("#amountOfPeopleSubmit").attr("value", $(this).val());
         // Also update the subtotal price   TODO: Bad #135
         $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() * (100-$("#membershipDiscount").val())/100 + "</p>");
     });

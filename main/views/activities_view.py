@@ -57,7 +57,6 @@ def view_booking():
         activity_type_id=request_activity_type_id
     )
 
-    # NEW CODE
     activity_type = adf.return_activity_type(request_activity_type_id)
 
     activity_capacities = adf.return_activity_type_capacities()
@@ -126,6 +125,8 @@ def query_session():
     """
 
     status_code = 200
+    redirect_route = "/activities/booking"
+    need_to_flash = False
 
     id = flask.request.json.get("id")
     session = adf.return_activity_with_id(id)
@@ -135,14 +136,13 @@ def query_session():
     # ----- Error Checking ----- #
     if user is None:
         flask.flash("You need to login to view session details.", "error")  # TODO: Does this make sense?
+        need_to_flash = True
         status_code = 300  # redirect
-
-    # if response:
-    #     flask.flash("You need to login to view session details.", "error")  # TODO: Does this make sense?
-    #     return response
+        redirect_route = "/account/login"
 
     if not session:
         flask.flash("This session does not exist.", "error")  # TODO: Severe error
+        need_to_flash = True
         status_code = 404
 
     # ----- Retrieve data ----- #
@@ -154,12 +154,16 @@ def query_session():
     subtotal = session_price
 
     session_dict = dict(
-        user_role=user.__mapper_args__['polymorphic_identity'],
+        user_role=None if user is None else user.__mapper_args__['polymorphic_identity'],
         minimum_age=session.activity_type.minimum_age,
         spaces_left=spaces_left,
         session_price=round(session_price, 2),  # TODO: Bad #135
         subtotal=round(subtotal, 2),  # TODO: Bad #135
-        max_booking=min(spaces_left, 8)
+        max_booking=min(spaces_left, 8),
+
+        status_code=status_code,
+        redirect_route=redirect_route,
+        flash=need_to_flash
     )
 
     # TODO: #135: Don't use floating point numbers for monetary calculation
@@ -196,6 +200,5 @@ def query_session():
     #     return flask.abort(404)
 
     response = flask.make_response(json.dumps(session_dict))
-    response.status_code = status_code
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
