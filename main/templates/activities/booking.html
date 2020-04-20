@@ -2,9 +2,6 @@
 {% block additional_css %}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/activities.css') }}">
 
-<!-- datetime picker -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
-
 <!-- FullCalender Stylesheet. Used for scheduler -->
 <link href='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.css' rel='stylesheet' />
 <link href='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.css' rel='stylesheet' />
@@ -52,7 +49,7 @@ Booking Page
                 <p hidden id="sessionPrice"></p>
                 <p id="subtotal">Subtotal: £0.0</p>
 
-                <div class="alert-success" role="alert" id="membershipDisplay"> <!-- TODO: Try jumbotron. I didn't know how to resize it, but on smaller size i'd imagine it to look good -->
+                <div class="alert-success" role="alert" id="membershipDisplay">
                     <p class="display-12">No membership.</p>
                 </div>
             </div>
@@ -177,11 +174,6 @@ Booking Page
 
 <script>
 
-    // TODO: Maybe remove
-    $(".multidate input").datepicker({
-        multidate: true
-    });
-
     // ----- Booking Calendars ----- //
     // The id/key separates each list into "buckets" for performance
     // If the list is a heap, then each insert is O(log n) so it's performant still
@@ -260,9 +252,7 @@ Booking Page
                             }
                         },
                         error: function(jqXHR) {
-                            // TODO: Make this user friendly
-                            alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.")
-                            console.log(jqXHR);
+                            alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
                         }
                     });
 
@@ -308,9 +298,7 @@ Booking Page
                                 }
                             },
                             error: function(jqXHR) {
-                                // TODO: Make this user friendly
                                 alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
-                                console.log(jqXHR);
                             }
                         });
                     }
@@ -340,8 +328,7 @@ Booking Page
     // Number of people slider
     var slider = $("#sessionNumPeopleSlider");
     slider.val(1);
-    // TODO: Add tooltip. Also make it change on slide ("slide" should've been an event but it doesn't work. Check https://seiyria.com/bootstrap-slider/#example-2 <<<<< also .slider is not a function)
-    slider.on("change", function(e) {
+    slider.on("input change", function(e) {
         $("#sessionNumPeopleVal").html($(this).val());
         // Also update the subtotal price   TODO: Bad #135
         $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() * (100-$("#membershipDiscount").val())/100 + "</p>");
