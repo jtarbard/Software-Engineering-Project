@@ -9,7 +9,7 @@ from flask import Response
 from main.data.db_classes.transaction_db_class import Receipt, Membership, MembershipType
 
 
-def return_user_response(request: flask.request, needs_login: bool):
+def return_user_response(request: flask.request, needs_login: bool):  # TODO: This. Is. A. Terrible. Function. Name.
     account_id = check_valid_account_cookie(request)  # Returns user ID from cookie
 
     user = None
