@@ -18,26 +18,45 @@ Booking Page
 {% endblock %}
 
 {% block main_content %}
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#bookingModal">
   Launch demo modal
 </button>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <div class="modal-body">
-        ...
+      <div class="modal-body" id="sessionInfo">
+          <ul id="sessionInfoList">
+            <!-- Session info elements added on click -->
+          </ul>
+
+          <!-- Number of people slider -->
+          <div class="row" id="sessionNumPeople">
+            <div class="col-md-4">
+                <label for="sessionNumPeopleSlider">Number of people: </label>
+            </div>
+            <div class="col-md-7">
+                <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider">
+            </div>
+            <div class="col-md-1">
+                <b id="sessionNumPeopleVal">1</b>
+            </div>
+          </div>
+
+          <p hidden id="sessionPrice"></p>
+          <p id="subtotal">Subtotal: £0.0</p>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" id="addToBasket">Add to basket</button>
       </div>
     </div>
   </div>
@@ -214,21 +233,56 @@ Booking Page
                     center: 'title',
                     right: 'dayGridMonth,timeGridWeek,timeGridDay'
                 },
-                events: [
-{#                    {% for session in session_availabilities %}#}
-{#                        {#}
-{#                            title: "{{ activity_type.name.title() }}",#}
-{#                            start: "{{ session.start_time.strftime("%Y-%m-%dT%H:%M:%S") }}",#}
-{#                            end: "{{ session.end_time.strftime("%Y-%m-%dT%H:%M:%S") }}"#}
-{#                        },#}
-{#                    {% endfor %}#}
-                ],
+                events: [],
 
                 // ----- Event Handlers ----- //
                 // Click on an session
                 eventClick: function(info) {
                     // Show session info
-                    $('#exampleModal').modal('show');
+                    var modal = $('#bookingModal');
+                    modal.modal('show');
+
+                    // Perform an ajax request to get all the session info
+                    $.ajax({
+                        type : "POST",
+                        url : "{{ url_for("activities.query_session") }}",
+                        data: JSON.stringify(info.event.extendedProps),
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(session) {
+                            session = JSON.parse(session);
+
+                            var modal = $('#bookingModal');
+                            var sessionInfoList = modal.find("#sessionInfoList");
+
+                            sessionInfoList.html(
+                                "<li>Start time: " + info.event.start + "</li>\n" +
+                                "<li>End time: " + info.event.end + "</li>\n" +
+                                "<li>Minimum age: " + session.minimum_age + "</li>\n" +
+                                "<li>Spaces left: " + session.spaces_left + "</li>\n" +
+                                "<li>Price for one: £" + session.session_price + "</li>"
+                            );
+                            modal.find("#sessionNumPeopleSlider").attr("max", session.max_booking);
+                            modal.find("#sessionPrice").val(session.session_price);
+                            modal.find("#subtotal").html("Subtotal: £" + session.session_price);
+
+                            {% if User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                            sessionInfoList.append(
+                                "<li>Total bookings: " + session.total_bookings + "</li>",
+                                "<li>Income: " + session.activity_income + "</li>",
+                                "<li>Cost: " + session.activity_cost + "</li>"
+                            );
+                            modal.find("#sessionNumPeopleSlider").attr("hidden", "hidden"); // hide the number of people slider for manager
+                            modal.find("#subtotalDisplay").attr("hidden", "hidden");
+                            {% endif %}
+                        },
+                        error: function(jqXHR) {
+                            // TODO: Make this user friendly
+                            alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.")
+                            alert(jqXHR);
+                        }
+                    });
+
+                    modal.find(".modal-title").text("Book for " + info.event.title);
                 },
 
                 // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
@@ -255,7 +309,10 @@ Booking Page
                                     var session = {
                                         title: results[i].name,
                                         start: results[i].start,
-                                        end: results[i].end
+                                        end: results[i].end,
+                                        extendedProps: {
+                                            id: results[i].id
+                                        }
                                     };
                                     var sessionStr = JSON.stringify(session);
 
@@ -265,6 +322,11 @@ Booking Page
                                         calendars[{{ activity_type.activity_type_id }}].addEvent(session);
                                     }
                                 }
+                            },
+                            error: function(jqXHR) {
+                                // TODO: Make this user friendly
+                                alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
+                                alert(jqXHR);
                             }
                         });
                     }
@@ -280,6 +342,21 @@ Booking Page
             calendars[{{ activity_type.activity_type_id }}].render();
 
         {% endfor %}
+    });
+
+    // Add to basket button
+    $("#addToBasket").on("click", function(e) {
+        alert("hi this works");
+    });
+
+    // Number of people slider
+    var slider = $("#sessionNumPeopleSlider");
+    slider.val(1);
+    // TODO: Add tooltip
+    slider.on("change", function(e) {
+        $("#sessionNumPeopleVal").html($(this).val());
+        // Also update the subtotal price   TODO: Bad #135
+        $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() + "</p>");
     });
 </script>
 {% endblock %}

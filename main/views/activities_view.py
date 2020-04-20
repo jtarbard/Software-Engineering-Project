@@ -7,7 +7,7 @@ import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
 from main.data.db_classes.activity_db_class import Activity
 from main.data.db_classes.transaction_db_class import Membership
-from main.data.db_classes.user_db_class import Customer
+from main.data.db_classes.user_db_class import Customer, Manager
 import main.view_lib.cookie_lib as cl
 
 blueprint = flask.Blueprint("activities", __name__)
@@ -178,46 +178,6 @@ def view_booking():
                                  page_title="Booking")
 
 
-@blueprint.route("/activities/view_activity/<int:activity_id>", methods=["GET"])
-def view_activity(activity_id: int):
-    user, response, has_cookie = cl.return_user_response(flask.request, True)
-    if response:
-        return response
-
-    activity = adf.return_activity_with_id(activity_id)
-    if not activity:
-        return flask.abort(404)
-
-    total_bookings = len(tdf.return_bookings_with_activity_id(activity.activity_id))
-    spaces_left = activity.activity_type.maximum_activity_capacity - total_bookings
-    activity_income = total_bookings * activity.activity_type.hourly_activity_price * (
-                activity.end_time - activity.start_time).seconds // 3600
-    activity_cost = total_bookings * activity.activity_type.hourly_activity_cost * (
-                activity.end_time - activity.start_time).seconds // 3600
-
-    if type(user) is not Customer or spaces_left <= 0:
-        membership = None
-    else:
-        customer = udf.return_customer_with_user_id(user.user_id)
-        membership: Membership = customer.current_membership
-
-    if activity.start_time < datetime.datetime.now() and type(user) is Customer:
-        return flask.abort(404)
-
-    duration: datetime.timedelta = activity.end_time - activity.start_time
-    session_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
-
-    final_price = session_price
-    if membership:
-        membership = Membership.query.filter_by(membership_id=membership.membership_id).first().membership_type
-        final_price = session_price * (1 - membership.discount / float(100))
-
-    return flask.render_template("/activities/activity.html", activity=activity, session_price=round(session_price, 2),
-                                 spaces_left=spaces_left, membership=membership, total_bookings=total_bookings,
-                                 final_price=round(final_price, 2), User=user, max_booking=min(spaces_left, 8),
-                                 activity_cost=activity_cost, activity_income=activity_income)
-
-
 # -------------------------------------------------- Ajax routes -------------------------------------------------- #
 @blueprint.route("/activities/query_sessions", methods=["POST"])
 def query_sessions():
@@ -238,12 +198,99 @@ def query_sessions():
                                                            activity_type_id=activity_type_id)
     data = list()
     for session in sessions:
-        data.append(dict(name=session.activity_type.name.title(),
+        data.append(dict(id=session.activity_id,
+                         name=session.activity_type.name.title(),
                          description=session.activity_type.description,
                          facility=session.facility.name,
                          start=session.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
                          end=session.end_time.strftime("%Y-%m-%dT%H:%M:%S")))
     response = flask.make_response(json.dumps(data))
     response.status_code = 200
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+@blueprint.route("/activities/query_session", methods=["POST"])
+def query_session():
+    """
+
+    This route should only be accessible via the booking.html Ajax (method).
+    (This was previously view_activity())
+
+    :return: the stringified session with the supplied id
+    """
+
+    status_code = 200
+
+    id = flask.request.json.get("id")
+    session = adf.return_activity_with_id(id)
+
+    user, response, has_cookie = cl.return_user_response(flask.request, True)
+
+    # ----- Error Checking ----- #
+    if user is None:
+        flask.flash("You need to login to view session details.", "error")  # TODO: Does this make sense?
+        status_code = 300  # redirect
+
+    # if response:
+    #     flask.flash("You need to login to view session details.", "error")  # TODO: Does this make sense?
+    #     return response
+
+    if not session:
+        flask.flash("This session does not exist.", "error")  # TODO: Severe error
+        status_code = 404
+
+    # ----- Retrieve data ----- #
+    total_bookings = len(tdf.return_bookings_with_activity_id(session.activity_id))
+    spaces_left = session.activity_type.maximum_activity_capacity - total_bookings
+    duration: datetime.timedelta = session.end_time - session.start_time
+    session_price = (duration.seconds // 3600 * session.activity_type.hourly_activity_price)  # TODO: Bad #135
+
+    final_price = session_price
+
+    session_dict = dict(
+        user_role=user.__mapper_args__['polymorphic_identity'],
+        minimum_age=session.activity_type.minimum_age,
+        spaces_left=spaces_left,
+        session_price=round(session_price, 2),  # TODO: Bad #135
+        final_price=round(final_price, 2),  # TODO: Bad #135
+        max_booking=min(spaces_left, 8)
+    )
+
+    # TODO: #135: Don't use floating point numbers for monetary calculation
+    if type(user) is Manager:
+        # TODO: Bad #135
+        # TODO: Potential financial security flaw? The cost is openly accessible from the object, so what's stopping malicious users from getting those values?
+        activity_income = total_bookings * session.activity_type.hourly_activity_price * (
+                          session.end_time - session.start_time).seconds // 3600
+        activity_cost = total_bookings * session.activity_type.hourly_activity_cost * (
+                        session.end_time - session.start_time).seconds // 3600
+
+        session_dict.update(dict(
+            total_bookings=total_bookings,
+            activity_cost=activity_cost,
+            activity_income=activity_income
+        ))
+    elif type(user) is Customer and spaces_left > 0:
+        customer = udf.return_customer_with_user_id(user.user_id)
+        membership = customer.current_membership
+        if membership is not None:
+            membership_type = Membership.query.filter_by(membership_id=membership.membership_id).first().membership_type
+            final_price = session_price * (1 - membership_type.discount / float(100))  # TODO: Bad #135
+
+            session_dict.update(dict(
+                final_price=round(final_price, 2),  # TODO: Bad #135
+                membership_name=membership.name.title(),
+                membership_discount=membership.discount
+            ))
+
+    # Don't check here. Check in js; also don't return sessions before today's date FOR CUSTOMER.
+    # if a CUSTOMER clicks on an EXPIRED session, show that it's expired, and don't allow user to book the session
+    # note that EMPLOYEE and MANAGER **CAN** still view the event details)
+    # if activity.start_time < datetime.datetime.now() and type(user) is Customer:
+    #     return flask.abort(404)
+
+    response = flask.make_response(json.dumps(session_dict))
+    response.status_code = status_code
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
