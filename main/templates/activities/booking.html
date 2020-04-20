@@ -7,6 +7,7 @@
 <link href='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.css' rel='stylesheet' />
 <link href='https://unpkg.com/@fullcalendar/daygrid@4.4.0/main.min.css' rel='stylesheet' />
 <link href='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.css' rel='stylesheet' />
 
 {% endblock %}
 
@@ -86,6 +87,7 @@ Booking Page
 <script src='https://unpkg.com/@fullcalendar/interaction@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/daygrid@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.js'></script>
 
 <script>
     // ----- Booking Calendars ----- //
@@ -101,12 +103,19 @@ Booking Page
         var calendarEl = document.getElementById("calendar");
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
-            plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid' ],
+            plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid', 'list' ],
             defaultView: 'timeGridWeek',
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            buttonText: {
+                today: 'Today',
+                month: 'Month',
+                week: 'Week',
+                day: 'Day',
+                list: 'List'
             },
             events: [],
 
