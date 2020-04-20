@@ -232,34 +232,53 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
 
 # Simply returns all activity instances between two datetimes AND in the specified facility_id
 # [Lewis S]
-def return_activities_between_dates_with_facility_and_activity(start_date: datetime.datetime, end_time: datetime.datetime,
+def return_activities_between_dates_with_facility_and_activity(start_time: datetime.datetime, end_time: datetime.datetime,
                                                                activity_type_id="Any", facility_id="Any"):
     if activity_type_id == "Any" and facility_id == "Any":
-        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time).all()
+        return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time).all()
     elif activity_type_id == "Any" and facility_id != "Any":
-        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
+        return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time,
                                      Activity.facility_id == facility_id).all()
     elif facility_id == "Any" and activity_type_id != "Any":
-        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
+        return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time,
                                      Activity.activity_type_id == activity_type_id).all()
     else:
-        return Activity.query.filter(Activity.start_time > start_date, Activity.end_time < end_time,
+        return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time,
                                      Activity.activity_type_id == activity_type_id, Activity.facility_id == facility_id).all()
 
 
-def return_weekly_activities_of_type(day: datetime.datetime, activity_type_id: int):
+def return_activities_between_dates_of_type(start_date, end_date, **kwargs):
+    """
+    :param start_date: The start date of the range of sessions requested
+    :param end_date: The end date of the range of sessions requested. Note: This is exclusive.
+    :param kwargs: activity_type: an ActivityType object. This is used if supplied.
+                   activity_type_id: an int. This is used if activity_type is not supplied.
+                   If both activity_type and activity_type_id are not supplied, the activity type will not be filtered.
+    :return: A list containing activities/sessions of type "activity_type_id" from start_date to end_date exclusive.
+    """
+    activity_type = kwargs.get("activity_type")
+    activity_type_id = kwargs.get("activity_type_id") if activity_type is None else activity_type.activity_type_id
+
+    if activity_type_id is None:
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date).all()
+    else:
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time <= end_date,
+                                     Activity.activity_type_id == activity_type_id).all()
+
+
+def return_weekly_activities_of_type(day: datetime.datetime, activity_type_id: int = None):
     """
     :param day: a date that indicates the week of activities desired
     :param activity_type_id: The type of the desired activities
     :return: A list containing activities in "day"'s week with the specified activity_type_id
     """
     start_date = day - datetime.timedelta(days=day.weekday())
-    end_date = start_date + datetime.timedelta(days=6)
+    end_date = start_date + datetime.timedelta(days=7)
 
-    if activity_type_id == "Any":
-        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time <= end_date).all()
+    if activity_type_id is None:
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date).all()
     else:
-        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time <= end_date,
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date,
                                      Activity.activity_type_id == activity_type_id).all()
 
 
