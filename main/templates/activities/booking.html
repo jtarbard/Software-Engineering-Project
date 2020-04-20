@@ -74,8 +74,8 @@ Booking Page
             <!-- Accordion Card -->
             <div class="card">
                 <div class="card-header" id={{ "heading" + activity.name.title() }}>
-                    <button type="button" class="btn btn-link" data-toggle="collapse" data-target={{ "#collapse" + activity.name.title() }}>
-                        {{ activity.name.title() }}
+                    <button type="button" class="btn btn-link activity_btn" data-toggle="collapse" data-target={{ "#collapse" + activity.name.title() }}>
+                        <p>{{ activity.name.title() }}</p>
                         <i class="fa fa-chevron-down pull-right"></i>
                     </button>
                 </div>
