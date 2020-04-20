@@ -12,7 +12,7 @@ blueprint = flask.Blueprint("basket", __name__)
 
 
 @blueprint.route("/misc/add_booking_to_basket", methods=["POST"])
-def view_classes_post():
+def add_booking_to_basket_post():
     user, response, has_cookie = cl.return_user_response(flask.request, True)
     if response:
         return response
@@ -22,22 +22,27 @@ def view_classes_post():
     booking_amount: int = int(data_form.get("amount_of_people"))
 
     if not activity or not booking_amount:
+        flask.flash("Not checked out or booked activity", category="error")
         return flask.render_template("/misc/general_error.html", error="Not checked out or booked activity", has_cookie=has_cookie)
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
         tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
+    # TODO: Discuss if this is the desired behaviour
+    #       In Test_4,Test_5, it's expected to render general_error page
     if not is_valid:
         return cl.destroy_account_cookie(flask.redirect("/"))
 
     if basket_activities:
         if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(
                 basket_activities) + booking_amount > 15:
+            flask.flash("Basket full", category="error")
             return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
 
     spaces_left = activity.activity_type.maximum_activity_capacity - len(
         tdf.return_bookings_with_activity_id(activity.activity_id))
     if spaces_left <= 0:
+        flask.flash("Not enough spaces left on activity", category="error")
         return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
                                      User=user, has_cookie=has_cookie)
 
@@ -48,6 +53,8 @@ def view_classes_post():
 
     activity_type = adf.return_activity_type_name_with_activity_type_id(activity.activity_type_id)
     flask.flash(activity_type.title()+" session has been added to your basket.", category="success")
+
+    response.headers['Access-Control-Allow-Origin'] = '*'
     return response
 
 
@@ -99,7 +106,7 @@ def basket_view():
         total_activity_price += current_price - (current_price * bulk_discount)
 
     current_membership_discount = 0
-    total_discounted_price = 0
+    # total_discounted_price = 0  # can uncomment but this is not needed (why is python weird)
     if basket_membership:
         total_discounted_price = (total_activity_price - basket_membership.discount / 100 * total_activity_price)
 
@@ -115,6 +122,7 @@ def basket_view():
             current_membership_discount = customer_membership.membership_type.discount
             final_price = total_discounted_price
         else:
+            total_discounted_price = total_activity_price
             final_price = total_activity_price
 
     return flask.render_template("/account/basket.html", basket_activities=basket_activities,

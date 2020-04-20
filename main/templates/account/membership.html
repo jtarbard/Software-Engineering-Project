@@ -2,13 +2,17 @@
 
 {% block page_content %}
 <div>
-    {% if membership %}
+    {% if membership_type %}
         <p>Membership: {{membership_type.name.title()}}</p>
         <p>Start Date: {{membership.start_date.strftime("%d %B, %Y")}}</p>
         <p>End Date: {{membership.end_date.strftime("%d %B, %Y")}}</p>
         <!-- TODO: implement renew function   -->
         <a href="" class="btn btn-primary">Renew Membership</a>
         <a href="/info/memberships/cancel" class="btn btn-danger">Cancel Membership</a>
+    {% elif User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+        <p>Managers do not have a membership.</p>
+    {% elif User.__mapper_args__ ['polymorphic_identity'] == "Employee" %}
+        <p>Employees do not have a membership.</p>
     {% else %}
         <p>Membership: No Membership Owned</p>
         <a href="{{ url_for('info.membership_view')}}" class="btn btn-primary">Purchase Membership</a>

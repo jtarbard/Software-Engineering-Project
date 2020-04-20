@@ -11,7 +11,7 @@ The Vertex classes!
 <div class="container">
     <div class="row">
             <div class="col-sm-12">
-            <a href="{{ url_for('activities.view_activities')}}">
+            <a href="{{ url_for('activities.view_booking')}}">
                 <div class="card">
                     <div class="card-body">
                         <h2 class="card-title text-center">View All Activities</h2>
@@ -39,7 +39,7 @@ The Vertex classes!
                         </div>
                         <div class="buttons">
                             <form method="post">
-                                <input type="hidden" name="activity" value="{{ activity.activity_type_id }}">
+                                <input type="hidden" name="request_activity_type_id" value="{{ activity.activity_type_id }}">
                                 <button class="btn btn-dark" type="submit" name="amount" value="single">Book</button>
                                 <button class="btn btn-dark" type="submit" name="amount" value="multiple">Bulk Book</button>
                             </form>

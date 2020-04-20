@@ -1,4 +1,69 @@
-.form-inline {
-    width: 80%
+/*.card {*/
+/*    background-color: initial;*/
+/*    color: initial;*/
+/*}*/
+
+/*.dropdown-menu {*/
+/*    color: initial;*/
+/*    background-color: initial;*/
+/*}*/
+
+.card {
+    z-index: 1;
 }
 
+.datetimepicker-input .input-group-append {
+    z-index: -1;
+}
+
+input {
+  border: 2px solid whitesmoke;
+  border-radius: 20px;
+  padding: 12px 10px;
+  text-align: center;
+  width: 250px;
+}
+
+.activity_btn {
+    width: 100%;
+}
+
+.activity_btn p {
+    float: left;
+    margin-bottom: 0px;
+}
+
+.activity_btn i {
+    float: right;
+}
+
+#membershipDisplay {
+    padding: .75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    line-height: 1.5;
+}
+
+#membershipDisplay p {
+    margin-bottom: 0px;
+}
+
+.fc-left .fc-button-group {
+    /*justify-content: flex-start;*/
+    float: left;
+}
+.fc-center h2 {
+    text-align: center;
+}
+.fc-right .fc-button-group {
+    /*justify-content: flex-end;*/
+    float: right;
+}
+
+@media (max-width: 768px){
+    .fc-left, .fc-center h2, .fc-right {
+        display: flex;
+        justify-content: center;
+        float: none;
+    }
+}

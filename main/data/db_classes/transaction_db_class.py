@@ -14,7 +14,7 @@ class Receipt(database.Model):
     receipt_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     customer_id = database.Column(database.Integer, database.ForeignKey("Customers.customer_id"), nullable=False)
     total_cost = database.Column(database.Integer, database.CheckConstraint("total_cost >= 0 and total_cost < 10000"), default=0)
-    # Total cost must be between 0 and 5000
+    # Total cost must be between 0 and 10000
     creation_time = database.Column(database.DateTime, default=datetime.now, nullable=False)
     # Sets the creation time to now
 

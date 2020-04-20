@@ -9,7 +9,7 @@ from flask import Response
 from main.data.db_classes.transaction_db_class import Receipt, Membership, MembershipType
 
 
-def return_user_response(request: flask.request, needs_login: bool):
+def return_user_response(request: flask.request, needs_login: bool):  # TODO: This. Is. A. Terrible. Function. Name.
     account_id = check_valid_account_cookie(request)  # Returns user ID from cookie
 
     user = None
@@ -92,7 +92,7 @@ def __hash_text(text: str) -> str:
 def add_activity_or_membership_to_basket(booking_object, request: flask.request, num_people=1, duration=None):
 
     if type(booking_object) is Activity:
-        response = flask.redirect("/activities/types")
+        response = flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=booking_object.activity_type.activity_type_id))
         if not num_people:
             return None
         if num_people < 1 or num_people > 8:

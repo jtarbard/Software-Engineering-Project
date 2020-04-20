@@ -1,0 +1,273 @@
+{% extends "includes/_main_layout.html"%}
+{% block additional_css %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/activities/activities.css') }}">
+
+<!-- FullCalender Stylesheet. Used for scheduler -->
+<link href='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/daygrid@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.css' rel='stylesheet' />
+<link href='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.css' rel='stylesheet' />
+
+{% endblock %}
+
+{% block title %}
+Booking Page
+{% endblock %}
+
+{% block main_content %}
+<!-- Modal -->
+<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="sessionInfo">
+                <input type="hidden" name="activity_id" id="activityID">
+
+                <ul id="sessionInfoList">
+                    <!-- Session info elements added on click -->
+                </ul>
+
+                <!-- Number of people slider -->
+                <div class="row" id="sessionNumPeople">
+                    <div class="col-md-4">
+                        <label for="sessionNumPeopleSlider">Number of people: </label>
+                    </div>
+                    <div class="col-md-7">
+                        <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider" name="num_people">
+                    </div>
+                    <div class="col-md-1">
+                        <b id="sessionNumPeopleVal">1</b>
+                    </div>
+                </div>
+
+                <p hidden id="membershipDiscount">0</p> <!-- 0-100. Indicates how much should be discounted, i.e. X/100 off -->
+                <p hidden id="sessionPrice"></p>
+                <p id="subtotal">Subtotal: £0.0</p>
+
+                <div class="alert-success" role="alert" id="membershipDisplay">
+                    <p class="display-12">No membership.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <form action="/misc/add_booking_to_basket" method="post">
+                    <input type="hidden" name="amount_of_people" value="1" id="amountOfPeopleSubmit">
+                    <input name="activity" type="hidden" value="" id="activitySubmit">
+                    <input type="submit" class="btn btn-primary" id="addToBasket" value="Add to Basket">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+
+<div class="container">
+    <!-- activity info -->
+    <p>{{ activity_type.description }}</p>
+    <!-- activity info -->
+
+    <h6>Book for a session:</h6>
+    <!-- Scheduler -->
+    <div id="calendar"></div>
+    <!-- Scheduler -->
+</div>
+</div>
+{% endblock %}
+
+{% block additional_js %}
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<script src='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/interaction@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/daygrid@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
+<script src='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.js'></script>
+
+<script>
+    // ----- Booking Calendars ----- //
+    // If the list is a heap, then each insert is O(log n) so it's performant still
+    var queryHistory = {}; // { activity_type_id: [{query} object literals] }. If this object literal exists, then the retrieved events must exist
+    var existingSessions = {}; // { activity_type_id: [{session} object literals] }.
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // initialize
+        queryHistory = [];
+        existingSessions = [];
+
+        var calendarEl = document.getElementById("calendar");
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid', 'list' ],
+            defaultView: 'timeGridWeek',
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+            },
+            buttonText: {
+                today: 'Today',
+                month: 'Month',
+                week: 'Week',
+                day: 'Day',
+                list: 'List'
+            },
+            events: [],
+
+            // ----- Styling -----
+            eventTextColor: "#FFFFFF",
+            eventBorderColor: "#000000",
+            eventBackgroundColor: "#000000",
+
+            // ----- Event Handlers ----- //
+            // Click on an session
+            eventClick: function(info) {
+                // Show session info
+                var modal = $('#bookingModal');
+                modal.modal('show');
+
+                $("#activityID").val(info.event.extendedProps.id);
+
+                // Perform an ajax request to get all the session info
+                $.ajax({
+                    type : "POST",
+                    url : "{{ url_for("activities.query_session") }}",
+                    data: JSON.stringify(info.event.extendedProps),
+                    contentType: 'application/json;charset=UTF-8',
+                    success: function(session) {
+                        session = JSON.parse(session);
+
+                        // need to flash a message (due to 300 or 404)
+                        if (session.flash) {
+                            document.location.href = session.redirect_route;
+                        }
+
+                        var modal = $('#bookingModal');
+                        var sessionInfoList = modal.find("#sessionInfoList");
+
+                        sessionInfoList.html(
+                            "<li>Start time: " + info.event.start + "</li>\n" +
+                            "<li>End time: " + info.event.end + "</li>\n" +
+                            "<li>Minimum age: " + session.minimum_age + "</li>\n" +
+                            "<li>Spaces left: " + session.spaces_left + "</li>\n" +
+                            "<li>Price for one: £" + session.session_price + "</li>"
+                        );
+                        modal.find("#sessionNumPeopleSlider").attr("max", session.max_booking);
+                        modal.find("#sessionPrice").val(session.session_price);
+                        modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
+
+                        {% if User is not defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                        sessionInfoList.append(
+                            "<li><b>Manager Info:</b></li>",
+                            "<li>Total bookings: " + session.total_bookings + "</li>",
+                            "<li>Income: " + session.activity_income + "</li>",
+                            "<li>Cost: " + session.activity_cost + "</li>"
+                        );
+                        {% endif %}
+
+                        if (session.membership_name !== undefined) {
+                            modal.find("#membershipDisplay p").html(
+                                session.membership_discount + "% Off discount applied for your " + session.membership_name + " membership."
+                            );
+                            modal.find("#membershipDiscount").val(session.membership_discount);
+                        } else {
+                            modal.find("#membershipDisplay").attr("hidden", "hidden");
+                        }
+
+                        $("#activitySubmit").attr("value", info.event.extendedProps.id);
+                    },
+                    error: function(jqXHR) {
+                        alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
+                    }
+                });
+
+                modal.find(".modal-title").text("Book for " + info.event.title);
+            },
+
+            // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
+            datesRender: function(info) {
+                // add the responsive classes back
+                $(".fc-toolbar").addClass("row no-gutters");
+                $(".fc-left").addClass("col-12 col-md-4");
+                $(".fc-center").addClass("col-12 col-md-4");
+                $(".fc-right").addClass("col-12 col-md-4");
+
+                let query = {
+                    activity_type_id: {{ activity_type.activity_type_id }},
+                    start_date: info.view.activeStart,
+                    end_date: info.view.activeEnd
+                };
+                query = JSON.stringify(query);
+
+                // check against cache
+                if (!queryHistory.includes(query)) {
+                    queryHistory.push(query);
+
+                    $.ajax({
+                        type : "POST",
+                        url : "{{ url_for("activities.query_sessions") }}",
+                        data: query,
+                        contentType: 'application/json;charset=UTF-8',
+                        success: function(results) {
+                            results = JSON.parse(results);
+                            for (let i = 0; i < results.length; i++) {
+                                var session = {
+                                    title: results[i].name,
+                                    start: results[i].start,
+                                    end: results[i].end,
+                                    extendedProps: {
+                                        id: results[i].id
+                                    }
+                                };
+                                var sessionStr = JSON.stringify(session);
+
+                                // if event doesn't exist in existingSessions, add to existingSessions and add to calendar
+                                if (!existingSessions.includes(sessionStr)) {
+                                    existingSessions.push(sessionStr);
+                                    calendar.addEvent(session);
+                                }
+                            }
+                        },
+                        error: function(jqXHR) {
+                            alert("An error occurred. Perhaps the internet connection between you and the website's server is interrupted.");
+                        }
+                    });
+                }
+            },
+
+            // don't rerender everytime an event is added
+            // TODO: Not sure how to use this
+            batchRendering: function() {
+
+            }
+        });
+
+        calendar.render();
+
+        $(".fc-toolbar").addClass("row no-gutters");
+        $(".fc-left").addClass("col-12 col-md-4");
+        $(".fc-center").addClass("col-12 col-md-4");
+        $(".fc-right").addClass("col-12 col-md-4");
+    });
+
+    // Add to basket button
+    $("#addToBasket").on("click", function(e) {
+        $('#bookingModal').modal("hide");
+    });
+
+    // Number of people slider
+    var slider = $("#sessionNumPeopleSlider");
+    slider.val(1);
+    slider.on("input change", function(e) {
+        $("#sessionNumPeopleVal").html($(this).val());
+        $("#amountOfPeopleSubmit").attr("value", $(this).val());
+        // Also update the subtotal price   TODO: Bad #135
+        $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() * (100-$("#membershipDiscount").val())/100 + "</p>");
+    });
+</script>
+{% endblock %}
