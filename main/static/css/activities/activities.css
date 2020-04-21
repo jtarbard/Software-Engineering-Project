@@ -67,3 +67,51 @@ input {
         float: none;
     }
 }
+
+#calendar {
+    background-color: white;
+}
+
+#bulk-buy {
+    margin-bottom: 3vh;
+}
+
+#bulk-top {
+    width: 100%;
+}
+
+#bulk-top p {
+    float: left;
+    margin-bottom: 0px;
+}
+
+#bulk-top i {
+    float: right;
+}
+
+#bulk-bottom {
+    margin-bottom: 2vh;
+}
+
+.bulk-bottom p {
+    margin-bottom: 0;
+}
+
+.divider {
+    width: 100%;
+    padding: 1vh 0;
+    border: 0;
+    border-top: 1px solid #cccccc;
+}
+
+.card-header {
+    background-color: white;
+}
+
+.card-header p, .card-header i {
+    color: black;
+}
+
+.card-header i {
+    padding-top: 0.25rem;
+}
