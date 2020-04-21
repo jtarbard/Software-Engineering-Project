@@ -2,9 +2,14 @@
     margin-bottom: 5vh;
 }
 
+.card {
+    padding: 2vh;
+}
+
 img {
     object-fit: contain;
-    max-height: 20vh;
+    max-height: 15vh;
+    padding: 0 1vw;
 }
 
 
