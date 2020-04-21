@@ -72,8 +72,11 @@ Booking Page
 <!-- Modal -->
 
 <div class="container">
-    <!-- activity info -->
-    <p>{{ activity_type.description }}</p>
+    <div class="content-container">
+        <!-- activity info -->
+        <p>Activity Description:</p>
+        <p>{{ activity_type.description }}</p>
+    </div>
     <!-- bulk booking -->
     <div id="bulk-buy" class="accordion">
         <div class="card">
@@ -106,10 +109,11 @@ Booking Page
         </div>
     </div>
 
-    <h6>Book for a session:</h6>
-    <!-- Scheduler -->
-    <div id="calendar"></div>
-    <!-- Scheduler -->
+    <div class="content-container">
+        <h6>Book for a session:</h6>
+        <!-- Scheduler -->
+        <div id="calendar"></div>
+    <div>
 </div>
 </div>
 {% endblock %}

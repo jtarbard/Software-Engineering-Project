@@ -68,8 +68,18 @@ input {
     }
 }
 
+.progress-bar {
+    border-left: 1px solid white;
+    border-right: 1px solid white;
+}
+
 #calendar {
     background-color: white;
+}
+
+.fc-toolbar {
+    background-color: white;
+    padding: 1vh 0;
 }
 
 #bulk-buy {

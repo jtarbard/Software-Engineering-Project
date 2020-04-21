@@ -9,6 +9,7 @@ body {
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
     background-image: url("sports.png");
+    margin-bottom: 5vh;
 }
 
 h1 {
@@ -23,6 +24,16 @@ h2, h3, h4, h5, h6, .navbar {
     font-weight: 400;
     letter-spacing: 3px;
     text-transform: uppercase;
+}
+
+.content-container {
+    background-color: white;
+    -webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
+    -moz-box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
+    box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
+    border-color: white;
+    padding: 18px 32px;
+    margin-bottom: 3vh;
 }
 
 /*Bootstrap classes customisation*/
@@ -40,17 +51,17 @@ h2, h3, h4, h5, h6, .navbar {
     border-color: white;
 }
 
-.btn-primary {
+.btn-primary, .btn-primary:hover {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
 
-.btn-secondary {
+.btn-secondary, .btn-secondary:hover {
     background-color: var(--neutral-color);
     border-color: var(--neutral-color);
 }
 
-.btn-danger {
+.btn-danger, .btn-danger:hover {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
 }
