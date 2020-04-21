@@ -31,7 +31,8 @@ def add_booking_to_basket_post():
     # TODO: Discuss if this is the desired behaviour
     #       In Test_4,Test_5, it's expected to render general_error page
     if not is_valid:
-        return cl.destroy_account_cookie(flask.redirect("/"))
+        flask.flash("User is invalid. Please try to login again.", category="error")
+        return cl.destroy_account_cookie(flask.redirect("/account/login"))
 
     if basket_activities:
         if (basket_membership and (len(basket_activities) + booking_amount > 14)) or len(
@@ -66,7 +67,8 @@ def basket_view():
         = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
-        return cl.destroy_account_cookie(flask.redirect("/account/basket"))
+        flask.flash("User is invalid. Please try to login again.", category="error")
+        return cl.destroy_account_cookie(flask.redirect("/account/login"))
 
     if not (basket_activities or basket_membership):
         return flask.render_template("/account/basket.html", User=user, has_cookie=has_cookie)

@@ -50,7 +50,8 @@ def buy_membership():
         db_transaction.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
-        return cl.destroy_account_cookie(flask.redirect("/"))
+        flask.flash("User is invalid. Please try to login again.", category="error")
+        return cl.destroy_account_cookie(flask.redirect("/account/login"))
 
     new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
     response = cl.add_activity_or_membership_to_basket(

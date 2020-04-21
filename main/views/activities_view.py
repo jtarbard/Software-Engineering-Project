@@ -141,12 +141,8 @@ def query_session():
 
     # ----- Error Checking ----- #
     if user is None:
-        flask.flash("You need to login to view session details.", "error")  # TODO: Does this make sense?
+        flask.flash("You need to login to view session details.", "error")  # TODO: change it so that add to basket does this check instead
         status_code = 300  # redirect
-
-    # if response:
-    #     flask.flash("You need to login to view session details.", "error")  # TODO: Does this make sense?
-    #     return response
 
     if not session:
         flask.flash("This session does not exist.", "error")  # TODO: Severe error
@@ -172,7 +168,6 @@ def query_session():
     # TODO: #135: Don't use floating point numbers for monetary calculation
     if type(user) is Manager:
         # TODO: Bad #135
-        # TODO: Potential financial security flaw? The cost is openly accessible from the object, so what's stopping malicious users from getting those values?
         activity_income = total_bookings * session.activity_type.hourly_activity_price * (
                           session.end_time - session.start_time).seconds // 3600
         activity_cost = total_bookings * session.activity_type.hourly_activity_cost * (
