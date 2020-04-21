@@ -1,0 +1,50 @@
+<!-- Modal -->
+    <div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="sessionInfo">
+                    <input type="hidden" name="activity_id" id="activityID">
+
+                    <ul id="sessionInfoList">
+                        <!-- Session info elements added on click -->
+                    </ul>
+
+                    <!-- Number of people slider -->
+                    <div class="row" id="sessionNumPeople">
+                        <div class="col-md-4">
+                            <label for="sessionNumPeopleSlider">Number of people: </label>
+                        </div>
+                        <div class="col-md-7">
+                            <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider" name="num_people">
+                        </div>
+                        <div class="col-md-1">
+                            <b id="sessionNumPeopleVal">1</b>
+                        </div>
+                    </div>
+
+                    <p hidden id="membershipDiscount">0</p> <!-- 0-100. Indicates how much should be discounted, i.e. X/100 off -->
+                    <p hidden id="sessionPrice"></p>
+                    <p id="subtotal">Subtotal: £0.0</p>
+
+                    <div class="alert-success" role="alert" id="membershipDisplay">
+                        <p class="display-12">No membership.</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <form action="/misc/add_booking_to_basket" method="post">
+                        <input type="hidden" name="amount_of_people" value="1" id="amountOfPeopleSubmit">
+                        <input name="activity" type="hidden" value="" id="activitySubmit">
+                        <input type="submit" class="btn btn-primary" id="addToBasket" value="Add to Basket">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->

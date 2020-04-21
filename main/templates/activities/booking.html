@@ -11,110 +11,70 @@
 
 {% endblock %}
 
-{% block title %}
-Booking Page
-{% endblock %}
-
 {% block main_content %}
-<!-- Modal -->
-<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+    {% include "activities/booking_modal.html" %}
+
+    <!-- Header TODO: Add -->
+
+    <div class="container">
+        {% if activity_type is not none %}
+            <!-- activity info -->
+            <div class="content-container">
+                <p>Activity Description:</p>
+                <p>{{ activity_type.description }}</p>
             </div>
-            <div class="modal-body" id="sessionInfo">
-                <input type="hidden" name="activity_id" id="activityID">
 
-                <ul id="sessionInfoList">
-                    <!-- Session info elements added on click -->
-                </ul>
-
-                <!-- Number of people slider -->
-                <div class="row" id="sessionNumPeople">
-                    <div class="col-md-4">
-                        <label for="sessionNumPeopleSlider">Number of people: </label>
+            <!-- bulk booking -->
+            <div id="bulk-buy" class="accordion">
+                <div class="card">
+                    <div class="card-header">
+                        <button class="btn btn-link" id="bulk-top" data-toggle="collapse" data-target="#bulk-collapse" aria-expanded="false" aria-controls="collapseExample">
+                            <p>Bulk Buy</p>
+                            <i class="fa fa-chevron-down pull-right"></i>
+                        </button>
                     </div>
-                    <div class="col-md-7">
-                        <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider" name="num_people">
-                    </div>
-                    <div class="col-md-1">
-                        <b id="sessionNumPeopleVal">1</b>
-                    </div>
-                </div>
-
-                <p hidden id="membershipDiscount">0</p> <!-- 0-100. Indicates how much should be discounted, i.e. X/100 off -->
-                <p hidden id="sessionPrice"></p>
-                <p id="subtotal">Subtotal: £0.0</p>
-
-                <div class="alert-success" role="alert" id="membershipDisplay">
-                    <p class="display-12">No membership.</p>
-                </div>
-
-<!--                <div class="jumbotron jumbotron-fluid" id="membershipDisplay"> &lt;!&ndash; TODO: Try jumbotron. I didn't know how to resize it, but on smaller size i'd imagine it to look good &ndash;&gt;-->
-<!--                    <p class="display-12">No membership.</p>-->
-<!--                </div>-->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <form action="/misc/add_booking_to_basket" method="post">
-                    <input type="hidden" name="amount_of_people" value="1" id="amountOfPeopleSubmit">
-                    <input name="activity" type="hidden" value="" id="activitySubmit">
-                    <input type="submit" class="btn btn-primary" id="addToBasket" value="Add to Basket">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
-
-<div class="container">
-    <div class="content-container">
-        <!-- activity info -->
-        <p>Activity Description:</p>
-        <p>{{ activity_type.description }}</p>
-    </div>
-    <!-- bulk booking -->
-    <div id="bulk-buy" class="accordion">
-        <div class="card">
-            <div class="card-header">
-                <button class="btn btn-link" id="bulk-top" data-toggle="collapse" data-target="#bulk-collapse" aria-expanded="false" aria-controls="collapseExample">
-                    <p>Bulk Buy</p>
-                    <i class="fa fa-chevron-down pull-right"></i>
-                </button>
-            </div>
-            <div class="collapse" id="bulk-collapse">
-                <div class="card-body">
-                    <div id="bulk-bottom" class="row no-gutters">
-                        <p class="col-12">
-                            You can save up to 30% by purchasing multiple classes of the same type at once, try it now by adding more
-                            than 3 {{ activity_type.name }} sessions to your basket.
-                        </p>
-                        <div class="divider"></div>
-                        <p class="col-6">{{ activity_type.name.title() }} Sessions Booked:</p>
-                        <p class="col-6 text-right">Discount: </p>
-                        <div class="progress col-12">
-                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
-                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="collapse" id="bulk-collapse">
+                        <div class="card-body">
+                            <div id="bulk-bottom" class="row no-gutters">
+                                <p class="col-12">
+                                    You can save up to 30% by purchasing multiple classes of the same type at once! Try it now by adding more
+                                    than 3 {{ activity_type.name }} sessions to your basket.
+                                </p>
+                                <div class="divider"></div>
+                                <p class="col-6">{{ activity_type.name.title() }} Sessions Booked:</p>
+                                <p class="col-6 text-right">Discount: </p>
+                                <div class="progress col-12">
+                                    <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                    <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        {% endif %}
 
-    <div class="content-container">
-        <h6>Book for a session:</h6>
-        <!-- Scheduler -->
-        <div id="calendar"></div>
-    <div>
-</div>
+        <label for="calendar_view">Filter Event Type</label>
+        <div class="input-group">
+            <select class="filter" id="type_filter" multiple="multiple">
+                <option value="Appointment">Appointment</option>
+                <option value="Check-in">Check-in</option>
+                <option value="Checkout">Checkout</option>
+                <option value="Inventory">Inventory</option>
+                <option value="Valuation">Valuation</option>
+                <option value="Viewing">Viewing</option>
+            </select>
+        </div>
+
+        <!-- Timetable -->
+        <div class="content-container">
+            <h6>Book for a session:</h6>
+            <div id="calendar"></div>
+        <div>
+    </div>
 </div>
 {% endblock %}
 
@@ -129,24 +89,27 @@ Booking Page
 
 <script>
     // ----- Booking Calendars ----- //
-    // If the list is a heap, then each insert is O(log n) so it's performant still
-    var queryHistory = {}; // { activity_type_id: [{query} object literals] }. If this object literal exists, then the retrieved events must exist
-    var existingSessions = {}; // { activity_type_id: [{session} object literals] }.
+    var queryHistory = []; // query strings. If this object literal exists, then the retrieved events must exist
+    var existingSessions = []; // session strings
 
     document.addEventListener('DOMContentLoaded', function() {
-        // initialize
-        queryHistory = [];
-        existingSessions = [];
+        {% if activity_type is none %}
+        var defaultViewCalendar = "timeGridDay";
+        var availableViewsCalendar = "timeGridDay,listDay";
+        {% else %}
+        var defaultViewCalendar = "timeGridWeek";
+        var availableViewsCalendar = "dayGridMonth,timeGridWeek,timeGridDay,listWeek";
+        {% endif %}
 
         var calendarEl = document.getElementById("calendar");
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
             plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid', 'list' ],
-            defaultView: 'timeGridWeek',
+            defaultView: defaultViewCalendar,
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                right: availableViewsCalendar
             },
             buttonText: {
                 today: 'Today',
@@ -157,7 +120,7 @@ Booking Page
             },
             events: [],
 
-            // ----- Styling -----
+            // ----- Styling ----- //
             eventTextColor: "#FFFFFF",
             eventBorderColor: "#000000",
             eventBackgroundColor: "#000000",
@@ -199,7 +162,7 @@ Booking Page
                         modal.find("#sessionPrice").val(session.session_price);
                         modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
 
-                        {% if User is not defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                        {% if User is defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
                         sessionInfoList.append(
                             "<li><b>Manager Info:</b></li>",
                             "<li>Total bookings: " + session.total_bookings + "</li>",
@@ -236,7 +199,9 @@ Booking Page
                 $(".fc-right").addClass("col-12 col-md-4");
 
                 let query = {
-                    activity_type_id: {{ activity_type.activity_type_id }},
+                    {% if activity_type is not none %}
+                        activity_type_id: {{ activity_type.activity_type_id }},
+                    {% endif %}
                     start_date: info.view.activeStart,
                     end_date: info.view.activeEnd
                 };
@@ -282,6 +247,11 @@ Booking Page
             // TODO: Not sure how to use this
             batchRendering: function() {
 
+            },
+
+            // Called when an event (session) is rendered in the calendar
+            eventRender: function(info) {
+                return true;
             }
         });
 
