@@ -149,8 +149,6 @@ def card_payment_post():
 
     response = cl.destroy_basket_cookie(response)
 
-    import pprint
-    pprint.pprint(response.data)
     return response
 
 
