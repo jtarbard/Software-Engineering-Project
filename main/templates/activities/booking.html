@@ -9,6 +9,9 @@
 <link href='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.css' rel='stylesheet' />
 <link href='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.css' rel='stylesheet' />
 
+<!-- multi selection box -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
 {% endblock %}
 
 {% block main_content %}
@@ -57,7 +60,6 @@
             </div>
         {% endif %}
 
-        <label for="calendar_view">Filter Event Type</label>
         <div class="input-group">
             <select class="filter" id="type_filter" multiple="multiple">
                 <option value="Appointment">Appointment</option>
@@ -80,6 +82,7 @@
 
 {% block additional_js %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
 <script src='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/interaction@4.4.0/main.min.js'></script>
@@ -87,7 +90,17 @@
 <script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.js'></script>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
 <script>
+    // ----- Multi Selection Boxes -----
+    // TODO: use jquery to find all ".filter" class (or some custom class), initialize all of them with select2
+    $("#type_filter").select2({
+       placeholder: "Filter Types",
+       allowClear: true
+   });
+
     // ----- Booking Calendars ----- //
     var queryHistory = []; // query strings. If this object literal exists, then the retrieved events must exist
     var existingSessions = []; // session strings
