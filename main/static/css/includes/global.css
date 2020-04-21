@@ -9,7 +9,6 @@ body {
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
     background-image: url("sports.png");
-    margin-bottom: 5vh;
 }
 
 h1 {
@@ -64,4 +63,15 @@ h2, h3, h4, h5, h6, .navbar {
 .btn-danger, .btn-danger:hover {
     background-color: var(--secondary-color);
     border-color: var(--secondary-color);
+}
+
+.list-group {
+    padding: 0;
+
+}
+
+.list-group-item {
+    border: 0;
+    padding: 1.5rem 2.5rem;
+
 }

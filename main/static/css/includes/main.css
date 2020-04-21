@@ -32,7 +32,7 @@ html {
 
 #page_title {
     min-height: 15vh;
-    margin-bottom: 6vh;
+    margin-bottom: 3vh;
     color: white;
     background-color: var(--primary-color);
 }
