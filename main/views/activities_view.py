@@ -5,7 +5,6 @@ import json
 import main.data.transactions.activity_db_transaction as adf
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.transaction_db_transaction as tdf
-from main.data.db_classes.activity_db_class import Activity
 from main.data.db_classes.transaction_db_class import Membership
 from main.data.db_classes.user_db_class import Customer, Manager
 import main.view_lib.cookie_lib as cl
@@ -44,6 +43,7 @@ def view_booking():
     if response:
         return response
 
+    # Get data from request
     request_activity_type_id = flask.request.args.get("request_activity_type_id")
     print("args", flask.request.args)
 
@@ -169,7 +169,6 @@ def query_session():
     # TODO: #135: Don't use floating point numbers for monetary calculation
     if type(user) is Manager:
         # TODO: Bad #135
-        # TODO: Potential financial security flaw? The cost is openly accessible from the object, so what's stopping malicious users from getting those values?
         activity_income = total_bookings * session.activity_type.hourly_activity_price * (
                           session.end_time - session.start_time).seconds // 3600
         activity_cost = total_bookings * session.activity_type.hourly_activity_cost * (
