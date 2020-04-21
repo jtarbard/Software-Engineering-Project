@@ -69,6 +69,7 @@ def view_booking():
                                  User=user,
                                  has_cookie=has_cookie,
                                  activity_type=activity_type,
+                                 facilities=adf.return_facilities("Any"),
                                  page_title=page_title)
 
 

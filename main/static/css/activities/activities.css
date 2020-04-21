@@ -126,8 +126,6 @@ input {
     padding-top: 0.25rem;
 }
 
-/*doesn't seem to work*/
-/*.fc-time-grid-event:hover{*/
-/*    cursor: pointer;*/
-/*    transition: all 0.2s linear;*/
-/*}*/
+select.filter{
+  width: 100% !important;
+}

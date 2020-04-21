@@ -60,20 +60,16 @@
             </div>
         {% endif %}
 
-        <div class="input-group">
-            <select class="filter" id="type_filter" multiple="multiple">
-                <option value="Appointment">Appointment</option>
-                <option value="Check-in">Check-in</option>
-                <option value="Checkout">Checkout</option>
-                <option value="Inventory">Inventory</option>
-                <option value="Valuation">Valuation</option>
-                <option value="Viewing">Viewing</option>
-            </select>
-        </div>
-
         <!-- Timetable -->
         <div class="content-container">
             <h6>Book for a session:</h6>
+            <div class="input-group">
+                <select class="filter" id="type_filter" multiple="multiple">
+                    {% for facility in facilities %}
+                    <option value="{{ facility.facility_id }}">{{ facility.name.title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <div id="calendar"></div>
         <div>
     </div>
