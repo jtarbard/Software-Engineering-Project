@@ -1,23 +1,7 @@
-.media {
+.card {
     height: 20.5vh;
-    margin-bottom: 5vh;
+    margin-bottom: 3vh;
     padding: 2vh 0;
-    border-radius: 5px;
-    border: 2px solid #1E1E1E;
-}
-
-/*Small devices (landscape phones, 576px and up)*/
-@media (min-width: 576px) {
-    .media, #title-bar {
-        margin-bottom: 2.5vh;
-    }
-}
-
-/*Medium devices (tablets, 768px and up)*/
-@media (min-width: 768px) {
-    .media, #title-bar {
-        margin-bottom: 5vh;
-    }
 }
 
 a:hover {
