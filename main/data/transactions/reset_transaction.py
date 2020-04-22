@@ -27,27 +27,43 @@ customer_account = None
 # Populates the database with all the facilities in out leisure center
 def create_facilities():
     names = [
-        "Main Swimming Pool", "Gym", "Sports Hall 1",
-        "Sports Hall 2", "Climbing Wall", "Tennis Courts",
-        "Outside Playing Field", "Studio Room"
+        "Main Swimming Pool", "Fitness Room", "Sports Hall 1", "Sports Hall 2",
+        "Climbing Wall", "Tennis Court 1", "Tennis Court 2", "Tennis Court 3",
+        "Tennis Court 4", "Squash Court 1", "Squash Court 2", "Squash Court 3",
+        "Squash Court 4", "Outside Playing Field", "Studio 1", "Studio 2"
     ]
 
     descriptions = [
-        "Main Swimming Pool description",
-        "Gym description",
-        "Sports Hall 1 description",
-        "Sports Hall 2 description",
+        "Our competition standard 50m, eight lane swimming pool is the ideal space for swimmers of all ages and abilities to enjoy.",
+        "Our contemporary 100-station itness room features an extensive range of cardiovascular and resistance machines and dedicated free-weight areas.",
+        "Our 120m apex sports hall is home to some of our football, basketball, badminton, trampolining, and boxing classes.",
+        "Our 60m edge sports hall is home to some of our basketball, badminton, trampolining, and boxing classes.",
         "Climbing Wall description",
         "Tennis Courts description",
+        "Tennis Courts description",
+        "Tennis Courts description",
+        "Tennis Courts description",
+        "Squash Courts description",
+        "Squash Courts description",
+        "Squash Courts description",
+        "Squash Courts description",
         "Outside Playing Field description",
-        "Studio Room description"
+        "Studio Room description",
+        "Studio Room description",
     ]
 
     max_capacities = [
-        70, 50, 80, 50, 10, 8, 150, 30
+        70, 120, 80, 50, 10, 8, 8, 8, 8, 4, 4, 4, 4, 150, 30, 30
     ]
 
-    facilities = [Facility(name=names[i], description=descriptions[i], max_capacity=max_capacities[i])
+    types = [
+        "Swimming Pool", "Fitness Room", "Apex Sports Hall", "Edge Sports Hall",
+        "Climbing Wall", "Tennis Courts", "Tennis Courts", "Tennis Courts",
+        "Tennis Courts", "Squash Courts", "Squash Courts", "Squash Courts",
+        "Squash Courts", "Outside Playing Field", "Studios", "Studios"
+    ]
+
+    facilities = [Facility(name=names[i], description=descriptions[i], max_capacity=max_capacities[i], type=types[i])
                   for i in range(len(names))]
 
     for i, facility in enumerate(facilities):
@@ -95,8 +111,9 @@ def create_activity_types():
     log_transaction("Creating database activity types:")
 
     names = [
-        "Football", "Basketball", "Badminton", "Gym", "Boxing",
-        "Climbing", "Cricket", "Tennis", "General Swim",
+        "Football", "Basketball", "Badminton", "General Fitness", "Boxing",
+        "Climbing", "Cricket", "Tennis Session", "Tennis Team Event", "Squash Session",
+        "Squash Team Event","General Swim",
         "Swimming classes", "Aqua", "Yoga", "Dancing",
         "Trampolining", "Rugby"
     ]
@@ -105,9 +122,11 @@ def create_activity_types():
 
     description = [
         "Football description", "Basketball description",
-        "Badminton description", "Gym description",
+        "Badminton description", "General Fitness description",
         "Boxing description", "Climbing description",
         "Cricket description", "Tennis description",
+        "Tennis description", "Squash description",
+        "Squash description",
         "General Swim description", "Swimming classes description",
         "Aqua description", "Yoga description",
         "Dancing description", "Trampolining description",
@@ -117,7 +136,8 @@ def create_activity_types():
     category = [
         "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded",
         "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded",
-        "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded"
+        "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded", "ToBeAdded",
+        "ToBeAdded", "ToBeAdded", "ToBeAdded",
     ]
 
     tags = [
@@ -136,19 +156,22 @@ def create_activity_types():
         ["..."],
         ["..."],
         ["..."],
+        ["..."],
+        ["..."],
+        ["..."],
     ]
 
-    minimum_age = [12, 12, 12, 16, 16, 16, 14, 12, 8, 0, 16, 12, 8, 14, 16]
+    minimum_age = [12, 12, 12, 16, 16, 16, 14, 12, 12, 12, 12,  8, 0, 16, 12, 8, 14, 16]
 
     hourly_activity_cost = [random.randint(100, 250) / 100 for i in range(activity_num)]
 
     hourly_activity_price = [(random.randint(150, 600) / 100) + hourly_activity_cost[i] for i in range(activity_num)]
 
-    max_staff = [6, 4, 2, 4, 8, 8, 4, 3, 3, 8, 2, 3, 4, 10, 6]
+    max_staff = [6, 4, 2, 4, 8, 8, 4, 1, 3, 1, 2, 3, 8, 2, 3, 4, 10, 6]
 
-    min_staff = [2, 2, 1, 1, 3, 4, 2, 1, 1, 2, 2, 1, 1, 2, 2]
+    min_staff = [2, 2, 1, 1, 3, 4, 2, 0, 1, 0, 1, 1, 2, 2, 1, 1, 2, 2]
 
-    activity_capacity = [50, 50, 24, 80, 40, 10, 50, 16, 70, 50, 30, 20, 20, 15, 50]
+    activity_capacity = [50, 50, 24, 120, 40, 10, 50, 4, 16, 4, 10, 70, 50, 30, 20, 20, 15, 50]
 
     for i in range(activity_num):
         if not adf.create_new_activity_type(names[i], description[i], category[i], tags[i], minimum_age[i],
@@ -164,11 +187,14 @@ def create_activity_type_and_role_validation():
         "Football": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "Basketball": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "Badminton": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Gym": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "General Fitness": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "Boxing": ["Activity Leader", "Activity Assistant", "Martial Arts Expert"],
         "Climbing": ["Activity Leader", "Activity Assistant", "Climbing Expert"],
         "Cricket": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Tennis": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Tennis Session": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Tennis Team Event": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Squash Session": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Squash Team Event": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "General Swim": ["Lifeguard"],
         "Swimming classes": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
         "Aqua": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
@@ -248,7 +274,7 @@ def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: 
                     returned_times = return_random_times(amount_today)
                     add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
-            elif activity_type.name == "gym":
+            elif activity_type.name == "General Fitness":
                 week_day_times = [6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]
                 add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
@@ -315,16 +341,21 @@ def create_activity_facility_relation():
                      ("basketball", ["sports hall 1", "sports hall 2", "outside playing field"]),
                      ("football", ["sports hall 1", "sports hall 2", "outside playing field"]),
                      ("badminton", ["sports hall 1", "sports hall 2"]),
-                     ("tennis", ["tennis courts"]),
-                     ("gym", ["gym"]),
+                     ("squash", ["squash court 1", "squash court 2", "squash court 3", "squash court 4"]),
+                     ("tennis session", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("tennis team event", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("squash session", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("squash team event", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("general fitness", ["Fitness Room"]),
                      ("boxing", ["sports hall 1", "sports hall 2"]),
                      ("climbing", ["climbing wall"]),
                      ("cricket", ["outside playing field"]),
-                     ("yoga", ["studio room"]),
+                     ("yoga", ["studio room 1", "studio room 2"]),
                      ("aqua", ["main swimming pool"]),
                      ("general swim", ["main swimming pool"]),
-                     ("dancing", ["studio room"]),
-                     ("trampolining", ["sports hall 1", "sports hall 2"]),
+                     ("spin", ["studio room 1", "studio room 2"]),
+                     ("dancing", ["studio room 1", "studio room 2"]),
+                     # ("gymnastics", ["sports hall 1", "sports hall 2"]),
                      ("rugby", ["outside playing field"])]
 
     for relation in relationships:

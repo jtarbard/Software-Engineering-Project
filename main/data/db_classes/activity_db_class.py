@@ -68,6 +68,7 @@ class Facility(database.Model):
     name = database.Column(database.String, nullable=False)
     description = database.Column(database.String, nullable=False)
     max_capacity = database.Column(database.Integer, nullable=False)
+    type = database.Column(database.String, nullable=False)
 
     current_activities = database.relationship("Activity", back_populates="facility")
 
