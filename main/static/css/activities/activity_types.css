@@ -3,13 +3,25 @@
 }
 
 .card {
-    padding: 2vh;
+    padding: 0;
+    overflow: hidden;
 }
 
-img {
-    object-fit: contain;
-    max-height: 15vh;
-    padding: 0 1vw;
+.card-img-top {
+    width: 100%;
+    max-height: 15vw;
+    object-fit: cover;
+
+    filter: brightness(75%);
+    transition: transform .5s ease;
+}
+
+.card-text-overlay {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: unset;
+    color: white;
 }
 
 

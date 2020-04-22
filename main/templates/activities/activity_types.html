@@ -10,16 +10,16 @@ The Vertex classes!
 {% block main_content %}
 <div class="container">
     <div class="row row-cols-1 row-cols-md-2">
-        {% for activity in activity_types %}
+        {% for activity_type in activity_types %}
+        {% if activity_type.activity_type_id == 1 or activity_type.activity_type_id == 2 %}
         <div class="col-12 col-md-6">
             <div class="card">
-                <div class="media">
-                    <img src="/static/imgs/activities-img/{{ activity.name }}.png" class="align-self-center" alt="Illustration of {{ activity.name }}">
-                    <div class="media-body">
-                        <h2 class="">{{ activity.name.title() }}</h2>
-                        <p class="">
-                            {{ activity.definition }}
-                        </p>
+                <img class="card-img-top" src="/static/imgs/activities-img/{{ activity_type.name }}.jpg" alt="Illustration of {{ activity_type.name }}">
+                <div class="card-img-overlay d-flex align-items-center justify-content-center">
+                    <h2 class="card-text-overlay">{{ activity_type.name.title() }}</h2>
+                </div>
+            </div>
+                        <!--
                         <div class="tags">
                             <p>Tags:</p>
                             {% for tag in activity_types.tags %}
@@ -28,16 +28,38 @@ The Vertex classes!
                         </div>
                         <div class="buttons">
                             <form method="post">
-                                <input type="hidden" name="request_activity_type_id" value="{{ activity.activity_type_id }}">
+                                <input type="hidden" name="request_activity_type_id" value="{{ activity_type.activity_type_id }}">
                                 <button class="btn btn-primary" type="submit" name="amount" value="single">Book</button>
                                 <button class="btn btn-primary" type="submit" name="amount" value="multiple">Bulk Book</button>
                             </form>
                         </div>
-                    </div>
-                </div>
-            </div>
+                        -->
         </div>
+        {% endif %}
         {% endfor %}
+        </div>
     </div>
 </div>
+{% endblock %}
+
+{% block additional_js %}
+<script>
+    $(document).ready(function() {
+        $( ".card" ).hover(
+            // on hover
+            function() {
+                $(this).addClass("shadow-lg").css("cursor", "pointer");  // change cursor to pointer on hover
+                $(this).find(".card-img-top").css("filter", "brightness(75%) blur(2px)");
+                $(this).find(".card-img-top").css("transform", "scale(1.1)");
+            },
+
+            // exit hover
+            function() {
+                $(this).removeClass("shadow-lg");
+                $(this).find(".card-img-top").css("filter", "brightness(75%)");
+                $(this).find(".card-img-top").css("transform", "scale(1.0)");
+            }
+        );
+    });
+</script>
 {% endblock %}
