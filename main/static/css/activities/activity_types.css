@@ -9,11 +9,17 @@
 
 .card-img-top {
     width: 100%;
-    max-height: 15vw;
+    height: 15vw;
     object-fit: cover;
 
     filter: brightness(75%);
     transition: transform .5s ease;
+}
+
+@media (max-width: 990px) {
+    .card-img-top {
+        height: 30vw;
+    }
 }
 
 .card-text-overlay {

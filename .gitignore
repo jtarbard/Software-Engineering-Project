@@ -9,3 +9,7 @@
 
 #virtual environment
 venv/
+
+# Irrelevant System Files
+*:Zone.Identifier
+**/.DS_Store

@@ -1,6 +1,6 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/activities/activities.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/activities/booking.css') }}">
 
 <!-- FullCalender Stylesheet. Used for scheduler -->
 <link href='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.css' rel='stylesheet' />
@@ -71,12 +71,20 @@ Booking Page
 </div>
 <!-- Modal -->
 
-<div class="container">
-    <div class="content-container">
-        <!-- activity info -->
-        <p>Activity Description:</p>
-        <p>{{ activity_type.description }}</p>
+<!-- activity info -->
+<div id="descriptionContainer" class="fluid-container">
+    <div class="container">
+        <div class="media row row-cols-1 row-cols-md-2 ">
+            <img class="col-12 col-md-5" src="/static/imgs/activities-img/{{ activity_type.name }}-description.jpg" alt="Illustration of {{ activity_type.name }}">
+            <div id="descriptionTextbox" class="align-self-center media-body col-12 col-md-7"> <!-- makes the content vertically aligned -->
+                <h1 id="descriptionTitle">{{ activity_type.name.title() }}</h1>
+                <p id="description">{{ activity_type.description }}</p>
+            </div>
+        </div>
     </div>
+</div>
+
+<div class="container">
     <!-- bulk booking -->
     <div id="bulk-buy" class="accordion">
         <div class="card">
