@@ -96,7 +96,8 @@ def query_sessions():
         data.append(dict(id=session.activity_id,
                          name=session.activity_type.name.title(),
                          description=session.activity_type.description,
-                         facility=session.facility.name,
+                         facility_id=session.facility.facility_id,
+                         facility_name=session.facility.name.title(),
                          start=session.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
                          end=session.end_time.strftime("%Y-%m-%dT%H:%M:%S")))
     response = flask.make_response(json.dumps(data))

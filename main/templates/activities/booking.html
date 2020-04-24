@@ -63,13 +63,15 @@
         <!-- Timetable -->
         <div class="content-container">
             <h6>Book for a session:</h6>
+            <!-- Facility Filter -->
             <div class="input-group">
-                <select class="filter" id="type_filter" multiple="multiple">
+                <select class="form-control" id="facilityFilter" multiple="multiple">
                     {% for facility in facilities %}
-                    <option value="{{ facility.facility_id }}">{{ facility.name.title() }}</option>
+                        <option value="{{ facility.facility_id }}">{{ facility.name.title() }}</option>
                     {% endfor %}
                 </select>
             </div>
+            <!-- Calendar / Timetable -->
             <div id="calendar"></div>
         <div>
     </div>
@@ -90,16 +92,27 @@
 
 
 <script>
-    // ----- Multi Selection Boxes -----
+    // ----- Multi Selection Boxes ----- //
     // TODO: use jquery to find all ".filter" class (or some custom class), initialize all of them with select2
-    $("#type_filter").select2({
-       placeholder: "Filter Types",
+    var facilityFilter = $("#facilityFilter");
+    facilityFilter.select2({
+       placeholder: "Filter Facility",
        allowClear: true
-   });
+    });
+
+    // update calendar on change
+    facilityFilter.on("change", function(e) {
+        // Rerender (note: .render() is broken. It doesn't do anything after initialization), hence this workaround
+        calendar.prev();
+        calendar.next();
+    });
 
     // ----- Booking Calendars ----- //
     var queryHistory = []; // query strings. If this object literal exists, then the retrieved events must exist
     var existingSessions = []; // session strings
+
+    var calendarEl = document.getElementById("calendar");
+    var calendar;
 
     document.addEventListener('DOMContentLoaded', function() {
         {% if activity_type is none %}
@@ -110,9 +123,7 @@
         var availableViewsCalendar = "dayGridMonth,timeGridWeek,timeGridDay,listWeek";
         {% endif %}
 
-        var calendarEl = document.getElementById("calendar");
-
-        var calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(calendarEl, {
             plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid', 'list' ],
             defaultView: defaultViewCalendar,
             header: {
@@ -161,6 +172,7 @@
                         var sessionInfoList = modal.find("#sessionInfoList");
 
                         sessionInfoList.html(
+                            "<li>Venue: " + info.event.extendedProps.facility_name + "</li>\n" +
                             "<li>Start time: " + info.event.start + "</li>\n" +
                             "<li>End time: " + info.event.end + "</li>\n" +
                             "<li>Minimum age: " + session.minimum_age + "</li>\n" +
@@ -196,7 +208,7 @@
                     }
                 });
 
-                modal.find(".modal-title").text("Book for " + info.event.title);
+                modal.find(".modal-title").text("Book for " + info.event.title.split("\n")[0]);
             },
 
             // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
@@ -229,11 +241,13 @@
                             results = JSON.parse(results);
                             for (let i = 0; i < results.length; i++) {
                                 var session = {
-                                    title: results[i].name,
+                                    title: results[i].name + "\nVenue: " + results[i].facility_name,
                                     start: results[i].start,
                                     end: results[i].end,
                                     extendedProps: {
-                                        id: results[i].id
+                                        id: results[i].id,
+                                        facility_id: results[i].facility_id,
+                                        facility_name: results[i].facility_name
                                     }
                                 };
                                 var sessionStr = JSON.stringify(session);
@@ -260,7 +274,13 @@
 
             // Called when an event (session) is rendered in the calendar
             eventRender: function(info) {
-                return true;
+                const selectedFacilities = facilityFilter.select2('data');
+                for (let i = 0; i < selectedFacilities.length; i++) {
+                    if (info.event.extendedProps.facility_id === parseInt(selectedFacilities[i].id)) {
+                        return true;
+                    }
+                }
+                return selectedFacilities.length === 0; // render everything if no facility is selected
             }
         });
 
@@ -272,12 +292,12 @@
         $(".fc-right").addClass("col-12 col-md-4");
     });
 
-    // Add to basket button
+    // ----- Add to basket button  ----- //
     $("#addToBasket").on("click", function(e) {
         $('#bookingModal').modal("hide");
     });
 
-    // Number of people slider
+    // ----- Number of people slider  ----- //
     var slider = $("#sessionNumPeopleSlider");
     slider.val(1);
     slider.on("input change", function(e) {
