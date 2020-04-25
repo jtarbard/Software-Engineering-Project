@@ -2,6 +2,7 @@ from datetime import datetime
 from main.data.db_session import database
 
 
+# Many to many relationship
 activity_available_at = \
     database.Table("ActivityAvailableAt",
                    database.Column('activity_type_id', database.Integer,
@@ -42,6 +43,7 @@ class ActivityType(database.Model):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # .lower() to avoid duplicates of different cases
         self.name = kwargs.get("name", "UNKNOWN_ACTIVITY_TYPE").lower()
 
 
@@ -61,15 +63,40 @@ class Activity(database.Model):
     bookings = database.relationship("Booking", back_populates="activity")
 
 
-class Facility(database.Model):
-    __tablename__ = 'Facilities'
+class FacilityType(database.Model):
+    """
+    FacilityType contains the items that will show up in the Facilities page on the website.
+    """
 
-    facility_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
-    name = database.Column(database.String, nullable=False)
+    __tablename__ = 'FacilityTypes'
+
+    facility_type_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    facility_type_name = database.Column(database.String, nullable=False)
     description = database.Column(database.String, nullable=False)
     max_capacity = database.Column(database.Integer, nullable=False)
-    type = database.Column(database.String, nullable=False)
 
+    facilities = database.relationship("Facility", back_populates="facility_type")
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # .lower() to avoid duplicates of different cases
+        self.facility_type_name = kwargs.get("facility_type_name", "UNKNOWN_FACILITY_TYPE_NAME").lower()
+
+
+class Facility(database.Model):
+    """
+    Facility contains individual facility objects.
+    This allows for multiple facilities of the same "type", for example, Sports Hall 1 and Sports Hall 2.
+    """
+
+    __tablename__ = "Facilities"
+
+    facility_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
+    facility_type_id = database.Column(database.Integer, database.ForeignKey("FacilityTypes.facility_type_id"),
+                                       nullable=False)
+    name = database.Column(database.String, nullable=False)  # calling this name as before for backwards compactibility
+
+    facility_type = database.relationship("FacilityType", back_populates="facilities")
     current_activities = database.relationship("Activity", back_populates="facility")
 
     # invisible backref list parameter from ActivityType : activities_available
@@ -77,4 +104,5 @@ class Facility(database.Model):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        # .lower() to avoid duplicates of different cases
         self.name = kwargs.get("name", "UNKNOWN_FACILITY_NAME").lower()

@@ -14,7 +14,7 @@ from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
 
-# For debug purpose
+# For demo purpose
 EMAIL_TYPES = {
     "customer": "team_10_c@leeds.ac.uk",
     "employee": "team_10_e@leeds.ac.uk",
@@ -24,57 +24,91 @@ PASSWORD = "WeAreTeam10"
 customer_account = None
 
 
-# Populates the database with all the facilities in out leisure center
-def create_facilities():
-    names = [
-        "Main Swimming Pool", "Fitness Room", "Sports Hall 1", "Sports Hall 2",
-        "Climbing Wall", "Tennis Court 1", "Tennis Court 2", "Tennis Court 3",
-        "Tennis Court 4", "Squash Court 1", "Squash Court 2", "Squash Court 3",
-        "Squash Court 4", "Outside Playing Field", "Studio 1", "Studio 2"
+def create_facility_types():
+    """
+    TODO: doc
+    """
+
+    # These are the "facilities" that will show up in the Facilities page on the website. They define the generic type
+    # of a type of facility
+    data = [
+        dict(name="Swimming Pool",
+             description="Our competition standard 50m, eight lane swimming pool is the ideal space for swimmers of all ages and abilities to enjoy.",
+             max_capacity=70),
+        dict(name="Fitness Room",
+             description="Our contemporary 100-station itness room features an extensive range of cardiovascular and resistance machines and dedicated free-weight areas.",
+             max_capacity=120),
+        dict(name="Apex Sports Hall",
+             description="Our 120m apex sports hall is home to some of our football, basketball, badminton, trampolining, and boxing classes.",
+             max_capacity=80),
+        dict(name="Edge Sports Hall",
+             description="Our 60m edge sports hall is home to some of our basketball, badminton, trampolining, and boxing classes.",
+             max_capacity=50),
+        dict(name="Climbing Wall",
+             description="Climbing Wall description",
+             max_capacity=10),
+        dict(name="Tennis Court",
+             description="Tennis Court description",
+             max_capacity=8),
+        dict(name="Squash Court",
+             description="Squash Court description",
+             max_capacity=4),
+        dict(name="Outside Playing Field",
+             description="Outside Playing Field description",
+             max_capacity=150),
+        dict(name="Studio",
+             description="Studio description",
+             max_capacity=30)
     ]
 
-    descriptions = [
-        "Our competition standard 50m, eight lane swimming pool is the ideal space for swimmers of all ages and abilities to enjoy.",
-        "Our contemporary 100-station itness room features an extensive range of cardiovascular and resistance machines and dedicated free-weight areas.",
-        "Our 120m apex sports hall is home to some of our football, basketball, badminton, trampolining, and boxing classes.",
-        "Our 60m edge sports hall is home to some of our basketball, badminton, trampolining, and boxing classes.",
-        "Climbing Wall description",
-        "Tennis Courts description",
-        "Tennis Courts description",
-        "Tennis Courts description",
-        "Tennis Courts description",
-        "Squash Courts description",
-        "Squash Courts description",
-        "Squash Courts description",
-        "Squash Courts description",
-        "Outside Playing Field description",
-        "Studio Room description",
-        "Studio Room description",
-    ]
-
-    max_capacities = [
-        70, 120, 80, 50, 10, 8, 8, 8, 8, 4, 4, 4, 4, 150, 30, 30
-    ]
-
-    types = [
-        "Swimming Pool", "Fitness Room", "Apex Sports Hall", "Edge Sports Hall",
-        "Climbing Wall", "Tennis Courts", "Tennis Courts", "Tennis Courts",
-        "Tennis Courts", "Squash Courts", "Squash Courts", "Squash Courts",
-        "Squash Courts", "Outside Playing Field", "Studios", "Studios"
-    ]
-
-    facilities = [Facility(name=names[i], description=descriptions[i], max_capacity=max_capacities[i], type=types[i])
-                  for i in range(len(names))]
-
-    for i, facility in enumerate(facilities):
-        if not add_to_database(facility):
-            log_transaction(f"Failed to add facility: {names[i]}")
+    for item in data:
+        facility_type = FacilityType(facility_type_name=item["name"],
+                                     description=item["description"],
+                                     max_capacity=item["max_capacity"])
+        if not add_to_database(facility_type):
+            log_transaction(f"Failed to add facility type: {facility_type}")
             return False
     return True
 
 
-# Creates all of the current job roles for staff
+def create_facilities():
+    """
+    Populates the database with all the facilities in our leisure center, The Vertex
+    """
+
+    facility_and_type_dict = {
+        "Main Swimming Pool": "Swimming Pool",
+        "Fitness Room": "Fitness Room",
+        "Apex Sports Hall": "Apex Sports Hall",
+        "Edge Sports Hall": "Edge Sports Hall",
+        "Climbing Wall": "Climbing Wall",
+        "Tennis Court 1": "Tennis Court",
+        "Tennis Court 2": "Tennis Court",
+        "Tennis Court 3": "Tennis Court",
+        "Tennis Court 4": "Tennis Court",
+        "Squash Court 1": "Squash Court",
+        "Squash Court 2": "Squash Court",
+        "Squash Court 3": "Squash Court",
+        "Squash Court 4": "Squash Court",
+        "Outside Playing Field": "Outside Playing Field",
+        "Studio 1": "Studio",
+        "Studio 2": "Studio"
+    }
+
+    for facility_name, facility_type in facility_and_type_dict.items():
+        facility = Facility(name=facility_name,
+                            facility_type_id=adf.return_facility_type_with_name(facility_type).facility_type_id)
+        if not add_to_database(facility):
+            log_transaction(f"Failed to add facility: {facility}")
+            return False
+    return True
+
+
 def create_roles():
+    """
+    Creates all of the current job roles for staff
+    """
+
     log_transaction("Creating database job roles:")
 
     names = [
@@ -106,15 +140,20 @@ def create_roles():
     return True
 
 
-# Defines all basic activity types
 def create_activity_types():
+    """
+    Defines all basic activity types
+    """
+
     log_transaction("Creating database activity types:")
 
     names = [
-        "Football", "Basketball", "Badminton", "General Fitness", "Boxing",
-        "Climbing", "Cricket", "Tennis Session", "Tennis Team Event", "Squash Session",
-        "Squash Team Event","General Swim",
-        "Swimming classes", "Aqua", "Yoga", "Dancing",
+        "Football", "Basketball", "Badminton",
+        "General Fitness", "Boxing", "Climbing", "Cricket",
+        "Tennis Session", "Tennis Team Event",
+        "Squash Session", "Squash Team Event",
+        "General Swim", "Swimming classes", "Aqua",
+        "Yoga", "Dancing",
         "Trampolining", "Rugby"
     ]
 
@@ -335,33 +374,35 @@ def create_random_bookings(activity: Activity):
 
 
 def create_activity_facility_relation():
-    # which activity types are available at which facilities?
+    """
+    which activity types are available at which facilities (facility object, not type)?
+    """
 
     relationships = [("swimming classes", ["main swimming pool"]),
-                     ("basketball", ["sports hall 1", "sports hall 2", "outside playing field"]),
-                     ("football", ["sports hall 1", "sports hall 2", "outside playing field"]),
-                     ("badminton", ["sports hall 1", "sports hall 2"]),
-                     ("squash", ["squash court 1", "squash court 2", "squash court 3", "squash court 4"]),
+                     ("basketball", ["apex sports hall", "edge sports hall", "outside playing field"]),
+                     ("football", ["apex sports hall", "edge sports hall", "outside playing field"]),
+                     ("badminton", ["apex sports hall", "edge sports hall"]),
                      ("tennis session", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
                      ("tennis team event", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
                      ("squash session", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
                      ("squash team event", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("general fitness", ["Fitness Room"]),
-                     ("boxing", ["sports hall 1", "sports hall 2"]),
+                     ("general fitness", ["fitness Room"]),
+                     ("boxing", ["apex sports hall", "edge sports hall"]),
                      ("climbing", ["climbing wall"]),
                      ("cricket", ["outside playing field"]),
-                     ("yoga", ["studio room 1", "studio room 2"]),
+                     ("yoga", ["studio 1", "studio 2"]),
                      ("aqua", ["main swimming pool"]),
                      ("general swim", ["main swimming pool"]),
-                     ("spin", ["studio room 1", "studio room 2"]),
-                     ("dancing", ["studio room 1", "studio room 2"]),
-                     # ("gymnastics", ["sports hall 1", "sports hall 2"]),
+                     # ("spin", ["studio 1", "studio 2"]),
+                     ("dancing", ["studio 1", "studio 2"]),
+                     ("trampolining", ["apex sports hall", "edge sports hall"]),
+                     # ("gymnastics", ["apex sports hall", "edge sports hall"]),
                      ("rugby", ["outside playing field"])]
 
-    for relation in relationships:
-        activity_type = ActivityType.query.filter_by(name=relation[0]).first()
-        for facility in relation[1]:
-            facility_object = Facility.query.filter_by(name=facility).first()
+    for relationship in relationships:
+        activity_type = ActivityType.query.filter_by(name=relationship[0].lower()).first()
+        for facility_name in relationship[1]:
+            facility_object = Facility.query.filter_by(name=facility_name.lower()).first()
 
             # make this facility be available in this activity type
             activity_type.available_facilities.append(facility_object)
@@ -379,6 +420,7 @@ def populate_db(create_timetable, populate_with_random_bookings):
         return False
 
     population_functions = [
+        [create_facility_types, "failed to create facility types"],
         [create_facilities, "failed to create facilities"],
         [create_roles, "failed to create_roles"],
         [create_membership_types, "failed to create create_membership_types"],

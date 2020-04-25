@@ -4,15 +4,24 @@ import csv
 from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
-from main.data.db_classes.activity_db_class import ActivityType, Activity, Facility
+from main.data.db_classes.activity_db_class import ActivityType, Activity, FacilityType, Facility
 import main.data.transactions.employee_data_transaction as edf
 
 TAGS_CSV = "main/data/transactions/valid_tags.csv"
 
 
-# Returns the activity with the same id as the parameter
-# [Lewis S]
+def return_facility_type_with_name(name: str):
+    """
+    Returns the facility type with the same name as the parameter
+    """
+    return FacilityType.query.filter(FacilityType.facility_type_name == name.lower()).first()
+
+
 def return_activity_type_with_id(activity_type_id: int):
+    """
+    Returns the activity with the same id as the parameter
+    [Lewis S]
+    """
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
 
@@ -226,7 +235,7 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
                             start_time=start_time, end_time=end_time)
 
     add_to_database(new_activity)
-    log_transaction(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
+    log_transaction(f"Added new activity with type_id {activity_type_id} starting on {start_time} in facility {facility_name}")
     return new_activity
 
 

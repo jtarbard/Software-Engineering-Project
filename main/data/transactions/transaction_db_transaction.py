@@ -81,7 +81,7 @@ def return_membership_type_with_id(id: int):
 #   - List of membership objects which have ids that are stored in the cookie
 # [Lewis S]
 def return_activities_and_memberships_from_basket_cookie_if_exists(request: flask.request):
-    # TODO: Comment
+    # available_facilitiesTODO: Comment
     print(flask.request.cookies)
     if "vertex_basket_cookie" not in request.cookies:
         return True, None, None, None
