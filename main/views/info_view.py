@@ -1,7 +1,7 @@
 import flask
 import main.view_lib.cookie_lib as cl
 import main.data.transactions.transaction_db_transaction as db_transaction
-from main.data.db_classes.activity_db_class import Facility
+from main.data.db_classes.activity_db_class import FacilityType
 from main.data.db_classes.user_db_class import Customer
 from main.data.db_classes.transaction_db_class import MembershipType
 from main.data.db_session import add_to_database
@@ -19,7 +19,7 @@ def about_func():
 def facilities_view():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
     return flask.render_template("/info/facilities.html", has_cookie=has_cookie,
-                                 facilities=Facility.query.all(), page_title="Facilities", User=user)
+                                 facility_types=FacilityType.query.all(), page_title="Facilities", User=user)
 
 
 @blueprint.route('/info/memberships', methods=["GET"])
