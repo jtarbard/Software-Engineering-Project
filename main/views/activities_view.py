@@ -151,6 +151,7 @@ def query_session():
         session_price=round(session_price, 2),  # TODO: Bad #135
         subtotal=round(subtotal, 2),  # TODO: Bad #135
         max_booking=min(spaces_left, 8),
+        num_weeks_available=adf.return_activity_weeks_available(id),
 
         status_code=status_code,
         redirect_route=redirect_route,

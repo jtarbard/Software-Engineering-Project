@@ -320,3 +320,34 @@ def return_facilities(facility_id):
 def return_activity_type(activity_type_id):
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
+
+def return_regular_activities(activity_obj, limit=2):
+    """
+    ...
+    """
+    num = 0
+    activities = []
+
+    next_activity = "gimme more"
+
+    while next_activity is not None and num < limit:
+        next_activity = Activity.query.filter(
+            Activity.start_time >= activity_obj.start_time + datetime.timedelta(days=7 * num),
+            Activity.end_time <= activity_obj.end_time + datetime.timedelta(days=7 * num)
+        ).first()
+
+        if next_activity is not None:
+            activities.append(next_activity)
+            num += 1
+
+    return activities
+
+
+def return_activity_weeks_available(activity_id):
+    """
+    Based on the time (e.g. Monday 10am-11am) of the activity with id :param activity_id:,
+    find the number of consecutive weekly sessions with the same time.
+    """
+    activity_obj = Activity.query.filter(Activity.activity_id == activity_id).first()
+
+    return len(return_regular_activities(activity_obj))

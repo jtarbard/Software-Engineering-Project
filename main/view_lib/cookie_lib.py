@@ -89,61 +89,73 @@ def __hash_text(text: str) -> str:
 
 
 # Returns cookie response
-def add_activity_or_membership_to_basket(booking_object, request: flask.request, num_people=1, duration=None):
+def add_activity_or_membership_to_basket(booking_objects, request: flask.request, num_people=1, duration=None):
 
-    if type(booking_object) is Activity:
-        response = flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=booking_object.activity_type.activity_type_id))
-        if not num_people:
-            return None
-        if num_people < 1 or num_people > 8:
-            return None
-        add_instance = "A:" + str(booking_object.activity_id)
+    if type(booking_objects) is not list:  # provided singular booking object (the old case)
+        booking_objects = [booking_objects]
 
-    elif type(booking_object) is MembershipType:
-        response = flask.redirect("/info/memberships")
-        if not duration:
-            return None
-        if duration < 1 or duration > 12:
-            #out of rang
-            return None
-        add_instance = "M:" + str(booking_object.membership_type_id) + ":" + str(duration)
-        num_people = 1
+    basket_buffer = ""
+    response = ""
 
-    else:
-        return None
+    # loop through every booking object
+    for b, booking_object in enumerate(booking_objects):
+        if type(booking_object) is Activity:
+            response = flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=booking_object.activity_type.activity_type_id))
+            if not num_people:
+                return None
+            if num_people < 1 or num_people > 8:
+                return None
+            add_instance = "A:" + str(booking_object.activity_id)
 
-    if "vertex_basket_cookie" not in request.cookies:
-        basket = add_instance
-        for i in range(num_people - 1):
-            basket += ";" + add_instance
+        elif type(booking_object) is MembershipType:
+            response = flask.redirect("/info/memberships")
+            if not duration:
+                return None
+            if duration < 1 or duration > 12:
+                #out of rang
+                return None
+            add_instance = "M:" + str(booking_object.membership_type_id) + ":" + str(duration)
+            num_people = 1
 
-        response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
-        return response
-
-    basket = request.cookies["vertex_basket_cookie"]
-
-    if type(booking_object) is MembershipType:
-        basket_items = 0
-        new_basket = ""
-
-        for basket_instance in basket.split(";"):
-            if basket_instance.split(":")[0] != "M":
-                basket_items += 1
-                if 1 < basket_items:
-                    new_basket += ";" + basket_instance
-                else:
-                    new_basket = basket_instance
-
-        if len(new_basket) is 0:
-            basket = add_instance
         else:
-            basket = add_instance + ";" + new_basket
+            return None
 
-    else:
-        for i in range(num_people):
-            basket += ";" + add_instance
+        if b == 0 and "vertex_basket_cookie" not in request.cookies:
+            basket_buffer = add_instance
+            for i in range(num_people - 1):
+                basket_buffer += ";" + add_instance
+            continue  # don't add more
+        elif b == 0:  # has basket cookie
+            basket = request.cookies.get("vertex_basket_cookie", basket_buffer)
+        else:
+            basket = basket_buffer
 
-    response.set_cookie("vertex_basket_cookie", basket, max_age=datetime.timedelta(days=1))
+        if type(booking_object) is MembershipType:
+            basket_items = 0
+            new_basket = ""
+
+            for basket_instance in basket.split(";"):
+                if basket_instance.split(":")[0] != "M":
+                    basket_items += 1
+                    if 1 < basket_items:
+                        new_basket += ";" + basket_instance
+                    else:
+                        new_basket = basket_instance
+
+            if len(new_basket) is 0:
+                basket = add_instance
+            else:
+                basket = add_instance + ";" + new_basket
+
+        else:
+            for i in range(num_people):
+                basket += ";" + add_instance
+
+        basket_buffer = basket  # store / buffer the new basket value
+
+        print(basket_buffer)
+
+    response.set_cookie("vertex_basket_cookie", basket_buffer, max_age=datetime.timedelta(days=1))
     return response
 
 
