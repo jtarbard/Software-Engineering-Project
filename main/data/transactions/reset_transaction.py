@@ -274,9 +274,13 @@ def create_base_account_types():
     return True
 
 
-# Populates the activity table with semi-random activities, creates a timetable for the website
 def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: timedelta,
                                            populate_with_random_bookings: bool):
+    """
+    Populates the activity table with semi-random activities, creating a timetable for the website.
+    The sessions are the same every week in order to satisfy the "regular discount" requirement. The sessions in a week
+    are still random.
+    """
     log_transaction(f"Creating timetable between dates: {start_date} and {start_date + end_date}")
     days_between_dates = end_date.days
 
@@ -288,62 +292,168 @@ def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: 
         global customer_account
         customer_account = udf.return_customer_with_email(EMAIL_TYPES["customer"])
 
-    for day_amount in range(days_between_dates):
-        for activity_type in activity_types:
-            if activity_type.name == "general swim":
-                if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
-                    week_day_times = [6, 7, 8, 13, 14, 15, 16, 17, 20, 21]
-                    add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
+    """
+    A dictionary of the times of each activity. The key is the activity name, the value is another dictionary:
+    If a key is specified with an empty list, it will get registered as an empty day (i.e. no session on that day).
+    Each key has a list of lists. The innermost list represents the spanning hours of the activity on some days.
+        weekday: from Monday to Friday, cycled.
+        weekend: on Saturday and Sunday.
+                 the random.randint() thing is for randomizing the number of sessions.
+        default: on unspecified days, cycled.
+         
+    Cycled lists (weekday and default) Does not need to contain the exact number of lists. 
+    Under-specified lists are cycled, and over-specified lists are unused.
+    For example, if weekday is not specified, and "default" contains this - [listA, listB, listC],
+    the times from Monday to Friday would be listA, listB, listC, listA, listB.
+    """
+    activity_times = {
+        "general swim": dict(
+            weekday=[[6, 7, 8, 13, 14, 15, 16, 17, 20, 21]],
+            weekend=[return_random_times(random.randint(8, 16)),
+                     return_random_times(random.randint(8, 16))]  # the two days have different times
+        ),
+        "swimming classes": dict(
+            weekday=[[9, 10, 11, 19]],
+            weekend=[[]]
+        ),
+        "aqua": dict(
+            weekday=[[18]],
+            weekend=[return_random_times(random.randint(4, 6)),
+                     return_random_times(random.randint(4, 6))]
+        ),
+        "general fitness": dict(
+            weekday=[[6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]],
+            weekend=[[6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21],
+                     [6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]]
+        ),
+        "badminton": dict(
+            default=[return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6))]
+        ),
+        "yoga": dict(
+            default=[return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6)),
+                     return_random_times(random.randint(3, 6))]
+        ),
+        "tennis": dict(
+            default=[return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4))]
+        ),
+        "football": dict(
+            default=[return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4))]
+        ),
+        "basketball": dict(
+            default=[return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4))]
+        ),
+        "rugby": dict(
+            default=[return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4)),
+                     return_random_times(random.randint(2, 4))]
+        ),
+        "default": dict(
+            default=[return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
+                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
+                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
+                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
+                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
+                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
+                     return_random_times(random.choice([1, 1, 1, 2, 2, 3]))]
+        )
+    }
+
+    for activity_type in activity_types:
+        week_times_dict = activity_times.get(activity_type.name, activity_times["default"])
+        weekday_times = week_times_dict.get("weekday", None)
+        weekend_times = week_times_dict.get("weekend", None)
+        # if even default is not specified, then create a 1-hour session at 8am
+        default_times = week_times_dict.get("default", [[8]])
+        # this increments by one whenever a weekday/weekend's time is not specified via weekday_times or weekend_times
+        unspecified_days_index = 0
+
+        for day_amount in range(days_between_dates):
+
+            day_index = (current_date + timedelta(days=day_amount)).weekday()
+
+            # weekday
+            if day_index not in [5, 6]:
+                if weekday_times is not None:
+                    times = weekday_times[day_index % len(weekday_times)]
                 else:
-                    amount_today = random.randint(8, 16)
-                    returned_times = return_random_times(amount_today)
-                    add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
+                    times = default_times[unspecified_days_index % len(default_times)]
+                    unspecified_days_index += 1
 
-            elif activity_type.name == "swimming classes":
-                if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
-                    week_day_times = [9, 10, 11, 19]
-                    add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
+                add_activities_with_times(times, day_amount, activity_type, start_date, populate_with_random_bookings)
 
-            elif activity_type.name == "aqua":
-                if (current_date + timedelta(days=day_amount)).weekday() not in [5, 6]:
-                    week_day_times = [18]
-                    add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
-                else:
-                    amount_today = random.randint(4, 6)
-                    returned_times = return_random_times(amount_today)
-                    add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
-
-            elif activity_type.name == "General Fitness":
-                week_day_times = [6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]
-                add_activities_with_times(week_day_times, day_amount, activity_type, start_date, populate_with_random_bookings)
-
-            elif activity_type.name in ["badminton", "yoga"]:
-                amount_today = random.randint(3, 6)
-                returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
-
-            elif activity_type.name in ["tennis", "football", "basketball", "rugby"]:
-                amount_today = random.randint(2, 4)
-                returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
-
+            # weekend
             else:
-                amount_today = random.choice([1, 1, 1, 2, 2, 3])
-                returned_times = return_random_times(amount_today)
-                add_activities_with_times(returned_times, day_amount, activity_type, start_date, populate_with_random_bookings)
+                if weekend_times is not None:
+                    times = weekend_times[day_index % len(weekend_times)]
+                else:
+                    times = default_times[unspecified_days_index % len(default_times)]
+                    unspecified_days_index += 1
+
+                add_activities_with_times(times, day_amount, activity_type, start_date, populate_with_random_bookings)
+
+            if day_index >= 6:
+                unspecified_days_index = 0  # restart the cycle for setting the session times on unspecified days
 
 
-# Returns random times that activities are assigned to
-def return_random_times(amount_today: int):
-    returned_times = random.choices([x for x in range(6, 21)], k=amount_today)
+def return_random_times(num_sessions: int):
+    """
+    Returns random times that activities are assigned to
+    :param num_sessions: number of sessions on this day
+    """
+    returned_times = random.choices([x for x in range(6, 21)], k=num_sessions)
     returned_times.sort()
     returned_times = list(dict.fromkeys(returned_times))
     return returned_times
 
 
-# Traverses the times an activity takes place and adds it to the database
 def add_activities_with_times(returned_times: list, day_amount: int, activity_type,
                               start_date: datetime.date, populate_with_random_bookings):
+    """
+    Traverses the times an activity takes place and adds it to the database
+    :param returned_times: a sorted list of integers from 6 to 21, indicating the start time (i.e. hour) of the activity
+                           All activities are at least 1 hour long. The minimum time unit is 1 hour.
+                           If there are contiguous integers, such as [2, 3, 4], an activity of time 2-4 will be created.
+                           i.e. Contiguous integers indicates the spanning time of the activity. Alternatively you can
+                           think of them as "coagulated" or "gelled" together.
+    :param start_date: a pivot date for the activity
+    :param day_amount: a positive integer indicating the number of days offset from :param start_date:.
+                       Adding :param day_amount: to :param start_date: creates the actual start date for the activity.
+    :param activity_type: type of the activity
+    :param populate_with_random_bookings: boolean indicating whether random bookings for this activity shall be made.
+    """
     for time in returned_times:
         end_time = time + 1
         if time - 1 in returned_times:
