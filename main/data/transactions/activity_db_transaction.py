@@ -124,7 +124,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     if len(category) < 4 or len(category) > 20 or not category.replace(" ", "").isalpha():
         log_transaction(f"Failed to add new activity type {name}: category not correct length or type")
         return False
-    if len(description) < 10 or len(description) > 200:
+    if len(description) < 10 or len(description) > 400:
         log_transaction(f"Failed to add new activity type {name}: description not correct length or type")
         return False
     if miniumum_age < 0 or miniumum_age > 100:

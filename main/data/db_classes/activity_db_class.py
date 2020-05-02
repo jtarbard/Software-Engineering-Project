@@ -23,7 +23,7 @@ class ActivityType(database.Model):
 
     activity_type_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     name = database.Column(database.String, nullable=False)
-    description = database.Column(database.String, nullable=False)
+    description = database.Column(database.Text, nullable=False)
     tags = database.Column(database.String)
     category = database.Column(database.String, nullable=False)
     minimum_age = database.Column(database.Integer, nullable=False)
@@ -72,7 +72,7 @@ class FacilityType(database.Model):
 
     facility_type_id = database.Column(database.Integer, primary_key=True, autoincrement=True)
     facility_type_name = database.Column(database.String, nullable=False)
-    description = database.Column(database.String, nullable=False)
+    description = database.Column(database.Text, nullable=False)
     max_capacity = database.Column(database.Integer, nullable=False)
 
     facilities = database.relationship("Facility", back_populates="facility_type")

@@ -163,7 +163,7 @@ def create_activity_types():
         "Our football classes are lead by FA qualified coaches and are designed to establish core skills and develop intermediate talent in an engaging and fun manner. Whatever your skill set our coaches are here to assist you." ,
         "Our basketball classes are lead by accredited coaches and are designed to establish core skills and develop intermediate talent in an engaging and fun manner. Whatever your skill set our coaches are here to assist you.",
         "Our badminton classes are lead by accredited coaches and are catered to your needs. Whether you need to establish core skills, develop intermediate talent, or refine expertise our coaches are here to help you achieve.",
-        "General Fitness sessions provide access to our state of the art fitness suite with access to our cardiovascular, resistance, and weight facilities and support from our trained staff it's the perfect place to attain your fitness goals.",
+        "General Fitness sessions provide access to our state of the art fitness suite with our range of cardiovascular, resistance, and weight facilities and support from our trained staff.",
         "Boxing description",
         "Climbing description",
         "Cricket description",
@@ -209,7 +209,6 @@ def create_activity_types():
     ]
 
     minimum_age = [6, 12, 12, 16, 16, 16, 14, 12, 12, 12, 12,  8, 0, 16, 12, 8, 14, 16]
-    maximum_age = [16, 12, 12, 16, 16, 16, 14, 12, 12, 12, 12,  8, 0, 16, 12, 8, 14, 16]
 
     hourly_activity_cost = [random.randint(100, 250) / 100 for i in range(activity_num)]
 
