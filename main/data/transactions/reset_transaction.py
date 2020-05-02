@@ -231,24 +231,24 @@ def create_activity_types():
 def create_activity_type_and_role_validation():
 
     activity_names_and_roles = {
-        "Football": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Basketball": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Badminton": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Football Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Basketball Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Badminton Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "General Fitness": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Boxing": ["Activity Leader", "Activity Assistant", "Martial Arts Expert"],
-        "Climbing": ["Activity Leader", "Activity Assistant", "Climbing Expert"],
-        "Cricket": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Tennis Session": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Tennis Team Event": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Squash Session": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Squash Team Event": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Boxing Classes": ["Activity Leader", "Activity Assistant", "Martial Arts Expert"],
+        "Climbing Sessions": ["Activity Leader", "Activity Assistant", "Climbing Expert"],
+        "Cricket Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Tennis Sessions": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Tennis Team Events": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Squash Sessions": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Squash Team Events": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "General Swim": ["Lifeguard"],
-        "Swimming classes": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
-        "Aqua": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
-        "Yoga": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Dancing": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Gymnastics": ["Activity Leader", "Activity Assistant", "Gymnastics Expert"],
-        "Rugby": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"]
+        "Swimming Classes": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
+        "Aqua Classes": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
+        "Yoga Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Dancing Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
+        "Gymnastics Classes": ["Activity Leader", "Activity Assistant", "Gymnastics Expert"],
+        "Rugby Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"]
     }
 
     for activity in activity_names_and_roles.keys():
@@ -497,25 +497,23 @@ def create_activity_facility_relation():
     """
 
     relationships = [("swimming classes", ["main swimming pool"]),
-                     ("basketball", ["apex sports hall", "edge sports hall"]),
-                     ("football", ["apex sports hall", "edge sports hall", "outside playing field"]),
-                     ("badminton", ["apex sports hall", "edge sports hall"]),
-                     ("tennis session", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("tennis team event", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("squash session", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("squash team event", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("basketball classes", ["apex sports hall", "edge sports hall"]),
+                     ("football classes", ["apex sports hall", "edge sports hall", "outside playing field"]),
+                     ("badminton classes", ["apex sports hall", "edge sports hall"]),
+                     ("tennis sessions", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("tennis team events", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("squash sessions", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("squash team events", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
                      ("general fitness", ["fitness Room"]),
-                     ("boxing", ["apex sports hall", "edge sports hall"]),
-                     ("climbing", ["climbing wall"]),
-                     ("cricket", ["outside playing field"]),
-                     ("yoga", ["studio 1", "studio 2"]),
-                     ("aqua", ["main swimming pool"]),
+                     ("boxing classes", ["apex sports hall", "edge sports hall"]),
+                     ("climbing sessions", ["climbing wall"]),
+                     ("cricket classes", ["outside playing field"]),
+                     ("yoga classes", ["studio 1", "studio 2"]),
+                     ("aqua classes", ["main swimming pool"]),
                      ("general swim", ["main swimming pool"]),
-                     # ("spin", ["studio 1", "studio 2"]),
-                     ("dancing", ["studio 1", "studio 2"]),
-                     ("Gymnastics", ["apex sports hall", "edge sports hall"]),
-                     # ("gymnastics", ["apex sports hall", "edge sports hall"]),
-                     ("rugby", ["outside playing field"])]
+                     ("dancing classes", ["studio 1", "studio 2"]),
+                     ("gymnastics classes", ["apex sports hall", "edge sports hall"]),
+                     ("rugby classes", ["outside playing field"])]
 
     for relationship in relationships:
         activity_type = ActivityType.query.filter_by(name=relationship[0].lower()).first()
