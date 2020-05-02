@@ -39,16 +39,16 @@ def create_facility_types():
              description="The contemporary 100-station fitness room features an extensive range of cardiovascular and resistance machines and dedicated free-weight areas.",
              max_capacity=120),
         dict(name="Apex Sports Hall",
-             description="The new 120m apex sports hall is home to an indoor football pitch, basketball courts, badminton courts, and our trampolining and boxing classes.",
+             description="The new 120m apex sports hall is home to an indoor football pitch, basketball courts, badminton courts, and our gymnastics and boxing classes.",
              max_capacity=80),
         dict(name="Edge Sports Hall",
-             description="The 60m edge sports hall is home to basketball courts, badminton courts, and our trampolining and boxing classes.",
+             description="The 60m edge sports hall is home to basketball courts, badminton courts, and our gymnastics and boxing classes.",
              max_capacity=50),
         dict(name="Climbing Wall",
              description="The 10m climbing wall features 10 belay lines, a bouldering cave and separate teaching wall and is designed for beginners and experts alike.",
              max_capacity=18),
         dict(name="Tennis Court",
-             description="The modern hard surface tennis courts are fitted with state of the art floodlighting and ready all year round.",
+             description="The outdoor modern hard surface tennis courts are fitted with state of the art floodlighting and ready all year round.",
              max_capacity=8),
         dict(name="Squash Court",
              description="The glass backed competition standard squash courts are ideal for both leisure and competitive play.",
@@ -115,7 +115,7 @@ def create_roles():
         "Lifeguard", "Sports Coach",
         "Instructor", "Swim Teacher",
         "Activity Leader", "Activity Assistant",
-        "Climbing Expert", "Trampoline Expert",
+        "Climbing Expert", "Gymnastics Expert",
         "Martial Arts Expert", "Direct Manager"
     ]
 
@@ -127,7 +127,7 @@ def create_roles():
         "Activity Leader description",
         "Activity Assistant description",
         "Climbing Expert description",
-        "Trampoline Expert description",
+        "Gymnastics Expert description",
         "Martial Arts Expert description",
         "Direct Manager description"
     ]
@@ -148,13 +148,13 @@ def create_activity_types():
     log_transaction("Creating database activity types:")
 
     names = [
-        "Football", "Basketball", "Badminton",
-        "General Fitness", "Boxing", "Climbing", "Cricket",
-        "Tennis Session", "Tennis Team Event",
-        "Squash Session", "Squash Team Event",
-        "General Swim", "Swimming classes", "Aqua",
-        "Yoga", "Dancing",
-        "Trampolining", "Rugby"
+        "Football Classes", "Basketball Classes", "Badminton Classes",
+        "General Fitness", "Boxing Classes", "Climbing Sessions",
+        "Cricket Classes", "Tennis Sessions", "Tennis Team Events",
+        "Squash Sessions", "Squash Team Events",
+        "General Swim", "Swimming Classes", "Aqua Classes",
+        "Yoga Classes", "Dancing Classes",
+        "Gymnastics Classes", "Rugby Classes"
     ]
 
     activity_num = len(names)
@@ -163,21 +163,21 @@ def create_activity_types():
         "Our football classes are lead by FA qualified coaches and are designed to establish core skills and develop intermediate talent in an engaging and fun manner. Whatever your skill set our coaches are here to assist you." ,
         "Our basketball classes are lead by accredited coaches and are designed to establish core skills and develop intermediate talent in an engaging and fun manner. Whatever your skill set our coaches are here to assist you.",
         "Our badminton classes are lead by accredited coaches and are catered to your needs. Whether you need to establish core skills, develop intermediate talent, or refine expertise our coaches are here to help you achieve.",
-        "General Fitness sessions provide access to our state of the art fitness suite with our range of cardiovascular, resistance, and weight facilities and support from our trained staff.",
+        "General fitness sessions provide access to our state of the art fitness suite with our range of cardiovascular, resistance, and weight facilities and support from our trained staff.",
         "Boxing description",
         "Climbing description",
-        "Cricket description",
+        "Our cricket classes are lead by accredited coaches and are catered to your needs. Whether you need to establish core skills, develop intermediate talent, or refine expertise our coaches are here to help you achieve.",
+        "Tennis sessions provide private access to our modern hard surface outdoor tennis courts. Equipment is available for rent at the reception.",
         "Tennis description",
-        "Tennis description",
+        "Squash sessions provide private access to our glass backed competition standard squash courts. Equipment is available for rent at the reception.",
         "Squash description",
-        "Squash description",
-        "General Swim description",
-        "Swimming classes description",
+        "General swim sessions are held in our 50m pool with eight lanes for exercise and practice and an open section for unrestricted fun general swim is perfect for individual or social fun.",
+        "Our swimming classes are lead by qualified instructors and are designed to establish core skills in an engaging and fun manner. No matter your experience our instructors are here to help.",
         "Aqua description",
-        "Yoga description",
-        "Dancing description",
-        "Trampolining description",
-        "Rugby description"
+        "Our yoga classes are held in our ultra-modern studio and lead by highly-experienced and well-loved instructors, with adaptive mood lighting and dampened acoustics, it's the perfect time for relaxation.",
+        "Our dance classes are carefully crafted high-intensity workouts designed to give you a full-body workout while you loose yourself to dance.",
+        "Our mixed gender artistic gymnastics classes are lead by nationally recognised instructors and are designed to support both core skill development and intermediate refinement.",
+        "Our rugby classes are lead by qualified coaches and are designed to establish core skills and develop intermediate talent in an engaging and fun manner. Whatever your skill set our coaches are here to assist you."
     ]
 
     category = [
@@ -247,7 +247,7 @@ def create_activity_type_and_role_validation():
         "Aqua": ["Lifeguard", "Swim Teacher", "Activity Leader", "Activity Assistant"],
         "Yoga": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
         "Dancing": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
-        "Trampolining": ["Activity Leader", "Activity Assistant", "Trampoline Expert"],
+        "Gymnastics": ["Activity Leader", "Activity Assistant", "Gymnastics Expert"],
         "Rugby": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"]
     }
 
@@ -513,7 +513,7 @@ def create_activity_facility_relation():
                      ("general swim", ["main swimming pool"]),
                      # ("spin", ["studio 1", "studio 2"]),
                      ("dancing", ["studio 1", "studio 2"]),
-                     ("trampolining", ["apex sports hall", "edge sports hall"]),
+                     ("Gymnastics", ["apex sports hall", "edge sports hall"]),
                      # ("gymnastics", ["apex sports hall", "edge sports hall"]),
                      ("rugby", ["outside playing field"])]
 
