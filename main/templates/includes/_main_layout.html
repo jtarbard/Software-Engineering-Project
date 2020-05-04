@@ -21,7 +21,7 @@ as the basic body -->
           crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/includes/global.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/includes/main.css') }}">
-    <link rel="icon" href="../../static/favicon.ico" type="image/ico" sizes="16x16">
+    <link rel="icon" href="../static/imgs/logo/vertex_favicon.png" type="image/ico" sizes="16x16">
     {% block additional_css %}{% endblock %} <!--Allows extra css to be added-->
 </head>
 <body>
@@ -38,10 +38,10 @@ as the basic body -->
 {% endif %}
 
 {% if not nav %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/navs/-->
-<nav class="navbar navbar-expand-lg navbar-dark bg-black main-nav" id="main-nav">
+<nav class="navbar navbar-expand-lg navbar-light main-nav" id="main-nav">
 <!--    <div class="container justify-content-center">-->
     <div class="d-block d-lg-none mx-auto" id="brand-mobile">
-        <a class="navbar-brand" base href="/">The Vertex</a>
+        <a class="navbar-brand" base href="/"><img src="../static/imgs/logo/vertex_logo.png"></a>
     </div>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
@@ -60,7 +60,7 @@ as the basic body -->
         </ul>
         <ul class="nav navbar-nav flex-fill justify-content-center d-none d-lg-block">
             <li class="nav-item">
-                <a class="navbar-brand mx-auto" base href="/">The Vertex</a>
+                <a class="navbar-brand mx-auto" base href="/"><img src="../static/imgs/logo/vertex_logo.png"></a>
             </li>
         </ul>
         <ul class="nav navbar-nav flex-fill w-100 justify-content-end" id="nav-content-right">
@@ -75,7 +75,7 @@ as the basic body -->
             <li class="nav-item d-block d-lg-none"><a class="nav-link" href="{{ url_for('account.view_account')}}">Account</a></li>
             <li class="nav-item dropdown d-none d-lg-block">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Account</a>
-                <div class="dropdown-menu navbar-dark bg-black" aria-labelledby="navbarDropdown">
+                <div class="dropdown-menu navbar-light" aria-labelledby="navbarDropdown">
                     <a href="{{ url_for('account.view_account')}}" class="nav-link pl-0">
                         <p>Home</p></a>
                     <a href="{{ url_for('account.view_account_bookings')}}" class="nav-link pl-0">
@@ -113,10 +113,15 @@ as the basic body -->
 {% endif %}
 <div>
     {% if page_title is defined %} <!-- Page title is not empty -->
+
     <div id="page_title" class="fluid-container">
-        <div class="container" id="page_title_container">
-            <h1 id="page_title_h1">{{ page_title }}</h1>
-            <!--      <div id="page-description">{% block page_description %} {% endblock %}</div>-->
+        <div class="container">
+            <div class="row">
+                <h1 class="align-self-center col-12 col-md-4">{{ page_title }}</h1>
+                <span class="align-self-center col-12 col-md-8">
+                    {% block page_description %} {% endblock %}
+                </span>
+            </div>
         </div>
     </div>
     {% endif %}

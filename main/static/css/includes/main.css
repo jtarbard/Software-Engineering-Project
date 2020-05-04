@@ -3,10 +3,14 @@ html {
 }
 
 /*Sets navbar height to a total of 10vh*/
-.navbar-brand {
-  height: 8vh;
-  padding: 1vh 0 1vh;
-  line-height: 6vh;
+.navbar-brand img {
+    height: 8vh;
+}
+
+#main-nav {
+    -webkit-box-shadow: 0px 5px 10px 0px rgba(207,207,207,0.25);
+    -moz-box-shadow: 0px 5px 10px 0px rgba(207,207,207,0.25);
+    box-shadow: 0px 5px 10px 0px rgba(207,207,207,0.25);
 }
 
 #main-nav .dropdown-menu {
@@ -31,25 +35,26 @@ html {
 }
 
 #page_title {
-    min-height: 15vh;
     margin-bottom: 3vh;
+    padding: 5vh;
     color: white;
     background-color: var(--primary-color);
 }
 
+#page_title .row {
+    min-height: 15vh;
+}
+
 #page_title h1 {
-    padding: 3vh 0;
-    padding-bottom: 0;
-    line-height: 10vh;
+    margin: 0;
     text-align: center;
 }
 
-#page-description {
-    /*margin-top: -3vh;*/
-    padding-bottom: 2vh;
-    z-index: 2;
-    text-align: center;
+#page_title p {
+    margin: 0;
 }
+
+
 
 /*// Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {

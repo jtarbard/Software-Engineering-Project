@@ -1,14 +1,16 @@
 /*The Vertex Global Styling*/
 :root {
-    --primary-color: #F1650E;
+    --primary-color: #6505FF;
     --secondary-color: #1e1e1e;
     --neutral-color: grey;
 }
 
 body {
+    min-width: 100vw;
+    min-height: 100vh;
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
-    background-image: url("sports.png");
+    /*background-image: url("sports.png");*/
 }
 
 h1 {
