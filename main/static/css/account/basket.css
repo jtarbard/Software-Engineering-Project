@@ -1,0 +1,17 @@
+#submit_btn{
+    display: none;
+    margin-top: 1vh;
+}
+
+#cancel_btn  {
+    display: none;
+    margin-top: 1vh;
+}
+
+#edit_btn {
+    margin-top: 1vh;
+}
+
+#delete_btn {
+    margin-top: 1vh;
+}

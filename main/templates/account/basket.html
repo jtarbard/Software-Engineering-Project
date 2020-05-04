@@ -1,6 +1,6 @@
 {% extends "includes/_main_layout.html"%}
 {% block additional_css %}
-
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/account/basket.css') }}">
 {% endblock %}
 
 {% block title %}
@@ -8,164 +8,154 @@ Your Basket
 {% endblock %}
 
 {% block main_content %}
-<h2>Basket page</h2>
 
-    {% if not (basket_activities or basket_membership) %}
-        <p>Basket empty</p>
-    {% else %}
-        {% if basket_activities %}
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr><td colspan="5"> Activities </td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Class Name</td>
-                            <td>Class Start Time </td>
-                            <td>Class End Time</td>
-                            <td>Facility</td>
-                            <td>Number of Bookings</td>
-                            <td>Price Per Item</td>
-                            <td>Regular discount</td>
-                            <td>Sub-Price</td>
-                            <td>Update</td>
-                        </tr>
-                        {% for activity, (session_price, num_bookings, regular_discount) in activity_and_price.items() %}
-                            <tr>
-                                <td>{{ activity.activity_type.name.capitalize() }}</td>
-                                <td>{{ activity.start_time }}</td>
-                                <td>{{ activity.end_time }}</td>
-                                <td>{{ activity.facility.name.capitalize() }}</td>
-                                <td>{{ num_bookings }}</td>
-                                <td>£{{ session_price }}</td>
-                                <td>{{ regular_discount }}%</td>
-                                <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * regular_discount / 100) }}</td>
-                                <td>    
-                                    <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
-                                        <input type="number" name="num_change" max="8" min="0" value="{{num_bookings}}">
-                                        <input type="submit" name="update" value="Update">
-                                        <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
-                                    </form>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <tr>
-                            <td colspan="5"></td>
-                            <td>Total Price:</td>
-                            <td>£{{ total_activity_price }}</td>
-                        </tr>
-                        {% if current_membership_discount %}
-                        <tr>
-                            <td colspan="5"></td>
-                            <td>Membership discount:</td>
-                            <td>{{ current_membership_discount }}% OFF!</td>
-                        </tr>
-                        <tr>
-                            <td colspan="5"></td>
-                            <td>Discounted Price:</td>
-                            <td>£{{ total_discounted_price }}</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-            <br>
+<div class="row no-gutters">
+    <div class="content-container col-12 col-lg-8">
+        <h1>Basket Items</h1>
+        <table class="table">
+            <thead>
+                <th class="col-2">Item</th>
+                <th class="col">Quantity</th>
+                <th class="col-2">Discount</th>
+                <th class="col">Total</th>
+            </thead>
+            <tbody>
+                {% if basket_membership %}
+                <form action="/account/basket" method="post" id="booking_item_{{basket_membership.membership_id}}">
+                <tr>
+                    <td>
+                        <h6>{{ basket_membership.name.capitalize() }} Membership</h6>
+                        Duration: {{ basket_membership_duration }} Month<br>
+                        Start Date: {{ basket_membership.start_time }}<br>
+                        End Date: {{ basket_membership.end_time }}.<br>
+                        <input type="hidden" name="delete" id="delete" value="booking_item_{{basket_membership.membership_id}}">
+                        <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
+                    </td>
+                    <td>1</td>
+                    <td>None</td>
+                    <td>£{{ basket_membership_duration * basket_membership.monthly_price }}</td>
+                </tr>
+                {% endif %}
+                {% if basket_activities %}
+                    {% for activity, (session_price, num_bookings, regular_discount) in activity_and_price.items() %}
+                    <tr>
+                        <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
+                            <td>
+                                <h6>{{ activity.activity_type.name.capitalize() }}</h6>
+                                Facility: {{ activity.facility.name.capitalize() }}<br>
+                                Date: {{ activity.start_time.strftime("%m/%y") }}<br>
+                                Time: {{ activity.start_time.strftime("%H:%M") }} - {{ activity.end_time.strftime("%H:%M") }}<br>
+                                <input type="hidden" name="delete" id="delete" value="booking_item_{{activity.activity_id}}">
+                                <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
+                                <input type="button" id="cancel_btn" onclick="edit()" value="Cancel" class="btn btn-secondary" required>
+                                <input type="submit" id="submit_btn" name="update" value="Update" class="btn btn-primary">
+                                <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
+                                <input type="button" id="edit_btn" onclick="edit()" value="Edit" class="btn btn-secondary" required>
+                            </td>
+                            <td>
+                                <input type="number" id="num_change" name="num_change" max="8" min="0" value="{{num_bookings}}" class="form-control-plaintext" readonly>
+                            </td>
+                            <td>{{ regular_discount }}%</td>
+                            <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * regular_discount / 100) }}</td>
+                        </form>
+                    </tr>
+                    <tr>
+                        <td>
+                            <form method="post">
+                            <input type="submit" name="delete_basket" value="Delete all items" class="btn btn-secondary">
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="content-container col-12 col-lg-4">
+        <h1>Order Summary</h1>
+        <h6>Pre-discount Item Total:</h6>
+        {% if basket_membership and basket_activities %}
+        <p>£{{(basket_membership_duration * basket_membership.monthly_price) + total_activity_price}}</p>
+        {% elif basket_activities %}
+        <p>£{{total_activity_price}}</p>
+        {% elif basket_membership %}
+        <p>£{{ basket_membership_duration * basket_membership.monthly_price}}</p>
         {% endif %}
-
-        {% if basket_membership %}
-
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr><td colspan="5"> Memberships </td></tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Name</td>
-                            <td>Discount</td>
-                            <td>Duration</td>
-                            <td>Price per month</td>
-                            <td>Total price</td>
-                        </tr>
-                        <tr>
-                            <td>{{ basket_membership.name }} </td>
-                            <td>{{ basket_membership.discount }} </td>
-                            <td>{{ basket_membership_duration }} </td>
-                            <td>£{{ basket_membership.monthly_price }} </td>
-                            <td>£{{ basket_membership_duration * basket_membership.monthly_price }} </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <br>
+        {% if current_membership_discount and basket_activities %}
+        <h6>Member Discounts:</h6>
+        <p>{{current_membership_discount}}% on all Activities</p>
+        <p>-£{{ (current_membership_discount/100) * total_activity_price }}</p>
         {% endif %}
+        <h6>Total Payable:</h6>
+        <p>£{{final_price}}</p>
 
-        {% if basket_membership or basket_activities %}
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr><td colspan="5"> Final Price </td></tr>
-                    </thead>
-                    <tbody>
-                        {% if basket_activities %}
-                        <tr>
-                            <td>Activity Price</td>
-                            <td>£{{total_activity_price}}</td>
-                        </tr>
-                        {% endif %}
-                        {% if basket_membership %}
-                        <tr>
-                            <td>Membership Price</td>
-                            <td>£{{ basket_membership_duration * basket_membership.monthly_price}}</td>
-                        </tr>
-                        {% endif %}
-                        {% if basket_membership and basket_activities %}
-                        <tr>
-                            <td>Total Price</td>
-                            <td>£{{(basket_membership_duration * basket_membership.monthly_price) + total_activity_price}}</td>
-                        </tr>
-                        {% endif %}
-                        {% if current_membership_discount %}
-                        <tr>
-                            <td>Membership Discount</td>
-                            <td>£{{current_membership_discount}}%</td>
-                        </tr>
-                        <tr>
-                            <td>Discounted Price</td>
-                            <td>£{{final_price}}</td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
-            <br>
-        {% endif %}
+    <form method="post" action="/transactions/pay-card">
+    <input type="submit" name="submit" value="Pay By Card" class="btn btn-primary">
+    <input type="hidden" name="checkout" value="user_has_checkout">
+    <input type="hidden" name="total_price" value="{{final_price}}">
+    <input type="hidden" name="payment_type" value="card">
+    </form>
 
-         <form method="post" action="/transactions/pay-card">
-            <input type="submit" name="submit" value="Pay By Card">
-             <input type="hidden" name="checkout" value="user_has_checkout">
-             <input type="hidden" name="total_price" value="{{final_price}}">
-             <input type="hidden" name="payment_type" value="card">
-        </form>
-
-        {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
-            <form method="post" action="/transactions/pay-card">
-            <input type="submit" name="submit" value="Pay With Cash">
-             <input type="hidden" name="checkout" value="user_has_checkout">
-             <input type="hidden" name="total_price" value="{{final_price}}">
-                <input type="hidden" name="payment_type" value="cash">
-        </form>
-        {% endif %}
-
-        <br>
-
-        <form method="post">
-            <input type="submit" name="delete_basket" value="Delete all items">
-        </form>
+    {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
+    <form method="post" action="/transactions/pay-card">
+    <input type="submit" name="submit" value="Pay With Cash" class="btn btn-primary">
+    <input type="hidden" name="checkout" value="user_has_checkout">
+    <input type="hidden" name="total_price" value="{{final_price}}">
+    <input type="hidden" name="payment_type" value="cash">
+    </form>
     {% endif %}
+
+    </div>
+</div>
+
 {% endblock %}
 
 {% block additional_js %}
 <script src="../../static/js/basket.js"> </script>
+<script>
+    let edit_state = false;
+
+    function delete_item(){
+        document.getElementById("num_change").setAttribute("value","0");
+        const id = document.getElementById("delete").getAttribute("value");
+        document.getElementById("id").submit();
+    }
+
+    function edit(){
+        const input = document.getElementById("num_change");
+        const submit = document.getElementById("submit_btn");
+        const cancel = document.getElementById("cancel_btn");
+        const del = document.getElementById("delete_btn");
+        const edit = document.getElementById("edit_btn");
+
+        if(edit_state){ //switch editing off
+            input.classList.remove("form-control");
+            input.classList.add("form-control-plaintext");
+            input.setAttribute("readonly","readonly");
+
+            submit.style.display = "none";
+            cancel.style.display = "none";
+            if (del != null) {
+                del.style.display = "inline-block";
+            }
+            edit.style.display = "inline-block";
+
+            edit_state = false;
+        }
+        else { //switch editing on
+            input.classList.remove("form-control-plaintext");
+            input.classList.add("form-control");
+            input.removeAttribute("readonly");
+
+            submit.style.display = "inline-block";
+            cancel.style.display = "inline-block";
+            edit.style.display = "none";
+
+            if (del != null){
+                del.style.display = "none";
+            }
+            edit_state = true;
+        }
+    }
+</script>
 {% endblock %}

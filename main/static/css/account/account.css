@@ -21,6 +21,7 @@
 }
 
 aside {
+    min-height: 86.5vh;
     padding: 0;
     margin: 0;
     color: #F2F2F2;
@@ -50,8 +51,7 @@ aside p {
     }
 
     aside {
-        min-height: 74.5vh;
-        height: inherit;
+        height: 100%;
         overflow-x: auto;
     }
 

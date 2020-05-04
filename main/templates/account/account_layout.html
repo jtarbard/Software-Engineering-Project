@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block main_content %}
-<div class="container-fluid">
+<div id="account-container"">
     <!--  Sidebar/Nav   -->
     {% if not sidebar_off %}
     <div class="row no-gutters equal">
-        <aside class="col-12 col-md-3 col-lg-2">
+        <aside class="col-12 col-md-3">
             <nav class="navbar navbar-expand p-0">
                 <div class="collapse navbar-collapse">
                     <ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between col-12 p-0"
@@ -92,7 +92,7 @@
         </aside>
         {% endif %}
         <!-- Page Content -->
-        <div class="col-md-9 col-lg-10">
+        <div class="col-md-9">
             <div id="page-content-wrapper">
                 <div id="title-bar" class="row no-gutters">
                     <h1 class="col-8 col-lg-9">{{User.first_name.title()}}</h1>

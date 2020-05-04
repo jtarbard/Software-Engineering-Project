@@ -1,10 +1,15 @@
-html {
-  scroll-behavior: smooth;
-}
 
 /*Sets navbar height to a total of 10vh*/
+
+#main-nav {
+    margin: 0;
+    padding: 2vh 2vh;
+}
+
 .navbar-brand img {
     height: 8vh;
+    padding-top: 1vh;
+    padding-bottom: 1vh;
 }
 
 #main-nav {

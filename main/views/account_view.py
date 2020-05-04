@@ -52,14 +52,14 @@ def login_post():
 
     if server_error:  # Returns login page if an error is found
         return flask.render_template("account/login_register.html", page_type="login", ServerError=server_error,
-                                     email=email, has_cookie=True, page_title="Login")
+                                     email=email, has_cookie=True)
 
     # Checks that the customer exists in the database, if not then the login page returned with an error
     user = udf.check_user_is_in_database_and_password_valid(email, password_first)
     if not user:  # Checks if the user actually exists
         return flask.render_template("account/login_register.html", page_type="login",
                                      ServerError="Input error: Incorrect email or password",
-                                     email=email, has_cookie=True, page_title="Login")
+                                     email=email, has_cookie=True)
 
     # Implies that no error has occurred and the user is redirected to their account. A cookie is then set that
     # Verifies the customer ID and a verification hash
@@ -117,7 +117,7 @@ def register_post():
         return flask.render_template("account/login_register.html", page_type="register",
                                      ServerError=server_error, email=email, date_of_birth=str(dob), first_name=first_name,
                                      last_name=last_name, postcode=postcode, address=address, title=title,
-                                     tel_number=tel_number, page_title="Register")
+                                     tel_number=tel_number)
 
     # user is created and returned
     user = udf.create_new_user_account(0, title=title, password=password_first, first_name=first_name, last_name=last_name,
@@ -139,7 +139,7 @@ def view_account():
 
     membership_type = account_lib.get_membership_type(user)
 
-    return flask.render_template("/account/account_home.html", User=user, membership_type=membership_type, page_title="Your Account", sidebar_off=True)
+    return flask.render_template("/account/account_home.html", User=user, membership_type=membership_type, sidebar_off=True)
 
 
 @blueprint.route("/account/receipts", methods=["GET"])
@@ -165,7 +165,7 @@ def view_account_receipts(returned_receipts=None):
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/receipts.html", User=user, has_cookie=has_cookie,
-                                 returned_receipts=returned_receipts, membership_type=membership_type, page_title="Receipts")
+                                 returned_receipts=returned_receipts, membership_type=membership_type)
 
 
 @blueprint.route("/account/bookings", methods=["GET"])
@@ -195,8 +195,7 @@ def view_account_bookings():
     membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/bookings.html", User=user,
-                                 returned_bookings=returned_bookings, membership_type=membership_type,
-                                 page_title="Upcoming Bookings", has_cookie=has_cookie)
+                                 returned_bookings=returned_bookings, membership_type=membership_type, has_cookie=has_cookie)
 
 
 @blueprint.route("/account/membership", methods=["GET"])
@@ -213,7 +212,7 @@ def view_account_membership():
         membership_type = account_lib.get_membership_type(user)
 
     return flask.render_template("/account/membership.html", User=user,
-                                 membership_type=membership_type, membership=membership, page_title="Membership", has_cookie=has_cookie)
+                                 membership_type=membership_type, membership=membership, has_cookie=has_cookie)
 
 
 # TODO: Refactor so that it handles other roles of users
@@ -251,7 +250,7 @@ def view_account_details():
             udf.update_user_account(user.user_id, details)
 
     return flask.render_template("/account/account_details.html", User=user, customer=customer,
-                                 membership_type=membership_type, page_title="Account Details", has_cookie=has_cookie)
+                                 membership_type=membership_type, has_cookie=has_cookie)
 
 
 # TODO: Refactor to handle users with different roles
@@ -293,7 +292,7 @@ def view_payment_details():
         else:
             payment_details = None
 
-    return flask.render_template("/account/card_details.html", User=user, payment_details=payment_details, membership_type=membership_type, page_title="Card Details", has_cookie=has_cookie)
+    return flask.render_template("/account/card_details.html", User=user, payment_details=payment_details, membership_type=membership_type, has_cookie=has_cookie)
 
 
 @blueprint.route("/account/view_statistics", methods=["POST", "GET"])
@@ -417,7 +416,7 @@ def view_usages():
                                  weekly_activities=weekly_activities, search_field_data=search_field_data,
                                  activity_types=activity_types, total_cash_in=total_cash_in,
                                  total_cash_out=total_cash_out, total_bookings=total_bookings,
-                                 total_activity_type_bookings=total_activity_type_bookings, page_title="Statistics",
+                                 total_activity_type_bookings=total_activity_type_bookings,
                                  has_cookie=has_cookie)
 
 

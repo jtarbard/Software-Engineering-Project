@@ -111,44 +111,42 @@ as the basic body -->
     </div>
 </nav>
 {% endif %}
-<div>
-    {% if page_title is defined %} <!-- Page title is not empty -->
-
-    <div id="page_title" class="fluid-container">
-        <div class="container">
-            <div class="row">
-                <h1 class="align-self-center col-12 col-md-4">{{ page_title }}</h1>
-                <span class="align-self-center col-12 col-md-8">
-                    {% block page_description %} {% endblock %}
-                </span>
-            </div>
+{% if page_title is defined %} <!-- Page title is not empty -->
+<div id="page_title" class="fluid-container">
+    <div class="container">
+        <div class="row">
+            <h1 class="align-self-center col-12 col-md-4">{{ page_title }}</h1>
+            <span class="align-self-center col-12 col-md-8">
+                {% block page_description %} {% endblock %}
+            </span>
         </div>
     </div>
-    {% endif %}
+</div>
+{% endif %}
 
-    <!--Defines the main content for the webpages, this is where allthe content is situated-->
-    {% block main_content %} {% endblock %}
+<!--Defines the main content for the webpages, this is where allthe content is situated-->
+{% block main_content %} {% endblock %}
 
-    {% with messages = get_flashed_messages(with_categories=True) %}
-    {% if messages %}
-    {% for message in messages %}
-    {% if message[0] == ("success") %}
-    <div class="alert alert-success fade show" role="alert">
-        {% elif message[0] == ("error") %}
-        <div class="alert alert-danger fade show" role="alert">
-            {% else %}
-            <div class="alert alert-primary fade show" role="alert">
-                {% endif %}
-                {{ message[1] }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            {% endfor %}
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+{% for message in messages %}
+{% if message[0] == ("success") %}
+<div class="alert alert-success fade show" role="alert">
+    {% elif message[0] == ("error") %}
+    <div class="alert alert-danger fade show" role="alert">
+        {% else %}
+        <div class="alert alert-primary fade show" role="alert">
             {% endif %}
-            {% endwith %}
+            {{ message[1] }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
     </div>
+</div>
 
     {% if footer == True %} <!-- Inspired from: https://mdbootstrap.com/docs/jquery/navigation/footer/-->
     <footer>
