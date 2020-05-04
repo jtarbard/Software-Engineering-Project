@@ -3,6 +3,7 @@
     --primary-color: #6505FF;
     --secondary-color: #1e1e1e;
     --neutral-color: grey;
+    --min-body-height: 86.5vh;
 }
 
 html {

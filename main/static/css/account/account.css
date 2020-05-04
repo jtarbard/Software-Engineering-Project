@@ -50,7 +50,7 @@ aside p {
     }
 
     aside {
-        min-height: 86.5vh;
+        min-height: var(--min-body-height);
         overflow-x: auto;
     }
 

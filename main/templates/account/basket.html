@@ -9,7 +9,7 @@ Your Basket
 
 {% block main_content %}
 
-<div class="row no-gutters">
+<div class="row">
     <div class="content-container col-12 col-lg-8">
         <h1>Basket Items</h1>
         <table class="table">
@@ -73,38 +73,45 @@ Your Basket
     </div>
     <div class="content-container col-12 col-lg-4">
         <h1>Order Summary</h1>
-        <h6>Pre-discount Item Total:</h6>
+        {% if current_membership_discount %}
+            <h6>Pre-discount Item Total:</h6>
+        {% else %}
+            <h6>Total Payable:</h6>
+        {% endif %}
         {% if basket_membership and basket_activities %}
-        <p>£{{(basket_membership_duration * basket_membership.monthly_price) + total_activity_price}}</p>
+            <p>£{{(basket_membership_duration * basket_membership.monthly_price) + total_activity_price}}</p>
         {% elif basket_activities %}
-        <p>£{{total_activity_price}}</p>
+            <p>£{{total_activity_price}}</p>
         {% elif basket_membership %}
-        <p>£{{ basket_membership_duration * basket_membership.monthly_price}}</p>
+            <p>£{{ basket_membership_duration * basket_membership.monthly_price}}</p>
+        {% else %}
+            <p>£0</p>
         {% endif %}
         {% if current_membership_discount and basket_activities %}
-        <h6>Member Discounts:</h6>
-        <p>{{current_membership_discount}}% on all Activities</p>
-        <p>-£{{ (current_membership_discount/100) * total_activity_price }}</p>
+            <h6>Member Discounts:</h6>
+            <p>{{current_membership_discount}}% on all Activities</p>
+            <p>-£{{ (current_membership_discount/100) * total_activity_price }}</p>
+            <h6>Total Payable:</h6>
+            <p>£{{final_price}}</p>
         {% endif %}
-        <h6>Total Payable:</h6>
-        <p>£{{final_price}}</p>
 
-    <form method="post" action="/transactions/pay-card">
-    <input type="submit" name="submit" value="Pay By Card" class="btn btn-primary">
-    <input type="hidden" name="checkout" value="user_has_checkout">
-    <input type="hidden" name="total_price" value="{{final_price}}">
-    <input type="hidden" name="payment_type" value="card">
-    </form>
+        {% if basket_membership or basket_activities %}
+            <form method="post" action="/transactions/pay-card">
+                <input type="submit" name="submit" value="Pay By Card" class="btn btn-primary">
+                <input type="hidden" name="checkout" value="user_has_checkout">
+                <input type="hidden" name="total_price" value="{{final_price}}">
+                <input type="hidden" name="payment_type" value="card">
+            </form>
 
-    {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
-    <form method="post" action="/transactions/pay-card">
-    <input type="submit" name="submit" value="Pay With Cash" class="btn btn-primary">
-    <input type="hidden" name="checkout" value="user_has_checkout">
-    <input type="hidden" name="total_price" value="{{final_price}}">
-    <input type="hidden" name="payment_type" value="cash">
-    </form>
-    {% endif %}
-
+            {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
+            <form method="post" action="/transactions/pay-card">
+                <input type="submit" name="submit" value="Pay With Cash" class="btn btn-primary">
+                <input type="hidden" name="checkout" value="user_has_checkout">
+                <input type="hidden" name="total_price" value="{{final_price}}">
+                <input type="hidden" name="payment_type" value="cash">
+            </form>
+            {% endif %}
+        {% endif %}
     </div>
 </div>
 
