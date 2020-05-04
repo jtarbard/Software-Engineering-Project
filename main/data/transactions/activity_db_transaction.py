@@ -321,9 +321,47 @@ def return_activity_type(activity_type_id):
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
 
-def return_regular_activities(activity_obj, limit=2):
+def return_regular_activities_before(activity_obj, limit=1000):
     """
-    ...
+    Return a list of "regular activities" with end_time BEFORE the end_time of the activity_obj supplied.
+    Activities are "regular" if:
+        1. they are of the same activity type
+        2. they happen on the weekday (e.g. Monday)
+        3. they have the same start and end time
+    :param activity_obj: a pivot activity, to specify for the list of regular activities
+    :param limit: upper limit of the number of regular activities returned
+    """
+
+    num = 0
+    activities = []
+
+    next_activity = "gimme more"
+
+    # Get all regular activities before this start date
+    while next_activity is not None and num < limit:
+        next_activity = Activity.query.filter(
+            Activity.activity_type_id == activity_obj.activity_type_id,
+            Activity.start_time >= activity_obj.start_time - datetime.timedelta(days=7 * num),
+            Activity.end_time <= activity_obj.end_time - datetime.timedelta(days=7 * num)
+        ).first()
+
+        if next_activity is not None:
+            activities.append(next_activity)
+            num += 1
+
+    # Sort them so the first activity is the oldest activity
+    return sorted(activities, key=lambda activity: activity.start_time.strftime("%Y-%m-%d-%H-%M-%S"))
+
+
+def return_regular_activities_from(activity_obj, limit=2):
+    """
+    Return a list of "regular activities" FROM the start date of the activity_obj supplied.
+    Activities are "regular" if:
+        1. they are of the same activity type
+        2. they happen on the weekday (e.g. Monday)
+        3. they have the same start and end time
+    :param activity_obj: a pivot activity, to specify for the list of regular activities
+    :param limit: upper limit of the number of regular activities returned
     """
     num = 0
     activities = []
@@ -332,6 +370,7 @@ def return_regular_activities(activity_obj, limit=2):
 
     while next_activity is not None and num < limit:
         next_activity = Activity.query.filter(
+            Activity.activity_type_id == activity_obj.activity_type_id,
             Activity.start_time >= activity_obj.start_time + datetime.timedelta(days=7 * num),
             Activity.end_time <= activity_obj.end_time + datetime.timedelta(days=7 * num)
         ).first()
@@ -350,4 +389,4 @@ def return_activity_weeks_available(activity_id):
     """
     activity_obj = Activity.query.filter(Activity.activity_id == activity_id).first()
 
-    return len(return_regular_activities(activity_obj))
+    return len(return_regular_activities_from(activity_obj, 1000))

@@ -50,7 +50,7 @@ def add_booking_to_basket_post():
 
     # Add all selected regular sessions to the basket cookie
     response = cl.add_activity_or_membership_to_basket(
-        booking_objects=adf.return_regular_activities(activity, limit=num_regular_sessions),
+        booking_objects=adf.return_regular_activities_from(activity, limit=num_regular_sessions),
         request=flask.request,
         num_people=booking_amount
     )
@@ -99,19 +99,17 @@ def basket_view():
         response.set_cookie("vertex_basket_cookie", new_activities_basket, max_age=datetime.timedelta(days=1))
         return response
 
-    activity_type_count = bl.return_activity_type_count_from_activity_list(basket_activities)
+    regular_discounts = bl.return_regular_discounts(basket_activities)
 
     activity_and_price = dict()
     total_activity_price = 0
-    for activity in basket_activities:
+    for i, activity in enumerate(basket_activities):
         duration: datetime.timedelta = activity.end_time - activity.start_time
         current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
         number_of_activities = basket_activities.count(activity)
 
-        bulk_discount = bl.return_bulk_discount(activity, activity_type_count=activity_type_count)
-
-        activity_and_price[activity] = (current_price, number_of_activities, bulk_discount)
-        total_activity_price += current_price - (current_price * bulk_discount)
+        activity_and_price[activity] = (current_price, number_of_activities, regular_discounts[i])
+        total_activity_price += current_price - (current_price * regular_discounts[i] / 100)  # TODO: Bad floating point for money
 
     current_membership_discount = 0
     # total_discounted_price = 0  # can uncomment but this is not needed (why is python weird)

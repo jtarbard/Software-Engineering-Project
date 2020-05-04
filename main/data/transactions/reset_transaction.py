@@ -551,7 +551,7 @@ def populate_db(create_timetable, populate_with_random_bookings):
             raise Exception(function_list[1])
 
     if create_timetable:
-        create_pseudorandom_activity_instances(start_date=datetime.today()-timedelta(weeks=2),
+        create_pseudorandom_activity_instances(start_date=datetime.today(),
                                                end_date=timedelta(weeks=4),
                                                populate_with_random_bookings=populate_with_random_bookings)
     return True
