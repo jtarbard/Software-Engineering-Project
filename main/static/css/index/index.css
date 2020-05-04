@@ -1,31 +1,145 @@
 .carousel {
-    height: 90vh;
+    height: 65vh;
+    background: #6505ff;
+    background: linear-gradient(90deg,#6505ff 0%, #6505ff 80%);
+    background: -webkit-linear-gradient(90deg,#6505ff 0%, #6505ff 80%);
+    background: -moz-linear-gradient(90deg,#6505ff 0%, #6505ff 80%);
+    z-index: 1;
 }
 
 .carousel-item {
-  width: 100%;
-  height: 90vh;
+    width: 100%;
+    height: 65vh;
 }
 
 .carousel-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 50%;
 }
 
 #caption {
-    position: absolute;
     width: 100%;
-    margin-top: -35vh;
     align-items: center;
 }
 
 #carousel-btn-container {
-    position: absolute;
-    margin-top: -15vh;
     align-items: center;
 }
 
-/*#carousel-btn {*/
-/*    color: white;*/
-/*}*/
+#introduction {
+    position: relative;
+    margin-top: -20vh;
+    z-index: 100;
+    /*-webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);*/
+    /*-moz-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);*/
+    /*box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);*/
+    margin-bottom: 0;
+}
+
+#introduction h1 {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+    padding: 5vh 0;
+}
+
+.intro-text {
+    width: 80%;
+    margin: auto;
+    text-align: center;
+}
+
+#more_about {
+    width: 40%;
+    margin: auto;
+    margin-top: var(--content-spacer);
+    margin-bottom: var(--content-spacer);
+    background-color: var(--primary-color);
+    text-align: center;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+#more_about h2 {
+    padding: 2vh;
+    font-size: 1rem;
+    color: white;
+}
+
+.media {
+    width: 90%;
+    margin: auto;
+    margin-bottom: var(--content-spacer);
+    background-color: lightgray;
+}
+
+.media p {
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    text-align: left;
+}
+
+.media img {
+    width: 35%;
+    margin: 5%;
+}
+
+.media-body {
+    width: 30%;
+    margin: 5% 5%;
+}
+
+.media-body+img {
+    margin-left: 0;
+}
+
+img+.media-body {
+    margin-left: 0;
+}
+
+.card, .c-body{
+    margin-bottom: 5vh;
+}
+
+.card {
+    padding: 0;
+    width: 90%;
+    margin: auto;
+    overflow: hidden;
+}
+
+.card-img-top {
+    height: 40vw;
+    object-fit: cover;
+
+    filter: brightness(75%);
+    transition: transform .5s ease;
+}
+
+.card-text-overlay {
+    text-transform: unset;
+    color: white;
+}
+
+/*// Medium devices (tablets, 768px and up)*/
+@media (max-width: 768px) {
+    .intro-text {
+        width: 100%;
+    }
+
+    #more_about {
+        width: 90%;
+        margin: auto;
+        margin-top: var(--content-spacer);
+        margin-bottom: var(--content-spacer);
+        background-color: var(--primary-color);
+        text-align: center;
+        text-decoration: none;
+    }
+}

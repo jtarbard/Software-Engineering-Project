@@ -20,20 +20,81 @@ The Vertex-Index!
     <a class="carousel-control-next" href="#carousel" role="button" data-slide="next">
     <span class="carousel-control-next-icon"></span>
     </a>
-    <div id="caption">
-        <div class="carousel-caption">
-            <h1>The Vertex Gym</h1>
+</div>
+<div class="container">
+    <div id="introduction" class="content-container">
+        <h1>The Vertex Sports Center</h1>
+        <p class="intro-text">
+        The Vertex is a large sports centre based in north-west Leeds.
+        Founded in 2000 to meet the needs of Leeds' ever-growing population the centre began with a medium
+        sized gym, pool and outside grounds and has since undergone multiple refurbishments and extensions.
+        The Vertex is now home to a state of the art gym, olympic sized swimming pool, large studio, two
+        sports halls, a tennis court, a climbing wall, and an extensive outside playing field making the
+        Vertex one of the best equipped sports centres in the north of England.
+        </p>
+        <a href="{{ url_for('info.about_func')}}">
+            <div id="more_about">
+                <h2 class="self-align-center">More About The Vertex</h2>
+            </div>
+        </a>
+        <p class="intro-text">
+
+        </p>
+        <div class="d-none d-md-block">
+            <div class="media">
+                <div class="media-body align-self-center">
+                    <h2 class="media-title">Activities</h2>
+                    <p>
+                    The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
+                    instructor and coach lead classes, private court renting sessions, to team events.
+                    </p>
+                </div>
+                <img class="align-self-center" src="../static/imgs/activities-img/basketball-description.jpg">
+            </div>
+            <div class="media">
+                <img class="align-self-center" src="../static/imgs/activities-img/basketball-description.jpg">
+                <div class="media-body align-self-center">
+                    <h2 class="media-title">Memberships</h2>
+                    <p>
+                    The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
+                    instructor and coach lead classes, private court renting sessions, to team events.
+                    </p>
+                </div>
+            </div>
+            <div class="media">
+                <div class="media-body align-self-center">
+                    <h2 class="media-title">Facilities</h2>
+                    <p>
+                    The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
+                    instructor and coach lead classes, private court renting sessions, to team events.
+                    </p>
+                </div>
+                <img class="align-self-center" src="../static/imgs/activities-img/basketball-description.jpg">
+            </div>
         </div>
     </div>
-    <div class="container col text-center" id="carousel-btn-container">
-        <a class="btn btn-lg bg-black" id="carousel-btn" href="../info/memberships">Join Now</a>
+    <div class="d-block d-md-none">
+        <div class="card-deck">
+            <div class="card">
+                <img class="card-img-top" src="../static/imgs/activities-img/basketball-description.jpg">
+                <div class="card-img-overlay d-flex align-items-center justify-content-center">
+                    <h2 class="card-text-overlay">Activities</h2>
+                </div>
+            </div>
+            <div class="card">
+                <img class="card-img-top" src="../static/imgs/activities-img/basketball-description.jpg">
+                <div class="card-img-overlay d-flex align-items-center justify-content-center">
+                    <h2 class="card-text-overlay">Activities</h2>
+                </div>
+            </div>
+            <div class="card">
+                <img class="card-img-top" src="../static/imgs/activities-img/basketball-description.jpg">
+                <div class="card-img-overlay d-flex align-items-center justify-content-center">
+                    <h2 class="card-text-overlay">Activities</h2>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-<!--<h2>Index page</h2>-->
-<!--    <a href="/account/login">Login (with any account type)</a><br>-->
-<!--    <a href="/account/register">Customer Register</a><br>-->
-<!--    {%  if User %}-->
-<!--    <a href="/account/your_account">View account</a><br>-->
-<!--    {% endif %}-->
 {% endblock %}
 

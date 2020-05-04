@@ -4,6 +4,7 @@
     --secondary-color: #1e1e1e;
     --neutral-color: grey;
     --min-body-height: 86.5vh;
+    --content-spacer: 5vh;
 }
 
 html {
