@@ -51,7 +51,7 @@ def return_regular_discounts(basket_activities=None):
     # Using the activity_id of the first returned regular activity list as the key,
     # increment if the same list is returned
     activity_regular_key = list()
-    prev_activity_id = -1  # used to check if the current activity id is the same as the previous one
+    counted_activity_ids = list()
     regular_count = dict()
 
     for activity in basket_activities:
@@ -61,11 +61,9 @@ def return_regular_discounts(basket_activities=None):
         if regular_count.get(first_act_id, None) is None:
             regular_count[first_act_id] = 1
         # If the basket contains multiple bookings of the same activity, only count the activity once
-        elif not activity.activity_id == prev_activity_id:
+        elif activity.activity_id not in counted_activity_ids:
             regular_count[first_act_id] += 1
 
-        prev_activity_id = activity.activity_id
+        counted_activity_ids.append(activity.activity_id)
 
-    print(activity_regular_key)
-    print(regular_count)
     return [regular_discount(regular_count[key]) for key in activity_regular_key]
