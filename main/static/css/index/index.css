@@ -103,28 +103,35 @@ img+.media-body {
     margin-left: 0;
 }
 
-.card, .c-body{
-    margin-bottom: 5vh;
-}
-
 .card {
     padding: 0;
-    width: 90%;
-    margin: auto;
+    margin-bottom: var(--content-spacer) !important;
     overflow: hidden;
+    -webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);
+    -moz-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);
+    box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);
+    background-color: lightgray;
+}
+
+.card-header {
+    border: none;
+    background-color: lightgray;
+    text-align: center;
 }
 
 .card-img-top {
-    height: 40vw;
+    width: 90%;
+    height: 20vh;
+    margin: auto;
     object-fit: cover;
-
-    filter: brightness(75%);
-    transition: transform .5s ease;
 }
 
-.card-text-overlay {
-    text-transform: unset;
-    color: white;
+.card-body {
+    text-align: center;
+}
+
+.card-body p {
+    margin: 0;
 }
 
 /*// Medium devices (tablets, 768px and up)*/
