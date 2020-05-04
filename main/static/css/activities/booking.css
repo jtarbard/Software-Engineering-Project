@@ -120,3 +120,16 @@ input {
 /*    line-height: 10vh;*/
 /*    text-align: center;*/
 /*}*/
+select.filter{
+  width: 100% !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: #2C3E50 !important;
+    color: white !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    color: white !important;
+    padding-right: 0.3rem !important;
+}

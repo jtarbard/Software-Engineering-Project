@@ -4,15 +4,24 @@ import csv
 from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
-from main.data.db_classes.activity_db_class import ActivityType, Activity, Facility
+from main.data.db_classes.activity_db_class import ActivityType, Activity, FacilityType, Facility
 import main.data.transactions.employee_data_transaction as edf
 
 TAGS_CSV = "main/data/transactions/valid_tags.csv"
 
 
-# Returns the activity with the same id as the parameter
-# [Lewis S]
+def return_facility_type_with_name(name: str):
+    """
+    Returns the facility type with the same name as the parameter
+    """
+    return FacilityType.query.filter(FacilityType.facility_type_name == name.lower()).first()
+
+
 def return_activity_type_with_id(activity_type_id: int):
+    """
+    Returns the activity with the same id as the parameter
+    [Lewis S]
+    """
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
 
@@ -115,7 +124,7 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
     if len(category) < 4 or len(category) > 20 or not category.replace(" ", "").isalpha():
         log_transaction(f"Failed to add new activity type {name}: category not correct length or type")
         return False
-    if len(description) < 10 or len(description) > 200:
+    if len(description) < 10 or len(description) > 400:
         log_transaction(f"Failed to add new activity type {name}: description not correct length or type")
         return False
     if miniumum_age < 0 or miniumum_age > 100:
@@ -226,7 +235,7 @@ def create_new_activity(activity_type_id: int, facility_name: str, start_time: d
                             start_time=start_time, end_time=end_time)
 
     add_to_database(new_activity)
-    log_transaction(f"Added new activity with id {activity_type_id} starting on {start_time} in facility {facility_name}")
+    log_transaction(f"Added new activity with type_id {activity_type_id} starting on {start_time} in facility {facility_name}")
     return new_activity
 
 
@@ -311,3 +320,73 @@ def return_facilities(facility_id):
 def return_activity_type(activity_type_id):
     return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
+
+def return_regular_activities_before(activity_obj, limit=1000):
+    """
+    Return a list of "regular activities" with end_time BEFORE the end_time of the activity_obj supplied.
+    Activities are "regular" if:
+        1. they are of the same activity type
+        2. they happen on the weekday (e.g. Monday)
+        3. they have the same start and end time
+    :param activity_obj: a pivot activity, to specify for the list of regular activities
+    :param limit: upper limit of the number of regular activities returned
+    """
+
+    num = 0
+    activities = []
+
+    next_activity = "gimme more"
+
+    # Get all regular activities before this start date
+    while next_activity is not None and num < limit:
+        next_activity = Activity.query.filter(
+            Activity.activity_type_id == activity_obj.activity_type_id,
+            Activity.start_time >= activity_obj.start_time - datetime.timedelta(days=7 * num),
+            Activity.end_time <= activity_obj.end_time - datetime.timedelta(days=7 * num)
+        ).first()
+
+        if next_activity is not None:
+            activities.append(next_activity)
+            num += 1
+
+    # Sort them so the first activity is the oldest activity
+    return sorted(activities, key=lambda activity: activity.start_time.strftime("%Y-%m-%d-%H-%M-%S"))
+
+
+def return_regular_activities_from(activity_obj, limit=2):
+    """
+    Return a list of "regular activities" FROM the start date of the activity_obj supplied.
+    Activities are "regular" if:
+        1. they are of the same activity type
+        2. they happen on the weekday (e.g. Monday)
+        3. they have the same start and end time
+    :param activity_obj: a pivot activity, to specify for the list of regular activities
+    :param limit: upper limit of the number of regular activities returned
+    """
+    num = 0
+    activities = []
+
+    next_activity = "gimme more"
+
+    while next_activity is not None and num < limit:
+        next_activity = Activity.query.filter(
+            Activity.activity_type_id == activity_obj.activity_type_id,
+            Activity.start_time >= activity_obj.start_time + datetime.timedelta(days=7 * num),
+            Activity.end_time <= activity_obj.end_time + datetime.timedelta(days=7 * num)
+        ).first()
+
+        if next_activity is not None:
+            activities.append(next_activity)
+            num += 1
+
+    return activities
+
+
+def return_activity_weeks_available(activity_id):
+    """
+    Based on the time (e.g. Monday 10am-11am) of the activity with id :param activity_id:,
+    find the number of consecutive weekly sessions with the same time.
+    """
+    activity_obj = Activity.query.filter(Activity.activity_id == activity_id).first()
+
+    return len(return_regular_activities_from(activity_obj, 1000))

@@ -48,8 +48,7 @@ def return_facility_with_name(facility_name: str):
 
 
 def return_facility_name_with_facility_id(facility_id):
-    facility = Facility.query.filter(Facility.facility_id == facility_id).first()
-    return facility.name
+    return return_facility_with_id(facility_id).name
 
 
 def return_role_id_with_name(role):

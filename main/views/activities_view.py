@@ -21,11 +21,10 @@ def view_activity_types():
     if response:
         return response
 
-    # View a chosen activity type's booking
     if flask.request.method == "POST":
-        data_form = flask.request.form
-        request_activity_type_id = data_form.get("request_activity_type_id")
+        request_activity_type_id = flask.request.form.get("request_activity_type_id")
 
+        # View a chosen activity type's booking, or view all activities and filter as desired
         return flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=request_activity_type_id))
 
     # = GET. View activity_types page (url is /activities/types)
@@ -43,43 +42,35 @@ def view_booking():
     if response:
         return response
 
-    # Get data from request
+    # Get this from the url argument (?request_activity_type_id=...)
     request_activity_type_id = flask.request.args.get("request_activity_type_id")
-    print("args", flask.request.args)
 
-    is_valid, basket_activities, basket_membership, basket_membership_duration = \
-        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    activity_type = adf.return_activity_type(request_activity_type_id)  # The supplied id can be invalid,
+                                                                        # or the url doesn't contain a supplied id - in this case, it indicates the "show all" page is requested
 
-    session_availabilities = dict()
+    page_title = "Booking" if activity_type is None else "Book " + activity_type.name.title()
 
-    weekly_activities = adf.return_weekly_activities_of_type(
-        day=datetime.datetime.today(),
-        activity_type_id=request_activity_type_id
-    )
-
-    activity_type = adf.return_activity_type(request_activity_type_id)
-
-    activity_capacities = adf.return_activity_type_capacities()
-    for session in weekly_activities:
-        if basket_activities:
-            amount_in_basket = basket_activities.count(session)
-            if amount_in_basket >= 8:
-                continue
-        else:
-            amount_in_basket = 0
-
-        availability = activity_capacities[session.activity_type_id] - len(tdf.return_bookings_with_activity_id(session.activity_id)) - amount_in_basket
-        if availability <= 0:
-            continue
-
-        session_availabilities[session] = availability
+    # is_valid, basket_activities, basket_membership, basket_membership_duration = \
+    #     tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+    #
+    # for session in weekly_activities:
+    #     if basket_activities:
+    #         amount_in_basket = basket_activities.count(session)
+    #         if amount_in_basket >= 8:
+    #             continue
+    #     else:
+    #         amount_in_basket = 0
+    #
+    #     availability = activity_capacities[session.activity_type_id] - len(tdf.return_bookings_with_activity_id(session.activity_id)) - amount_in_basket
+    #     if availability <= 0:
+    #         continue
 
     return flask.render_template("/activities/booking.html",
                                  User=user,
-                                 session_availabilities=session_availabilities,
                                  has_cookie=has_cookie,
                                  activity_type=activity_type,
-                                 page_title="Book " + activity_type.name.title())
+                                 facilities=adf.return_facilities("Any"),
+                                 page_title=page_title)
 
 
 # -------------------------------------------------- Ajax routes -------------------------------------------------- #
@@ -92,8 +83,8 @@ def query_sessions():
     :return: the sessions within the supplied date range
     """
 
-    activity_type = flask.request.json.get("activity_type")
-    activity_type_id = flask.request.json.get("activity_type_id")
+    activity_type = flask.request.json.get("activity_type", None)
+    activity_type_id = flask.request.json.get("activity_type_id", None)
     start_date = flask.request.json.get("start_date")
     end_date = flask.request.json.get("end_date")  # note: exclusive
 
@@ -105,7 +96,8 @@ def query_sessions():
         data.append(dict(id=session.activity_id,
                          name=session.activity_type.name.title(),
                          description=session.activity_type.description,
-                         facility=session.facility.name,
+                         facility_id=session.facility.facility_id,
+                         facility_name=session.facility.name.title(),
                          start=session.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
                          end=session.end_time.strftime("%Y-%m-%dT%H:%M:%S")))
     response = flask.make_response(json.dumps(data))
@@ -160,6 +152,7 @@ def query_session():
         session_price=round(session_price, 2),  # TODO: Bad #135
         subtotal=round(subtotal, 2),  # TODO: Bad #135
         max_booking=min(spaces_left, 8),
+        num_weeks_available=adf.return_activity_weeks_available(id),
 
         status_code=status_code,
         redirect_route=redirect_route,

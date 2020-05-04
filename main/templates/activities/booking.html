@@ -9,67 +9,23 @@
 <link href='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.css' rel='stylesheet' />
 <link href='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.css' rel='stylesheet' />
 
-{% endblock %}
+<!-- multi selection box -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
 
-{% block title %}
-Booking Page
 {% endblock %}
 
 {% block main_content %}
-<!-- Modal -->
-<div class="modal fade" id="bookingModal" tabindex="-1" role="dialog" aria-labelledby="bookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="bookingModalLabel">Book for</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span aria-hidden="true">&times;</span>
-                </button>
+    {% include "activities/booking_modal.html" %}
+
+    <!-- Header TODO: Add -->
+
+    <div class="container">
+        {% if activity_type is not none %}
+            <!-- activity info -->
+            <div class="content-container">
+                <p>Activity Description:</p>
+                <p>{{ activity_type.description }}</p>
             </div>
-            <div class="modal-body" id="sessionInfo">
-                <input type="hidden" name="activity_id" id="activityID">
-
-                <ul id="sessionInfoList">
-                    <!-- Session info elements added on click -->
-                </ul>
-
-                <!-- Number of people slider -->
-                <div class="row" id="sessionNumPeople">
-                    <div class="col-md-4">
-                        <label for="sessionNumPeopleSlider">Number of people: </label>
-                    </div>
-                    <div class="col-md-7">
-                        <input type="range" class="custom-range" min="1" max="8" data-slider-value="1" id="sessionNumPeopleSlider" name="num_people">
-                    </div>
-                    <div class="col-md-1">
-                        <b id="sessionNumPeopleVal">1</b>
-                    </div>
-                </div>
-
-                <p hidden id="membershipDiscount">0</p> <!-- 0-100. Indicates how much should be discounted, i.e. X/100 off -->
-                <p hidden id="sessionPrice"></p>
-                <p id="subtotal">Subtotal: £0.0</p>
-
-                <div class="alert-success" role="alert" id="membershipDisplay">
-                    <p class="display-12">No membership.</p>
-                </div>
-
-<!--                <div class="jumbotron jumbotron-fluid" id="membershipDisplay"> &lt;!&ndash; TODO: Try jumbotron. I didn't know how to resize it, but on smaller size i'd imagine it to look good &ndash;&gt;-->
-<!--                    <p class="display-12">No membership.</p>-->
-<!--                </div>-->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <form action="/misc/add_booking_to_basket" method="post">
-                    <input type="hidden" name="amount_of_people" value="1" id="amountOfPeopleSubmit">
-                    <input name="activity" type="hidden" value="" id="activitySubmit">
-                    <input type="submit" class="btn btn-primary" id="addToBasket" value="Add to Basket">
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal -->
 
 <!-- activity info -->
 <div id="descriptionContainer" class="fluid-container">
@@ -114,20 +70,29 @@ Booking Page
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        {% endif %}
 
-    <div class="content-container">
-        <h6>Book for a session:</h6>
-        <!-- Scheduler -->
-        <div id="calendar"></div>
-    <div>
-</div>
+        <!-- Timetable -->
+        <div class="content-container">
+            <h6>Book for a session:</h6>
+            <!-- Facility Filter -->
+            <div class="input-group">
+                <select class="form-control" id="facilityFilter" multiple="multiple">
+                    {% for facility in facilities %}
+                        <option value="{{ facility.facility_id }}">{{ facility.name.title() }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <!-- Calendar / Timetable -->
+            <div id="calendar"></div>
+        <div>
+    </div>
 </div>
 {% endblock %}
 
 {% block additional_js %}
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+
 <script src='https://unpkg.com/@fullcalendar/core@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/bootstrap@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/interaction@4.4.0/main.min.js'></script>
@@ -135,26 +100,48 @@ Booking Page
 <script src='https://unpkg.com/@fullcalendar/timegrid@4.4.0/main.min.js'></script>
 <script src='https://unpkg.com/@fullcalendar/list@4.4.0/main.min.js'></script>
 
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
 <script>
+    // ----- Multi Selection Boxes ----- //
+    // TODO: use jquery to find all ".filter" class (or some custom class), initialize all of them with select2
+    var facilityFilter = $("#facilityFilter");
+    facilityFilter.select2({
+       placeholder: "Filter Facility",
+       allowClear: true
+    });
+
+    // update calendar on change
+    facilityFilter.on("change", function(e) {
+        // Rerender (note: .render() is broken. It doesn't do anything after initialization), hence this workaround
+        calendar.prev();
+        calendar.next();
+    });
+
     // ----- Booking Calendars ----- //
-    // If the list is a heap, then each insert is O(log n) so it's performant still
-    var queryHistory = {}; // { activity_type_id: [{query} object literals] }. If this object literal exists, then the retrieved events must exist
-    var existingSessions = {}; // { activity_type_id: [{session} object literals] }.
+    var queryHistory = []; // query strings. If this object literal exists, then the retrieved events must exist
+    var existingSessions = []; // session strings
+
+    var calendarEl = document.getElementById("calendar");
+    var calendar;
 
     document.addEventListener('DOMContentLoaded', function() {
-        // initialize
-        queryHistory = [];
-        existingSessions = [];
+        {% if activity_type is none %}
+        var defaultViewCalendar = "timeGridDay";
+        var availableViewsCalendar = "timeGridDay,listDay";
+        {% else %}
+        var defaultViewCalendar = "timeGridWeek";
+        var availableViewsCalendar = "dayGridMonth,timeGridWeek,timeGridDay,listWeek";
+        {% endif %}
 
-        var calendarEl = document.getElementById("calendar");
-
-        var calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(calendarEl, {
             plugins: [ 'bootstrap', 'interaction', 'dayGrid', 'timeGrid', 'list' ],
-            defaultView: 'timeGridWeek',
+            defaultView: defaultViewCalendar,
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek'
+                right: availableViewsCalendar
             },
             buttonText: {
                 today: 'Today',
@@ -165,7 +152,7 @@ Booking Page
             },
             events: [],
 
-            // ----- Styling -----
+            // ----- Styling ----- //
             eventTextColor: "#FFFFFF",
             eventBorderColor: "#000000",
             eventBackgroundColor: "#000000",
@@ -197,6 +184,7 @@ Booking Page
                         var sessionInfoList = modal.find("#sessionInfoList");
 
                         sessionInfoList.html(
+                            "<li>Venue: " + info.event.extendedProps.facility_name + "</li>\n" +
                             "<li>Start time: " + info.event.start + "</li>\n" +
                             "<li>End time: " + info.event.end + "</li>\n" +
                             "<li>Minimum age: " + session.minimum_age + "</li>\n" +
@@ -207,7 +195,7 @@ Booking Page
                         modal.find("#sessionPrice").val(session.session_price);
                         modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
 
-                        {% if User is not defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                        {% if User is defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
                         sessionInfoList.append(
                             "<li><b>Manager Info:</b></li>",
                             "<li>Total bookings: " + session.total_bookings + "</li>",
@@ -225,6 +213,16 @@ Booking Page
                             modal.find("#membershipDisplay").attr("hidden", "hidden");
                         }
 
+
+
+                        var numWeeksAvailable = $("#regularSessionSelect");
+                        numWeeksAvailable.html("<option>1</option>");
+                        for (let i = 2; i <= session.num_weeks_available; i++) {
+                            numWeeksAvailable.append("<option>" + i + "</option>");
+                        }
+
+
+
                         $("#activitySubmit").attr("value", info.event.extendedProps.id);
                     },
                     error: function(jqXHR) {
@@ -232,7 +230,7 @@ Booking Page
                     }
                 });
 
-                modal.find(".modal-title").text("Book for " + info.event.title);
+                modal.find(".modal-title").text("Book for " + info.event.title.split("\n")[0]);
             },
 
             // When a new set of dates has been rendered, query the info for uncached sessions, and put them into the calendar
@@ -244,7 +242,9 @@ Booking Page
                 $(".fc-right").addClass("col-12 col-md-4");
 
                 let query = {
-                    activity_type_id: {{ activity_type.activity_type_id }},
+                    {% if activity_type is not none %}
+                        activity_type_id: {{ activity_type.activity_type_id }},
+                    {% endif %}
                     start_date: info.view.activeStart,
                     end_date: info.view.activeEnd
                 };
@@ -263,11 +263,13 @@ Booking Page
                             results = JSON.parse(results);
                             for (let i = 0; i < results.length; i++) {
                                 var session = {
-                                    title: results[i].name,
+                                    title: results[i].name + "\nVenue: " + results[i].facility_name,
                                     start: results[i].start,
                                     end: results[i].end,
                                     extendedProps: {
-                                        id: results[i].id
+                                        id: results[i].id,
+                                        facility_id: results[i].facility_id,
+                                        facility_name: results[i].facility_name
                                     }
                                 };
                                 var sessionStr = JSON.stringify(session);
@@ -290,6 +292,17 @@ Booking Page
             // TODO: Not sure how to use this
             batchRendering: function() {
 
+            },
+
+            // Called when an event (session) is rendered in the calendar
+            eventRender: function(info) {
+                const selectedFacilities = facilityFilter.select2('data');
+                for (let i = 0; i < selectedFacilities.length; i++) {
+                    if (info.event.extendedProps.facility_id === parseInt(selectedFacilities[i].id)) {
+                        return true;
+                    }
+                }
+                return selectedFacilities.length === 0; // render everything if no facility is selected
             }
         });
 
@@ -301,12 +314,12 @@ Booking Page
         $(".fc-right").addClass("col-12 col-md-4");
     });
 
-    // Add to basket button
+    // ----- Add to basket button  ----- //
     $("#addToBasket").on("click", function(e) {
         $('#bookingModal').modal("hide");
     });
 
-    // Number of people slider
+    // ----- Number of people slider  ----- //
     var slider = $("#sessionNumPeopleSlider");
     slider.val(1);
     slider.on("input change", function(e) {
@@ -314,6 +327,12 @@ Booking Page
         $("#amountOfPeopleSubmit").attr("value", $(this).val());
         // Also update the subtotal price   TODO: Bad #135
         $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() * (100-$("#membershipDiscount").val())/100 + "</p>");
+    });
+
+    // number of regular sessions selection box
+    var regularSess = $("#regularSessionSelect");
+    regularSess.on("change", function(e) {
+        $("#numRegularSessionsSubmit").attr("value", $(this).val());
     });
 </script>
 {% endblock %}
