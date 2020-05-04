@@ -1,7 +1,7 @@
 import random
 import datetime
 
-from main.data.db_classes.activity_db_class import Activity, ActivityType, Facility
+from main.data.db_classes.activity_db_class import Activity, ActivityType, Facility, FacilityType
 
 
 def test_activity_type_legal():
@@ -59,8 +59,8 @@ def test_activity_legal():
         assert activity.end_time == end_time
 
 
-def test_facility_legal():
-    names = ["Basketball Court", "ALLCAPS"]
+def test_facility_type_legal():
+    names = ["Basketball Court Type", "ALLCAPS"]
     descriptions = ["Lorem Ipsum",
                     "1234567890!@#$%^&*()-=_+qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`~[]{}\\|;':\",./<>?"]
 
@@ -68,13 +68,29 @@ def test_facility_legal():
     exp_names = ["basketball court", "allcaps"]
     exp_descriptions = ["Lorem Ipsum",
                         "1234567890!@#$%^&*()-=_+qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM`~[]{}\\|;':\",./<>?"]
+
     for i in range(500):
         index = i % len(names)
 
         max_cap = random.randint(3, 1000)
-        facility = Facility(name=names[index], description=descriptions[index], max_capacity=max_cap)
+        facility_type = FacilityType(facility_type_name=names[index], description=descriptions[index], max_capacity=max_cap)
+
+        assert facility_type.facility_type_name == exp_names[index]
+        assert facility_type.description == exp_descriptions[index]
+        assert facility_type.max_capacity == max_cap
+
+
+def test_facility_legal():
+    names = ["Basketball Court", "ALLCAPS"]
+
+    # Change expected result as implementation decision changes, but the tests should still pass after those changes
+    exp_names = ["basketball court", "allcaps"]
+
+    for i in range(500):
+        index = i % len(names)
+
+        facility = Facility(name=names[index], facility_type_id=i)
 
         assert facility.name == exp_names[index]
-        assert facility.description == exp_descriptions[index]
-        assert facility.max_capacity == max_cap
+        assert facility.facility_type_id == i
 

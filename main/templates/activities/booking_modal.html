@@ -28,6 +28,21 @@
                         </div>
                     </div>
 
+                    <!-- Buy weekly sessions -->
+                    <div class="form-row" id="weeklySession">
+                        <div class="col-md-8">
+                            Book sessions at this time for
+                        </div>
+                        <div class="input-group col-md-4">
+                            <select class="form-control" id="regularSessionSelect">
+                                <option>1</option>
+                            </select>
+                            <div class="input-group-append">
+                                <span class="input-group-text">weeks</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <p hidden id="membershipDiscount">0</p> <!-- 0-100. Indicates how much should be discounted, i.e. X/100 off -->
                     <p hidden id="sessionPrice"></p>
                     <p id="subtotal">Subtotal: £0.0</p>
@@ -41,6 +56,7 @@
                     <form action="/misc/add_booking_to_basket" method="post">
                         <input type="hidden" name="amount_of_people" value="1" id="amountOfPeopleSubmit">
                         <input name="activity" type="hidden" value="" id="activitySubmit">
+                        <input type="hidden" name="num_regular_sessions" value="1" id="numRegularSessionsSubmit">
                         <input type="submit" class="btn btn-primary" id="addToBasket" value="Add to Basket">
                     </form>
                 </div>

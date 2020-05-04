@@ -10,16 +10,16 @@ The Vertex - Facilities!
 {% block main_content %}
 <div class="container">
     <div class="row row-cols-1 row-cols-md-2">
-        {% for facility in facilities %}
-        <div class="col-12 col-md-6" id="{{facility.facility_id}}">
+        {% for facility_type in facility_types %}
+        <div class="col-12 col-md-6" id="{{ facility_type.facility_type_id }}">
             <div class="card">
-              <img src="/static/imgs/facility-img/facility{{ facility.facility_id }}.jpg" class="card-img-top" alt="{{ facility.facility_id }}">
+              <img src="/static/imgs/facility-img/facility{{ facility_type.facility_type_id }}.jpg" class="card-img-top" alt="Illustration of the facility &ldquo;{{ facility_type.facility_type_name }}&rdquo;">
               <div class="card-body">
-                <h2 class="card-title">{{ facility.name.title() }}</h2>
+                <h2 class="card-title">{{ facility_type.facility_type_name.title() }}</h2>
                 <p class="card-text">
-                    {{ facility.description }}
+                    {{ facility_type.description }}
                     <br>
-                    Capacity: {{ facility.max_capacity }}
+                    Capacity: {{ facility_type.max_capacity }}
                 </p>
               </div>
             </div>

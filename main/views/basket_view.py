@@ -20,6 +20,7 @@ def add_booking_to_basket_post():
     data_form = flask.request.form
     activity = adf.return_activity_with_id(data_form.get('activity'))
     booking_amount: int = int(data_form.get("amount_of_people"))
+    num_regular_sessions: int = int(data_form.get("num_regular_sessions"))
 
     if not activity or not booking_amount:
         flask.flash("Not checked out or booked activity", category="error")
@@ -47,7 +48,12 @@ def add_booking_to_basket_post():
         return flask.render_template("/misc/general_error.html", error="Not enough spaces left on activity",
                                      User=user, has_cookie=has_cookie)
 
-    response = cl.add_activity_or_membership_to_basket(activity, flask.request, num_people=booking_amount)
+    # Add all selected regular sessions to the basket cookie
+    response = cl.add_activity_or_membership_to_basket(
+        booking_objects=adf.return_regular_activities(activity, limit=num_regular_sessions),
+        request=flask.request,
+        num_people=booking_amount
+    )
 
     if not response:
         return flask.abort(500)

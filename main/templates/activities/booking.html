@@ -201,6 +201,16 @@
                             modal.find("#membershipDisplay").attr("hidden", "hidden");
                         }
 
+
+
+                        var numWeeksAvailable = $("#regularSessionSelect");
+                        numWeeksAvailable.html("<option>1</option>");
+                        for (let i = 2; i <= session.num_weeks_available; i++) {
+                            numWeeksAvailable.append("<option>" + i + "</option>");
+                        }
+
+
+
                         $("#activitySubmit").attr("value", info.event.extendedProps.id);
                     },
                     error: function(jqXHR) {
@@ -305,6 +315,12 @@
         $("#amountOfPeopleSubmit").attr("value", $(this).val());
         // Also update the subtotal price   TODO: Bad #135
         $("#subtotal").html("<p>Subtotal: £" + $("#sessionPrice").val() * $(this).val() * (100-$("#membershipDiscount").val())/100 + "</p>");
+    });
+
+    // number of regular sessions selection box
+    var regularSess = $("#regularSessionSelect");
+    regularSess.on("change", function(e) {
+        $("#numRegularSessionsSubmit").attr("value", $(this).val());
     });
 </script>
 {% endblock %}

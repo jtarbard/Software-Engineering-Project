@@ -5,10 +5,11 @@ from main.data.db_session import database
 
 from main.data.db_classes.transaction_db_class import MembershipType, Membership, PaymentDetails, Receipt, Booking
 from main.data.db_classes.employee_data_db_class import Employee_Router, Role
-from main.data.db_classes.activity_db_class import ActivityType, Activity, Facility
+from main.data.db_classes.activity_db_class import ActivityType, Activity, FacilityType, Facility
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
 # These are created in create_all(), at runtime, before any test is run.
+facility_type_objs = []
 facility_objs = []
 membership_type_objs = []
 activity_type_objs = []
@@ -21,13 +22,20 @@ employee_objs = []
 manager_objs = []
 
 
-def create_facilities():
-    names = ["Central Hub"]
+def create_facility_types():
+    names = ["Central Hub Type"]
     descriptions = ["For basket cookies purpose, there is only 1 facility."]
     max_capacities = [314]
 
-    return [ Facility(name=names[i], description=descriptions[i], max_capacity=max_capacities[i])
-             for i in range(len(names))]
+    return [ FacilityType(facility_type_name=names[i], description=descriptions[i], max_capacity=max_capacities[i])
+             for i in range(len(names)) ]
+
+
+def create_facilities():
+    names = ["Central Hub 1"]
+
+    return [ Facility(name=names[i], facility_type_id=1)
+             for i in range(len(names)) ]
 
 
 def create_membership_types():
