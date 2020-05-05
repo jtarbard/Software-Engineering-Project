@@ -27,6 +27,10 @@
     opacity: 50%;
 }
 
+.carousel-inner > .item {
+    transition: 1s ease-in-out left;
+}
+
 #caption {
     width: 100%;
     align-items: center;

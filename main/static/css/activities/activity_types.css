@@ -24,13 +24,6 @@
     transform: scale(1.1);
 }
 
-#view_all, #view_all:hover *:not(.card-img-overlay) {
-    transition: none;
-    -webkit-filter: none; /* Chrome, Safari, Opera */
-    filter: none;
-    transform: scale(1);
-}
-
 @media (max-width: 768px) {
     .card-img-top {
         height: 50vw;
@@ -38,11 +31,9 @@
 }
 
 .card-text-overlay {
-    /*font-family: 'Poppins', sans-serif;*/
-    /*font-weight: 600;*/
-    /*letter-spacing: 1px;*/
-    /*text-transform: unset;*/
     color: white;
 }
 
-
+#view_all {
+    margin-bottom: var(--content-spacer);
+}
