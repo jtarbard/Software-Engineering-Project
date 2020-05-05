@@ -1,5 +1,8 @@
 .media {
     position: relative;
+    -webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
+    -moz-box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
+    box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
 }
 
 .media-body {

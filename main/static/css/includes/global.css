@@ -55,7 +55,6 @@ h2, h3, h4, h5, h6, .navbar {
     border-color: white;
     padding: var(--content-spacer);
     margin-bottom: 3vh;
-    background-color: var(--light-color);
 }
 
 /*// Medium devices (tablets, 768px and up)*/
