@@ -4,7 +4,7 @@ import csv
 from main.data.db_session import add_to_database
 from main.logger import log_transaction
 
-from main.data.db_classes.activity_db_class import ActivityType, Activity, FacilityType, Facility
+from main.data.db_classes.activity_db_class import ActivityType, SessionType, Activity, FacilityType, Facility
 import main.data.transactions.employee_data_transaction as edf
 
 TAGS_CSV = "main/data/transactions/valid_tags.csv"
@@ -17,32 +17,32 @@ def return_facility_type_with_name(name: str):
     return FacilityType.query.filter(FacilityType.facility_type_name == name.lower()).first()
 
 
-def return_activity_type_with_id(activity_type_id: int):
+def return_session_type_with_id(session_type_id: int):
     """
-    Returns the activity with the same id as the parameter
+    Returns the SessionType with the same id as the parameter
     [Lewis S]
     """
-    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+    return SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
 
 
-# Attempts to return the name of an activity type with a specific activity type ID, this is to combat
+# Attempts to return the name of an session type with a specific session type ID, this is to combat
 # lazy loading errors
 # [Lewis S]
-def return_activity_type_name_with_activity_type_id(activity_type_id):
-    activity_type: ActivityType = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+def return_session_type_name_with_activity_type_id(session_type_id):
+    session_type: SessionType = SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
 
     # if not activity_type:
     #     log_transaction(f"Failed to return activity type name with activity type ID: {activity_type_id} from DB")
     # else:
     #     log_transaction(f"Successfully returned activity type name with activity type ID: {activity_type_id} from DB")
 
-    return str(activity_type.name)
+    return str(session_type.session_type_name)
 
 
-# Returns an activity with the same name as the parameter
+# Returns the session type with the same name as the parameter
 # [Lewis S]
-def return_activity_type_with_name(activity_type_name: str):
-    return ActivityType.query.filter(ActivityType.name == activity_type_name.lower()).first()
+def return_session_type_with_name(session_type_name: str):
+    return SessionType.query.filter(SessionType.session_type_name == session_type_name.lower()).first()
 
 
 # Attempts to add a tag to the list of tags in the csv file, if the tag exists in the csv file then the new tag is
@@ -94,13 +94,21 @@ def check_tags_are_valid(tag_list: list):
     return True
 
 
-# Returns all the activity types stored in the database
-# [Lewis S]
 def return_all_activity_types():
+    """
+    Returns all the activity types (e.g. "Tennis") stored in the database
+    """
     return ActivityType.query.all()
 
 
-# Used for creating a new activity type, each of the following parameters are checked as follows:
+def return_all_session_types():
+    """
+    Returns all the session types (e.g. "Tennis Team Event") stored in the database
+    """
+    return SessionType.query.all()
+
+
+# Used for creating a new session type, each of the following parameters are checked as follows:
 #    -Name must been 3 and 20, and cannot contain spaces or special characters, and the activity of that
 #     name cannot already be in the database
 #    -Description must be between 10 and 200
@@ -114,54 +122,62 @@ def return_all_activity_types():
 #    -Min staff must be between 0 and 10 (and minimum staff must be less than the maximum staff)
 #    -The tags must match the tags stored in the valid_tags.csv file
 # [Lewis S]
-def create_new_activity_type(name: str, description: str, category: str, tags_list: list, miniumum_age: int,
-                             maximum_activity_capacity: int, hourly_activity_cost: int, hourly_activity_price: int,
-                             max_staff: int, min_staff: int):
+def create_new_session_type(activity_type_name: str, name: str, description: str, category: str, tags_list: list,
+                            minimum_age: int, maximum_activity_capacity: int,
+                            hourly_activity_cost: int, hourly_activity_price: int,
+                            max_staff: int, min_staff: int):
 
+    activity_type = return_activity_type_with_name(activity_type_name)
+
+    if activity_type is None:
+        log_transaction(f"Failed to add new session type {name}: did not find an activity type with name {activity_type_name}")
+        return False
     if len(name) < 3 or len(name) > 20 or not name.replace(" ", "").isalpha():
-        log_transaction(f"Failed to add new activity type {name}: name not correct length or type")
+        log_transaction(f"Failed to add new session type {name}: name not correct length or type")
         return False
     if len(category) < 4 or len(category) > 20 or not category.replace(" ", "").isalpha():
-        log_transaction(f"Failed to add new activity type {name}: category not correct length or type")
+        log_transaction(f"Failed to add new session type {name}: category not correct length or type")
         return False
     if len(description) < 10 or len(description) > 400:
-        log_transaction(f"Failed to add new activity type {name}: description not correct length or type")
+        log_transaction(f"Failed to add new session type {name}: description not correct length or type")
         return False
-    if miniumum_age < 0 or miniumum_age > 100:
-        log_transaction(f"Failed to add new activity type {name}: maximum_age or miniumum_age not correct size")
+    if minimum_age < 0 or minimum_age > 100:
+        log_transaction(f"Failed to add new session type {name}: maximum_age or miniumum_age not correct size")
         return False
     if maximum_activity_capacity > 150:
-        log_transaction(f"Failed to add new activity type {name}: maximum_activity_capacity not correct size")
+        log_transaction(f"Failed to add new session type {name}: maximum_activity_capacity not correct size")
         return False
     if hourly_activity_cost < 0 or hourly_activity_price < 0 or hourly_activity_price > 50 or hourly_activity_cost > 200:
-        log_transaction(f"Failed to add new activity type {name}: hourly cost or price not correct size")
+        log_transaction(f"Failed to add new session type {name}: hourly cost or price not correct size")
         return False
     if max_staff > 15 or max_staff < 0 or min_staff < 0 or min_staff > 10:
-        log_transaction(f"Failed to add new activity type {name}: max_staff or min_staff not correct size")
+        log_transaction(f"Failed to add new session type {name}: max_staff or min_staff not correct size")
         return False
 
     if not check_tags_are_valid(tags_list):
-        log_transaction(f"Failed to add new activity type {name}: invalid tag instance")
+        log_transaction(f"Failed to add new session type {name}: invalid tag instance")
         return False
 
     tags = ":".join(tags_list)
     if len(tags) > 200:
-        log_transaction(f"Failed to add new activity type {name}: tag length too long")
+        log_transaction(f"Failed to add new session type {name}: tag length too long")
         return False
 
-    activity_types = return_all_activity_types()
-    for activity in activity_types:
-        if activity.name == name.lower():
-            log_transaction(f"Failed to add new activity type {name}: activity name already exists")
+    session_types = return_all_session_types()
+    for session_type in session_types:
+        if session_type.session_type_name == name.lower():
+            log_transaction(f"Failed to add new session type {name}: session type name already exists")
             return False
 
-    new_activity_type = ActivityType(name=name, description=description, category=category, tags=tags,
-                                     minimum_age=miniumum_age, maximum_activity_capacity=maximum_activity_capacity,
-                                     hourly_activity_cost=hourly_activity_cost,
-                                     hourly_activity_price=hourly_activity_price,
-                                     max_staff=max_staff, min_staff=min_staff)
+    new_session_type = SessionType(activity_type_id=activity_type.activity_type_id,
+                                   session_type_name=name, description=description,
+                                   category=category, tags=tags, minimum_age=minimum_age,
+                                   maximum_activity_capacity=maximum_activity_capacity,
+                                   hourly_activity_cost=hourly_activity_cost,
+                                   hourly_activity_price=hourly_activity_price,
+                                   max_staff=max_staff, min_staff=min_staff)
 
-    add_to_database(new_activity_type)
+    add_to_database(new_session_type)
     return True
 
 
@@ -172,27 +188,27 @@ def create_new_activity_type(name: str, description: str, category: str, tags_li
 #       - The activity type for the given ID could not be returned
 #  If these are valid then the table is searched and a list of activity istances are returned
 # [Lewis S]
-def return_activity_instances_between_dates(activity_type_id, start_time: datetime.datetime, end_time: datetime.datetime):
+def return_activity_instances_between_dates(session_type_id, start_time: datetime.datetime, end_time: datetime.datetime):
     start_time = start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute // 30)
     end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute // 30)
 
-    if activity_type_id == "Any":
+    if session_type_id == "Any":
         return Activity.query.filter(Activity.start_time <= start_time, Activity.end_time >= end_time).all()
 
-    if type(activity_type_id) is not int:
+    if type(session_type_id) is not int:
         log_transaction(
-            f"Failed to return activity with id {activity_type_id} starting on {start_time}: facility id or activity type id invalid")
+            f"Failed to return session type with id {session_type_id} starting on {start_time}: facility id or activity type id invalid")
         return False
     if end_time > start_time + datetime.timedelta(hours=6) or end_time < start_time + datetime.timedelta(hours=1):
         log_transaction(
-            f"Failed to return activity with id {activity_type_id} starting on {start_time}: date times invalid")
+            f"Failed to return session type with id {session_type_id} starting on {start_time}: date times invalid")
         return False
-    if not return_activity_type_with_id(activity_type_id):
+    if not return_session_type_with_id(session_type_id):
         log_transaction(
-            f"Failed to return activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+            f"Failed to return session type with id {session_type_id} starting on {start_time}: activity type does not exist")
         return False
 
-    return Activity.query.filter(Activity.activity_type_id == activity_type_id,
+    return Activity.query.filter(Activity.session_type_id == session_type_id,
                                  Activity.start_time <= start_time,
                                  Activity.end_time >= end_time).all()
 
@@ -207,82 +223,70 @@ def return_activity_instances_between_dates(activity_type_id, start_time: dateti
 #       - An activity of the same activity type already exists between the two given times
 # If these conditions are met then a new activity instance is created
 # [Lewis S]
-def create_new_activity(activity_type_id: int, facility_name: str, start_time: datetime.datetime, end_time: datetime.datetime):
+def create_new_activity(session_type_id: int, activity_type_id: int, facility_name: str, start_time: datetime.datetime, end_time: datetime.datetime):
     facility = edf.return_facility_with_name(facility_name)
-    start_time= start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute//30)
-    end_time= end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute//30)
+    start_time = start_time.replace(second=0, microsecond=0, minute=0, hour=start_time.hour) + datetime.timedelta(hours=start_time.minute//30)
+    end_time = end_time.replace(second=0, microsecond=0, minute=0, hour=end_time.hour) + datetime.timedelta(hours=end_time.minute//30)
 
+    if type(session_type_id) is not int:
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time}: session type id invalid")
+        return False
     if type(activity_type_id) is not int:
-        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type id invalid")
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time}: activity_type_id invalid")
         return False
     if end_time > start_time+datetime.timedelta(hours=6) or end_time < start_time+datetime.timedelta(hours=1):
-        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time} and ending {end_time}: date times invalid")
         return False
     if end_time.hour < 7 or start_time.hour < 6 or end_time.hour > 22 or start_time.hour > 21:
-        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time} and ending {end_time}: date times invalid")
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time} and ending {end_time}: date times invalid")
         return False
     if not facility:
-        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: facility does not exist")
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time}: facility does not exist")
         return False
-    if not return_activity_type_with_id(activity_type_id):
-        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity type does not exist")
+    if not return_session_type_with_id(session_type_id):
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time}: session type does not exist")
         return False
-    if return_activity_instances_between_dates(activity_type_id, start_time, end_time):
-        log_transaction(f"Failed to add new activity with id {activity_type_id} starting on {start_time}: activity already exists")
+    if return_activity_instances_between_dates(session_type_id, start_time, end_time):
+        log_transaction(f"Failed to add new activity with id {session_type_id} starting on {start_time}: activity already exists")
         return False
 
-    new_activity = Activity(facility_id=facility.facility_id, activity_type_id=activity_type_id,
+    new_activity = Activity(facility_id=facility.facility_id,
+                            session_type_id=session_type_id, activity_type_id=activity_type_id,
                             start_time=start_time, end_time=end_time)
 
     add_to_database(new_activity)
-    log_transaction(f"Added new activity with type_id {activity_type_id} starting on {start_time} in facility {facility_name}")
+    log_transaction(f"Added new activity with type_id {session_type_id} starting on {start_time} in facility {facility_name}")
     return new_activity
 
 
 # Simply returns all activity instances between two datetimes AND in the specified facility_id
 # [Lewis S]
 def return_activities_between_dates_with_facility_and_activity(start_time: datetime.datetime, end_time: datetime.datetime,
-                                                               activity_type_id="Any", facility_id="Any"):
-    if activity_type_id == "Any" and facility_id == "Any":
+                                                               session_type="Any", facility_id="Any"):
+    if session_type == "Any" and facility_id == "Any":
         return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time).all()
-    elif activity_type_id == "Any" and facility_id != "Any":
+    elif session_type == "Any" and facility_id != "Any":
         return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time,
                                      Activity.facility_id == facility_id).all()
-    elif facility_id == "Any" and activity_type_id != "Any":
+    elif facility_id == "Any" and session_type != "Any":
         return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time,
-                                     Activity.activity_type_id == activity_type_id).all()
+                                     Activity.session_type_id == session_type).all()
     else:
         return Activity.query.filter(Activity.start_time > start_time, Activity.end_time < end_time,
-                                     Activity.activity_type_id == activity_type_id, Activity.facility_id == facility_id).all()
+                                     Activity.session_type_id == session_type, Activity.facility_id == facility_id).all()
 
 
-def return_activities_between_dates_of_type(start_date, end_date, **kwargs):
+def return_activities_between_dates_of_activity_type(start_date, end_date, **kwargs):
     """
     :param start_date: The start date of the range of sessions requested
     :param end_date: The end date of the range of sessions requested. Note: This is exclusive.
     :param kwargs: activity_type: an ActivityType object. This is used if supplied.
                    activity_type_id: an int. This is used if activity_type is not supplied.
                    If both activity_type and activity_type_id are not supplied, the activity type will not be filtered.
-    :return: A list containing activities/sessions of type "activity_type_id" from start_date to end_date exclusive.
+    :return: A list containing sessions of type "activity_type_id" from start_date to end_date exclusive.
     """
     activity_type = kwargs.get("activity_type")
-    activity_type_id = kwargs.get("activity_type_id") if activity_type is None else activity_type.activity_type_id
-
-    if activity_type_id is None:
-        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date).all()
-    else:
-        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time <= end_date,
-                                     Activity.activity_type_id == activity_type_id).all()
-
-
-def return_weekly_activities_of_type(day: datetime.datetime, activity_type_id: int = None):
-    """
-    :param day: a date that indicates the week of activities desired
-    :param activity_type_id: The type of the desired activities
-    :return: A list containing activities in "day"'s week with the specified activity_type_id
-    """
-    start_date = day - datetime.timedelta(days=day.weekday())
-    end_date = start_date + datetime.timedelta(days=7)
+    activity_type_id = kwargs.get("activity_type_id", None) if activity_type is None else activity_type.activity_type_id
 
     if activity_type_id is None:
         return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date).all()
@@ -291,34 +295,61 @@ def return_weekly_activities_of_type(day: datetime.datetime, activity_type_id: i
                                      Activity.activity_type_id == activity_type_id).all()
 
 
+def return_weekly_activities_of_type(day: datetime.datetime, session_type_id: int = None):
+    """
+    :param day: a date that indicates the week of activities desired
+    :param session_type_id: The type of the desired activities
+    :return: A list containing activities in "day"'s week with the specified activity_type_id
+    """
+    start_date = day - datetime.timedelta(days=day.weekday())
+    end_date = start_date + datetime.timedelta(days=7)
+
+    if session_type_id is None:
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date).all()
+    else:
+        return Activity.query.filter(Activity.start_time >= start_date, Activity.end_time < end_date,
+                                     Activity.session_type_id == session_type_id).all()
+
+
+def return_session_types_with_activity_type_id(activity_type_id: int):
+    return SessionType.query.filter(SessionType.activity_type_id == activity_type_id).all()
+
+
+def return_activity_type_with_name(activity_type_name: str):
+    return ActivityType.query.filter(ActivityType.name == activity_type_name).first()
+
+
+def return_activity_type_with_id(activity_type_id: str):
+    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+
+
 # Simply returns an activity with an specific id
 # [Lewis S]
 def return_activity_with_id(activity_id: int):
     return Activity.query.filter(Activity.activity_id == activity_id).first()
 
 
-# Returns the max capacity for an activity of a specific type- this is used for combatting lazy loading
+# Returns the max capacity for an activity of a specific session type- this is used for combatting lazy loading
 # [Lewis S]
-def return_activity_capacity_with_activity_type_id(activity_type_id):
-    activity_type: ActivityType = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
-    return int(activity_type.maximum_activity_capacity)
+def return_activity_capacity_with_session_type_id(session_type_id):
+    session_type: SessionType = SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
+    return int(session_type.maximum_activity_capacity)
 
 
-def return_activity_type_capacities():
+def return_session_type_capacities():
     """
-    :return: a dict of (activity_type_id: activity_type maximum capacity) for all activity types
+    :return: a dict of (session_type_id: session_type maximum capacity) for all activity types
     """
-    return {activity_type.activity_type_id: activity_type.maximum_activity_capacity for activity_type in ActivityType.query.filter().all()}
+    return {session_type.session_type_id: session_type.maximum_activity_capacity for session_type in SessionType.query.filter().all()}
 
+
+def return_session_type(session_type_id):
+    return SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
 
 def return_facilities(facility_id):
     if facility_id == "Any":
         return Facility.query.all()
     return Facility.query.filter(Facility.facility_id == facility_id).all()
-
-
-def return_activity_type(activity_type_id):
-    return ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
 
 
 def return_regular_activities_before(activity_obj, limit=1000):
@@ -340,7 +371,7 @@ def return_regular_activities_before(activity_obj, limit=1000):
     # Get all regular activities before this start date
     while next_activity is not None and num < limit:
         next_activity = Activity.query.filter(
-            Activity.activity_type_id == activity_obj.activity_type_id,
+            Activity.session_type_id == activity_obj.session_type_id,
             Activity.start_time >= activity_obj.start_time - datetime.timedelta(days=7 * num),
             Activity.end_time <= activity_obj.end_time - datetime.timedelta(days=7 * num)
         ).first()
@@ -370,7 +401,7 @@ def return_regular_activities_from(activity_obj, limit=2):
 
     while next_activity is not None and num < limit:
         next_activity = Activity.query.filter(
-            Activity.activity_type_id == activity_obj.activity_type_id,
+            Activity.session_type_id == activity_obj.session_type_id,
             Activity.start_time >= activity_obj.start_time + datetime.timedelta(days=7 * num),
             Activity.end_time <= activity_obj.end_time + datetime.timedelta(days=7 * num)
         ).first()
@@ -385,7 +416,7 @@ def return_regular_activities_from(activity_obj, limit=2):
 def return_activity_weeks_available(activity_id):
     """
     Based on the time (e.g. Monday 10am-11am) of the activity with id :param activity_id:,
-    find the number of consecutive weekly sessions with the same time.
+    find the number of consecutive weekly sessions with the same time (i.e. regular).
     """
     activity_obj = Activity.query.filter(Activity.activity_id == activity_id).first()
 

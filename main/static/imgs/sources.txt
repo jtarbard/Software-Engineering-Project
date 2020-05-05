@@ -32,3 +32,5 @@ Gym.jpg (Fitness) Photo by Wells Chan on Unsplash
 Gym-description Photo by ŞULE MAKAROĞLU on Unsplash
 (Alternatively use the man one, which is a Photo by Rohit Reddy on Unsplash)
 Badminton.jpg Photo by Jackie Hutchinson on Unsplash
+
+tennis-team-event-description Photo by Julian Schiemann on Unsplash

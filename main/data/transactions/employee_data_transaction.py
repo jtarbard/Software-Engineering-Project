@@ -1,7 +1,7 @@
 # Holds all functions related to the employees/managers of the website and the transactions with the database
 from main.data.db_session import add_to_database
 from main.data.db_classes.employee_data_db_class import Role, Employee_Router
-from main.data.db_classes.activity_db_class import Facility, ActivityType
+from main.data.db_classes.activity_db_class import Facility, SessionType
 from main.logger import log_transaction
 
 # Returns list of all roles in the database
@@ -58,8 +58,8 @@ def return_role_id_with_name(role):
     return role
 
 
-def add_role_to_activity_type(role_id, activity_type_id):
+def add_role_to_activity_type(role_id, session_type_id):
     role = Role.query.filter(Role.role_id == role_id).first()
-    activity_type = ActivityType.query.filter(ActivityType.activity_type_id == activity_type_id).first()
+    session_type = SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
 
-    role.activities_with_role.append(activity_type)
+    role.activities_with_role.append(session_type)

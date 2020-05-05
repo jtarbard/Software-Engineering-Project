@@ -36,9 +36,9 @@ class Role(database.Model):
                                                 secondary=employee_role,
                                                 backref=database.backref("allowed_roles", lazy="dynamic"))
 
-    activities_with_role = database.relationship("ActivityType",
-                                                secondary=activity_roles,
-                                                backref=database.backref("allowed_roles", lazy="dynamic"))
+    activities_with_role = database.relationship("SessionType",
+                                                 secondary=activity_roles,
+                                                 backref=database.backref("allowed_roles", lazy="dynamic"))
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

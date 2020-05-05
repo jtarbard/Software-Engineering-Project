@@ -7,7 +7,7 @@ import string
 import main.data.transactions.user_db_transaction as udf
 import main.data.transactions.activity_db_transaction as adf
 import main.view_lib.cookie_lib as cl
-from main.data.db_classes.activity_db_class import ActivityType
+from main.data.db_classes.activity_db_class import SessionType
 from main.data.db_classes.user_db_class import Customer, Manager, Employee
 from main.data.transactions.transaction_db_transaction import add_new_card_details
 from main.view_lib import account_lib
@@ -179,7 +179,7 @@ def view_account_bookings():
         customer: Customer = udf.return_customer_with_user_id(user.user_id)
         for receipt in customer.purchases:
             for booking in receipt.bookings:
-                if booking.activity.start_time > datetime.datetime.now() and booking.deleted == False:
+                if booking.activity.start_time > datetime.datetime.now() and booking.deleted is False:
                     if booking.activity not in returned_bookings:
                         returned_bookings[booking.activity] = [receipt, 1, booking.activity.start_time]
                     else:
@@ -233,7 +233,6 @@ def view_account_details():
             "title": data_form.get("title"),
             "first_name": data_form.get("first_name"),
             "last_name": data_form.get("last_name"),
-            "title": data_form.get("title"),
             "email": data_form.get("email"),
             "dob": datetime.datetime.strptime(data_form.get("dob"), "%Y-%m-%d"),
             "tel_number": data_form.get("tel_number"),
@@ -281,11 +280,11 @@ def view_payment_details():
             ds.delete_from_database(customer.payment_detail)
         else:
             add_new_card_details(customer, card_number=data_form.get('card_number'),
-                                     start_date=data_form.get('start_date'),
-                                     expiration_date=data_form.get('expiration_date'),
-                                     street_and_number=data_form.get('street_and_number'),
-                                     town=data_form.get('town'), city=data_form.get('city'),
-                                     postcode=data_form.get('postcode'))
+                                 start_date=data_form.get('start_date'),
+                                 expiration_date=data_form.get('expiration_date'),
+                                 street_and_number=data_form.get('street_and_number'),
+                                 town=data_form.get('town'), city=data_form.get('city'),
+                                 postcode=data_form.get('postcode'))
 
         if customer.payment_detail:
             payment_details = vars(customer.payment_detail)
@@ -316,37 +315,37 @@ def view_usages():
     if type(end_date) is str:
         end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d")
 
-    activity_type_id = data_form.get("activity_type_id")
+    session_type_id = data_form.get("session_type_id", None)
 
     if not start_date:
-        start_date = datetime.date.today() - datetime.timedelta(hours=24*7)
+        start_date = datetime.date.today() - datetime.timedelta(days=7)
     if not end_date:
         end_date = datetime.date.today()
 
-    if not activity_type_id:
-        activity_type_id = "Any"
-    elif activity_type_id != "Any":
-        activity_type_id = int(activity_type_id)
+    if not session_type_id:
+        session_type_id = "Any"
+    elif session_type_id != "Any":
+        session_type_id = int(session_type_id)
 
     start_search = datetime.datetime.combine(start_date, datetime.datetime.min.time())
     end_search = datetime.datetime.combine(end_date, datetime.datetime.min.time())
 
-    activities = adf.return_activity_instances_between_dates(activity_type_id, end_search, start_search)
+    activities = adf.return_activity_instances_between_dates(session_type_id, end_search, start_search)
 
-    activity_types = adf.return_all_activity_types()
+    session_types = adf.return_all_session_types()
 
     if not activities:
         weekly_activities = None
-        total_activity_type_bookings = None
+        total_session_type_bookings = None
     else:
         weekly_activities = {}
-        total_activity_type_bookings = {}
+        total_session_type_bookings = {}
 
-        for activity_type in activity_types:
+        for session_type in session_types:
             color = ""
             for i in range(6):
                 color += random.choice("abcdef" + string.digits)
-            total_activity_type_bookings[activity_type] = [0, color]
+            total_session_type_bookings[session_type] = [0, color]
 
     total_cash_in = 0
     total_cash_out = 0
@@ -358,20 +357,20 @@ def view_usages():
     number_of_weeks = (end_date_monday-start_date_monday).days // 7
 
     for activity in activities:
-        activity_type: ActivityType = activity.activity_type
+        session_type: SessionType = activity.session_type
         num_activity_bookings = len(activity.bookings)
 
-        activity_income = num_activity_bookings * activity_type.hourly_activity_price * (activity.end_time - activity.start_time).seconds//3600
-        activity_cost = num_activity_bookings * activity_type.hourly_activity_cost * (activity.end_time - activity.start_time).seconds//3600
+        activity_income = num_activity_bookings * session_type.hourly_activity_price * (activity.end_time - activity.start_time).seconds//3600
+        activity_cost = num_activity_bookings * session_type.hourly_activity_cost * (activity.end_time - activity.start_time).seconds//3600
         activity_week = ((activity.end_time - datetime.timedelta(days=activity.end_time.weekday()))-start_date_monday).days // 7
 
         if activity_week not in weekly_activities:
             weekly_activities[activity_week] = {}
 
-        if activity_type not in weekly_activities[activity_week]:
-            weekly_activities[activity_week][activity_type] = [[activity, activity_income, activity_cost, num_activity_bookings]]
+        if session_type not in weekly_activities[activity_week]:
+            weekly_activities[activity_week][session_type] = [[activity, activity_income, activity_cost, num_activity_bookings]]
         else:
-            weekly_activities[activity_week][activity_type].append([activity, activity_income, activity_cost, num_activity_bookings])
+            weekly_activities[activity_week][session_type].append([activity, activity_income, activity_cost, num_activity_bookings])
 
         if "income" not in weekly_activities[activity_week]:
             weekly_activities[activity_week]["income"] = activity_income
@@ -397,26 +396,26 @@ def view_usages():
         total_cash_in += activity_income
         total_cash_out += activity_cost
         total_bookings += num_activity_bookings
-        total_activity_type_bookings[activity_type][0] += num_activity_bookings
+        total_session_type_bookings[session_type][0] += num_activity_bookings
 
-    total_activity_type_bookings = {k: v for k, v in sorted(total_activity_type_bookings.items(), key=lambda item: item[1][0], reverse=True)}
-    activity_types = list(total_activity_type_bookings.keys())
+    total_session_type_bookings = {k: v for k, v in sorted(total_session_type_bookings.items(), key=lambda item: item[1][0], reverse=True)}
+    session_types = list(total_session_type_bookings.keys())
 
     for week_num in weekly_activities.keys():
         weekly_activities[week_num]["cost"] += fixed_cost
         total_cash_out += fixed_cost
 
-    search_field_data = {}
+    search_field_data = dict()
     search_field_data["start_date"] = start_date.strftime("%Y-%m-%d")
     search_field_data["end_date"] = end_date.strftime("%Y-%m-%d")
     search_field_data["max_date"] = datetime.date.today()
-    search_field_data["activity_type"] = activity_type_id
+    search_field_data["session_type"] = session_type_id
 
     return flask.render_template("/account/statistics.html", User=user, number_of_weeks=number_of_weeks+1,
                                  weekly_activities=weekly_activities, search_field_data=search_field_data,
-                                 activity_types=activity_types, total_cash_in=total_cash_in,
+                                 session_types=session_types, total_cash_in=total_cash_in,
                                  total_cash_out=total_cash_out, total_bookings=total_bookings,
-                                 total_activity_type_bookings=total_activity_type_bookings,
+                                 total_session_type_bookings=total_session_type_bookings, page_title="Statistics",
                                  has_cookie=has_cookie)
 
 

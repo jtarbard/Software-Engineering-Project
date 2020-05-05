@@ -41,7 +41,7 @@ def add_booking_to_basket_post():
             flask.flash("Basket full", category="error")
             return flask.render_template("/misc/general_error.html", error="Basket full", User=user, has_cookie=has_cookie)
 
-    spaces_left = activity.activity_type.maximum_activity_capacity - len(
+    spaces_left = activity.session_type.maximum_activity_capacity - len(
         tdf.return_bookings_with_activity_id(activity.activity_id))
     if spaces_left <= 0:
         flask.flash("Not enough spaces left on activity", category="error")
@@ -58,8 +58,8 @@ def add_booking_to_basket_post():
     if not response:
         return flask.abort(500)
 
-    activity_type = adf.return_activity_type_name_with_activity_type_id(activity.activity_type_id)
-    flask.flash(activity_type.title()+" session has been added to your basket.", category="success")
+    session_type_name = adf.return_session_type_name_with_activity_type_id(activity.activity_type_id)
+    flask.flash(session_type_name.title()+" session has been added to your basket.", category="success")
 
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response
@@ -84,7 +84,7 @@ def basket_view():
     new_activities_basket = ""
     redirect = False
     for activity in basket_activities:
-        spaces_left = activity.activity_type.maximum_activity_capacity - len(
+        spaces_left = activity.session_type.maximum_activity_capacity - len(
             tdf.return_bookings_with_activity_id(activity.activity_id))
         number_of_activities = basket_activities.count(activity)
         if spaces_left >= number_of_activities and activity.start_time > datetime.datetime.now():
@@ -105,7 +105,7 @@ def basket_view():
     total_activity_price = 0
     for i, activity in enumerate(basket_activities):
         duration: datetime.timedelta = activity.end_time - activity.start_time
-        current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
+        current_price = (duration.seconds // 3600 * activity.session_type.hourly_activity_price)
         number_of_activities = basket_activities.count(activity)
 
         activity_and_price[activity] = (current_price, number_of_activities, regular_discounts[i])

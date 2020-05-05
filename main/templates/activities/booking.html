@@ -15,44 +15,71 @@
 {% endblock %}
 
 {% block main_content %}
-    {% include "activities/booking_modal.html" %}
+{% include "activities/booking_modal.html" %}
 
-    <!-- Header TODO: Add -->
+<!-- Header TODO: Add -->
 
-<!-- activity info -->
-<div id="descriptionContainer" class="fluid-container">
-    <div class="container">
-        <div class="media row row-cols-1 row-cols-md-2 ">
-            <img class="col-12 col-md-5" src="/static/imgs/activities-img/{{ activity_type.name }}-description.jpg"
-                 alt="Illustration of {{ activity_type.name }}">
-            <div id="descriptionTextbox" class="align-self-center media-body col-12 col-md-7">
-                <!-- makes the content vertically aligned -->
-                <h1 id="descriptionTitle">{{ activity_type.name.title() }}</h1>
-                <p id="description">{{ activity_type.description }}</p>
+{% for session_type in session_types %}
+    <!-- activity info -->
+    <div id="descriptionContainer" class="fluid-container">
+        <div class="container">
+            <div class="media row row-cols-1 row-cols-md-2 ">
+                <img class="col-12 col-md-5" src="/static/imgs/activities-img/{{ session_type.session_type_name | replace(" ", "-") }}-description.jpg" alt="Illustration of {{ session_type.name }}">
+                <div id="descriptionTextbox" class="align-self-center media-body col-12 col-md-7"> <!-- makes the content vertically aligned -->
+                    <h1 id="descriptionTitle">{{ session_type.session_type_name.title() }}</h1>
+                    <p id="description">{{ session_type.description }}</p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="container">
-
-            <!-- Timetable -->
-            <div class="content-container">
-                <h6>Book for a session:</h6>
-                <!-- Facility Filter -->
-                <div class="input-group">
-                    <select class="form-control" id="facilityFilter" multiple="multiple">
-                        {% for facility in facilities %}
-                        <option value="{{ facility.facility_id }}">{{ facility.name.title() }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <!-- Calendar / Timetable -->
-                <div id="calendar"></div>
-                <div>
+    <!-- bulk booking -->
+    <div id="bulk-buy" class="container accordion">
+        <div class="card">
+            <div class="card-header">
+                <button class="btn btn-link" id="bulk-top" data-toggle="collapse" data-target="#bulk-collapse" aria-expanded="false" aria-controls="collapseExample">
+                    <p>Bulk Buy</p>
+                    <i class="fa fa-chevron-down pull-right"></i>
+                </button>
+            </div>
+            <div class="collapse" id="bulk-collapse">
+                <div class="card-body">
+                    <div id="bulk-bottom" class="row no-gutters">
+                        <p class="col-12">
+                            You can save up to 30% by purchasing multiple classes of the same type at once, try it now by adding more
+                            than 3 {{ activity_type.name }} sessions to your basket.
+                        </p>
+                        <div class="divider"></div>
+                        <p class="col-6">{{ session_type.session_type_name.title() }} Sessions Booked:</p>
+                        <p class="col-6 text-right">Discount: </p>
+                        <div class="progress col-12">
+                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                          <div class="progress-bar" role="progressbar" style="width: 20%" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+{% endfor %}
+
+<div class="container">
+    <!-- Timetable -->
+    <div class="content-container">
+        <h6>Book for a session:</h6>
+        <!-- Facility Filter -->
+        <div class="input-group">
+            <select class="form-control" id="facilityFilter" multiple="multiple">
+                {% for facility in facilities %}
+                    <option value="{{ facility.facility_id }}">{{ facility.name.title() }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- Calendar / Timetable -->
+        <div id="calendar"></div>
     </div>
 </div>
 {% endblock %}

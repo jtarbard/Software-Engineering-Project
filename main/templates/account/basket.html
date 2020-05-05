@@ -41,7 +41,7 @@ Your Basket
                     <tr>
                         <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
                             <td>
-                                <h6>{{ activity.activity_type.name.capitalize() }}</h6>
+                                <h6>{{ activity.session_type.session_type_name.capitalize() }}</h6>
                                 Facility: {{ activity.facility.name.capitalize() }}<br>
                                 Date: {{ activity.start_time.strftime("%m/%y") }}<br>
                                 Time: {{ activity.start_time.strftime("%H:%M") }} - {{ activity.end_time.strftime("%H:%M") }}<br>

@@ -5,7 +5,7 @@ from main.data.db_session import database
 
 from main.data.db_classes.transaction_db_class import MembershipType, Membership, PaymentDetails, Receipt, Booking
 from main.data.db_classes.employee_data_db_class import Employee_Router, Role
-from main.data.db_classes.activity_db_class import ActivityType, Activity, FacilityType, Facility
+from main.data.db_classes.activity_db_class import SessionType, Activity, FacilityType, Facility
 from main.data.db_classes.user_db_class import Customer, Employee, Manager
 
 # These are created in create_all(), at runtime, before any test is run.
@@ -61,13 +61,13 @@ def create_activity_types():
     min_staffs = [1, 2, 3, 4, 5]
     max_staffs = [1, 2, 3, 4, 5]
 
-    return [ ActivityType(name=names[i], description=descriptions[i], category=categories[i],
-                          tags=tags_list[i], minimum_age=minimum_ages[i],
-                          maximum_activity_capacity=maximum_activity_capacities[i],
-                          hourly_activity_cost=hourly_activity_costs[i],
-                          hourly_activity_price=hourly_activity_prices[i],
-                          max_staff=max_staffs[i], min_staff=min_staffs[i])
-             for i in range(len(names)) ]
+    return [SessionType(name=names[i], description=descriptions[i], category=categories[i],
+                        tags=tags_list[i], minimum_age=minimum_ages[i],
+                        maximum_activity_capacity=maximum_activity_capacities[i],
+                        hourly_activity_cost=hourly_activity_costs[i],
+                        hourly_activity_price=hourly_activity_prices[i],
+                        max_staff=max_staffs[i], min_staff=min_staffs[i])
+            for i in range(len(names))]
 
 
 def create_activities():
