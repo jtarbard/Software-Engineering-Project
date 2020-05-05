@@ -45,8 +45,9 @@ def view_booking():
     # Get this from the url argument (?request_activity_type_id=...)
     request_activity_type_id = flask.request.args.get("request_activity_type_id")
 
-    activity_type = adf.return_activity_type(request_activity_type_id)  # The supplied id can be invalid,
-                                                                        # or the url doesn't contain a supplied id - in this case, it indicates the "show all" page is requested
+    activity_type = adf.return_activity_type_with_id(request_activity_type_id)
+    # The supplied id can be invalid, or the url doesn't contain a supplied id - in this case, it indicates the "show all" page is requested
+    session_types = adf.return_session_types_with_activity_type_id(request_activity_type_id)
 
     page_title = "Booking" if activity_type is None else "Book " + activity_type.name.title()
 
@@ -68,7 +69,8 @@ def view_booking():
     return flask.render_template("/activities/booking.html",
                                  User=user,
                                  has_cookie=has_cookie,
-                                 activity_type=activity_type,
+                                 activity_type=activity_type,  # For query_sessions
+                                 session_types=session_types,
                                  facilities=adf.return_facilities("Any"),
                                  page_title=page_title)
 
@@ -83,19 +85,17 @@ def query_sessions():
     :return: the sessions within the supplied date range
     """
 
-    activity_type = flask.request.json.get("activity_type", None)
     activity_type_id = flask.request.json.get("activity_type_id", None)
     start_date = flask.request.json.get("start_date")
     end_date = flask.request.json.get("end_date")  # note: exclusive
 
-    sessions = adf.return_activities_between_dates_of_type(start_date, end_date,
-                                                           activity_type=activity_type,
-                                                           activity_type_id=activity_type_id)
+    sessions = adf.return_activities_between_dates_of_activity_type(start_date, end_date,
+                                                                    activity_type_id=activity_type_id)
     data = list()
     for session in sessions:
         data.append(dict(id=session.activity_id,
-                         name=session.activity_type.name.title(),
-                         description=session.activity_type.description,
+                         name=session.session_type.session_type_name.title(),
+                         description=session.session_type.description,
                          facility_id=session.facility.facility_id,
                          facility_name=session.facility.name.title(),
                          start=session.start_time.strftime("%Y-%m-%dT%H:%M:%S"),
@@ -139,15 +139,15 @@ def query_session():
 
     # ----- Retrieve data ----- #
     total_bookings = len(tdf.return_bookings_with_activity_id(session.activity_id))
-    spaces_left = session.activity_type.maximum_activity_capacity - total_bookings
+    spaces_left = session.session_type.maximum_activity_capacity - total_bookings
     duration: datetime.timedelta = session.end_time - session.start_time
-    session_price = (duration.seconds // 3600 * session.activity_type.hourly_activity_price)  # TODO: Bad #135
+    session_price = (duration.seconds // 3600 * session.session_type.hourly_activity_price)  # TODO: Bad #135
 
     subtotal = session_price
 
     session_dict = dict(
         user_role=None if user is None else user.__mapper_args__['polymorphic_identity'],
-        minimum_age=session.activity_type.minimum_age,
+        minimum_age=session.session_type.minimum_age,
         spaces_left=spaces_left,
         session_price=round(session_price, 2),  # TODO: Bad #135
         subtotal=round(subtotal, 2),  # TODO: Bad #135
@@ -162,9 +162,9 @@ def query_session():
     # TODO: #135: Don't use floating point numbers for monetary calculation
     if type(user) is Manager:
         # TODO: Bad #135
-        activity_income = total_bookings * session.activity_type.hourly_activity_price * (
+        activity_income = total_bookings * session.session_type.hourly_activity_price * (
                           session.end_time - session.start_time).seconds // 3600
-        activity_cost = total_bookings * session.activity_type.hourly_activity_cost * (
+        activity_cost = total_bookings * session.session_type.hourly_activity_cost * (
                         session.end_time - session.start_time).seconds // 3600
 
         session_dict.update(dict(

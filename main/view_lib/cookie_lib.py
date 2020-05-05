@@ -100,7 +100,7 @@ def add_activity_or_membership_to_basket(booking_objects, request: flask.request
     # loop through every booking object
     for b, booking_object in enumerate(booking_objects):
         if type(booking_object) is Activity:
-            response = flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=booking_object.activity_type.activity_type_id))
+            response = flask.redirect(flask.url_for("activities.view_booking", _method='GET', request_activity_type_id=booking_object.activity_type_id))
             if not num_people:
                 return None
             if num_people < 1 or num_people > 8:

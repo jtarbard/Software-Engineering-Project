@@ -2,7 +2,7 @@ import main.data.transactions.activity_db_transaction as adf
 
 
 def return_activity_type_count_from_activity_list(basket_activities):
-    activity_type_count = [0 for activity in adf.return_all_activity_types()]
+    activity_type_count = [0 for activity in adf.return_all_session_types()]
     for activity in list(dict.fromkeys(basket_activities)):
         activity_type_count[activity.activity_type_id-1] += 1
     return activity_type_count

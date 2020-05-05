@@ -1,7 +1,7 @@
 import random
 import datetime
 
-from main.data.db_classes.activity_db_class import Activity, ActivityType, Facility, FacilityType
+from main.data.db_classes.activity_db_class import Activity, SessionType, Facility, FacilityType
 
 
 def test_activity_type_legal():
@@ -27,12 +27,12 @@ def test_activity_type_legal():
         hourly_price = hourly_cost + random.randint(3, 100)
         min_staff = random.randint(3, 100)
         max_staff = min_staff + random.randint(3, 100)
-        act_type = ActivityType(name=names[index], description=descriptions[index],
-                                category=categories[index], tags=tagss[index],
-                                minimum_age=min_age, maximum_activity_capacity=max_cap,
-                                hourly_activity_cost=hourly_cost,
-                                hourly_activity_price=hourly_price,
-                                max_staff=max_staff, min_staff=min_staff)
+        act_type = SessionType(name=names[index], description=descriptions[index],
+                               category=categories[index], tags=tagss[index],
+                               minimum_age=min_age, maximum_activity_capacity=max_cap,
+                               hourly_activity_cost=hourly_cost,
+                               hourly_activity_price=hourly_price,
+                               max_staff=max_staff, min_staff=min_staff)
         assert act_type.name == exp_names[index]
         assert act_type.description == exp_descriptions[index]
         assert act_type.category == exp_categories[index]

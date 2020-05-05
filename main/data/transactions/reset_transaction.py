@@ -142,19 +142,54 @@ def create_roles():
 
 def create_activity_types():
     """
-    Defines all basic activity types
+    Define and add all activity types in the database.
+    ActivityType are, for example, "Tennis", "Basketball", "Yoga" (loosely, the "Sports" name);
+    whereas SessionType (previously ActivityType) are, for example, "Tennis Team Event".
+    """
+    names = [
+        "Football", "Basketball", "Badminton", "General Fitness", "Boxing", "Climbing", "Cricket", "Tennis", "Squash",
+        "Swimming", "Aqua", "Yoga", "Dancing", "Gymnastics", "Rugby"
+    ]
+
+    for name in names:
+        activity_type = ActivityType(name=name)
+        if not add_to_database(activity_type):
+            log_transaction(f"Failed to add activity type: {activity_type}")
+            return False
+    return True
+
+
+def create_session_types():
+    """
+    Defines all basic session types. These are the types a session can be. For example, "Tennis Team Event".
     """
 
-    log_transaction("Creating database activity types:")
+    log_transaction("Creating database session types:")
+
+    # TODO: We should try to convert the individual lists into this format.
+    # data = [
+    #     dict(activity_type_name="Football",
+    #          name="Football Classes",
+    #          description="Football classes are led by FA qualified coaches and are designed to establish core skills and develop intermediate talent in an engaging and fun manner. Whatever your skill set our coaches are here to assist you." ,
+    #          category="TBA",
+    #          tags=["Ball Games", "Class"]
+    #     )
+    # ]
+
+    activity_type_names = [
+        "Football", "Basketball", "Badminton",
+        "General Fitness", "Boxing", "Climbing", "Cricket",
+        "Tennis", "Tennis", "Squash", "Squash",
+        "Swimming", "Swimming", "Aqua",
+        "Yoga", "Dancing", "Gymnastics", "Rugby"
+    ]
 
     names = [
         "Football Classes", "Basketball Classes", "Badminton Classes",
-        "General Fitness", "Boxing Classes", "Climbing Sessions",
-        "Cricket Classes", "Tennis Sessions", "Tennis Team Events",
-        "Squash Sessions", "Squash Team Events",
+        "General Fitness", "Boxing Classes", "Climbing Sessions", "Cricket Classes",
+        "Tennis Sessions", "Tennis Team Events", "Squash Sessions", "Squash Team Events",
         "General Swim", "Swimming Classes", "Aqua Classes",
-        "Yoga Classes", "Dancing Classes",
-        "Gymnastics Classes", "Rugby Classes"
+        "Yoga Classes", "Dancing Classes", "Gymnastics Classes", "Rugby Classes"
     ]
 
     activity_num = len(names)
@@ -221,14 +256,52 @@ def create_activity_types():
     activity_capacity = [50, 50, 24, 120, 40, 10, 50, 4, 16, 4, 10, 70, 50, 30, 20, 20, 15, 50]
 
     for i in range(activity_num):
-        if not adf.create_new_activity_type(names[i], description[i], category[i], tags[i], minimum_age[i],
-                                            activity_capacity[i], hourly_activity_cost[i], hourly_activity_price[i],
-                                            max_staff[i], min_staff[i]):
+        if not adf.create_new_session_type(activity_type_names[i].lower(), names[i], description[i], category[i],
+                                           tags[i], minimum_age[i], activity_capacity[i],
+                                           hourly_activity_cost[i], hourly_activity_price[i],
+                                           max_staff[i], min_staff[i]):
             return False
     return True
 
 
-def create_activity_type_and_role_validation():
+def create_activity_facility_relation():
+    """
+    which session types are available at which facilities (facility object, not type)?
+    """
+
+    relationships = [("swimming classes", ["main swimming pool"]),
+                     ("basketball classes", ["apex sports hall", "edge sports hall"]),
+                     ("football classes", ["apex sports hall", "edge sports hall", "outside playing field"]),
+                     ("badminton classes", ["apex sports hall", "edge sports hall"]),
+                     ("tennis sessions", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("tennis team events", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("squash sessions", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("squash team events", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
+                     ("general fitness", ["fitness Room"]),
+                     ("boxing classes", ["apex sports hall", "edge sports hall"]),
+                     ("climbing sessions", ["climbing wall"]),
+                     ("cricket classes", ["outside playing field"]),
+                     ("yoga classes", ["studio 1", "studio 2"]),
+                     ("aqua classes", ["main swimming pool"]),
+                     ("general swim", ["main swimming pool"]),
+                     ("dancing classes", ["studio 1", "studio 2"]),
+                     ("gymnastics classes", ["apex sports hall", "edge sports hall"]),
+                     ("rugby classes", ["outside playing field"])]
+
+    for relationship in relationships:
+        session_type = SessionType.query.filter(SessionType.session_type_name == relationship[0].lower()).first()
+        for facility_name in relationship[1]:
+            facility_object = Facility.query.filter_by(name=facility_name.lower()).first()
+
+            # make this facility be available in this session type
+            session_type.available_facilities.append(facility_object)
+        # update database
+        add_to_database(session_type)
+
+    return True
+
+
+def create_session_type_and_role_validation():
 
     activity_names_and_roles = {
         "Football Classes": ["Sports Coach", "Instructor", "Activity Leader", "Activity Assistant"],
@@ -252,14 +325,14 @@ def create_activity_type_and_role_validation():
     }
 
     for activity in activity_names_and_roles.keys():
-        activity_type = adf.return_activity_type_with_name(activity.lower())
-        if not activity_type:
+        session_type = adf.return_session_type_with_name(activity.lower())
+        if not session_type:
             return False
         for role in activity_names_and_roles[activity]:
             role: Role = edf.return_role_id_with_name(role.lower())
             if not role:
                 return False
-            edf.add_role_to_activity_type(role.role_id, activity_type.activity_type_id)
+            edf.add_role_to_activity_type(role.role_id, session_type.session_type_id)
 
     return True
 
@@ -294,14 +367,14 @@ def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: 
 
     current_date = start_date
 
-    activity_types = ActivityType.query.all()
+    session_types = SessionType.query.all()
 
     if populate_with_random_bookings:
         global customer_account
         customer_account = udf.return_customer_with_email(EMAIL_TYPES["customer"])
 
     """
-    A dictionary of the times of each activity. The key is the activity name, the value is another dictionary:
+    A dictionary of the times of each activity. The key is the session name, the value is another dictionary:
     If a key is specified with an empty list, it will get registered as an empty day (i.e. no session on that day).
     Each key has a list of lists. The innermost list represents the spanning hours of the activity on some days.
         weekday: from Monday to Friday, cycled.
@@ -324,7 +397,7 @@ def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: 
             weekday=[[9, 10, 11, 19]],
             weekend=[[]]
         ),
-        "aqua": dict(
+        "aqua classes": dict(
             weekday=[[18]],
             weekend=[return_random_times(random.randint(4, 6)),
                      return_random_times(random.randint(4, 6))]
@@ -334,79 +407,47 @@ def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: 
             weekend=[[6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21],
                      [6, 7, 8, 9, 10, 12, 13, 14, 15, 16, 18, 19, 20, 21]]
         ),
-        "badminton": dict(
-            default=[return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6))]
+        "badminton classes": dict(
+            num_sessions_list=[3, 4, 5, 6]
         ),
-        "yoga": dict(
-            default=[return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6)),
-                     return_random_times(random.randint(3, 6))]
+        "yoga classes": dict(
+            num_sessions_list=[3, 4, 5, 6]
         ),
-        "tennis": dict(
-            default=[return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4))]
+        "tennis sessions": dict(
+            num_sessions_list=[2, 3, 4]
         ),
-        "football": dict(
-            default=[return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4))]
+        "football classes": dict(
+            num_sessions_list=[2, 3, 4]
         ),
-        "basketball": dict(
-            default=[return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4))]
+        "basketball classes": dict(
+            num_sessions_list=[2, 3, 4]
         ),
-        "rugby": dict(
-            default=[return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4)),
-                     return_random_times(random.randint(2, 4))]
-        ),
-        "default": dict(
-            default=[return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
-                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
-                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
-                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
-                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
-                     return_random_times(random.choice([1, 1, 1, 2, 2, 3])),
-                     return_random_times(random.choice([1, 1, 1, 2, 2, 3]))]
+        "rugby sessions": dict(
+            num_sessions_list=[2, 3, 4]
         )
     }
 
-    for activity_type in activity_types:
-        week_times_dict = activity_times.get(activity_type.name, activity_times["default"])
+    for session_type in session_types:
+        week_times_dict = activity_times.get(session_type.session_type_name, None)
+
+        if week_times_dict is None:
+            # Check whether the session_type has times specified. If not, create them:
+            week_times_dict = dict(
+                weekday=[return_random_times(random.choice([1, 1, 1, 2, 2, 3])) for i in range(5)],
+                weekend=[return_random_times(random.choice([1, 1, 1, 2, 2, 3])) for i in range(2)]
+            )
+        elif week_times_dict is not None and week_times_dict.get("num_sessions_list") is not None:
+            # If the session_type is specified, and "num_sessions" is specified, then create the random times accordingly:
+            num_sessions_list = week_times_dict.get("num_sessions_list")
+            week_times_dict = dict(
+                weekday=[return_random_times(random.choice(num_sessions_list)) for i in range(5)],
+                weekend=[return_random_times(random.choice(num_sessions_list)) for i in range(2)]
+            )
+
         weekday_times = week_times_dict.get("weekday", None)
         weekend_times = week_times_dict.get("weekend", None)
         # if even default is not specified, then create a 1-hour session at 8am
         default_times = week_times_dict.get("default", [[8]])
-        # this increments by one whenever a weekday/weekend's time is not specified via weekday_times or weekend_times
-        unspecified_days_index = 0
 
         for day_amount in range(days_between_dates):
 
@@ -417,23 +458,18 @@ def create_pseudorandom_activity_instances(start_date: datetime.date, end_date: 
                 if weekday_times is not None:
                     times = weekday_times[day_index % len(weekday_times)]
                 else:
-                    times = default_times[unspecified_days_index % len(default_times)]
-                    unspecified_days_index += 1
+                    times = default_times[day_index % len(default_times)]
 
-                add_activities_with_times(times, day_amount, activity_type, start_date, populate_with_random_bookings)
+                add_activities_with_times(times, day_amount, session_type, start_date, populate_with_random_bookings)
 
             # weekend
             else:
                 if weekend_times is not None:
                     times = weekend_times[day_index % len(weekend_times)]
                 else:
-                    times = default_times[unspecified_days_index % len(default_times)]
-                    unspecified_days_index += 1
+                    times = default_times[day_index % len(default_times)]
 
-                add_activities_with_times(times, day_amount, activity_type, start_date, populate_with_random_bookings)
-
-            if day_index >= 6:
-                unspecified_days_index = 0  # restart the cycle for setting the session times on unspecified days
+                add_activities_with_times(times, day_amount, session_type, start_date, populate_with_random_bookings)
 
 
 def return_random_times(num_sessions: int):
@@ -447,7 +483,7 @@ def return_random_times(num_sessions: int):
     return returned_times
 
 
-def add_activities_with_times(returned_times: list, day_amount: int, activity_type,
+def add_activities_with_times(returned_times: list, day_amount: int, session_type,
                               start_date: datetime.date, populate_with_random_bookings):
     """
     Traverses the times an activity takes place and adds it to the database
@@ -459,7 +495,7 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
     :param start_date: a pivot date for the activity
     :param day_amount: a positive integer indicating the number of days offset from :param start_date:.
                        Adding :param day_amount: to :param start_date: creates the actual start date for the activity.
-    :param activity_type: type of the activity
+    :param session_type: type of the session (e.g. "Tennis classes", "Tennis Team Event")
     :param populate_with_random_bookings: boolean indicating whether random bookings for this activity shall be made.
     """
     for time in returned_times:
@@ -470,11 +506,12 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
             end_time += 1
         midnight_start_date = datetime.combine(start_date, datetime.min.time())
 
-        facilities_total = len(activity_type.available_facilities)
-        random_facility = random.randint(0, facilities_total - 1)
+        facilities_total = len(session_type.available_facilities)
+        random_facility = random.randint(0, facilities_total - 1)  # TODO: Make regular session happen in the same facility
 
-        new_activity = adf.create_new_activity(activity_type.activity_type_id,
-                                               activity_type.available_facilities[random_facility].name,
+        new_activity = adf.create_new_activity(session_type.session_type_id,
+                                               session_type.activity_type_id,
+                                               session_type.available_facilities[random_facility].name,
                                                midnight_start_date + timedelta(days=day_amount) + timedelta(hours=time),
                                                midnight_start_date + timedelta(days=day_amount) + timedelta(hours=end_time))
 
@@ -483,49 +520,13 @@ def add_activities_with_times(returned_times: list, day_amount: int, activity_ty
 
 
 def create_random_bookings(activity: Activity):
-    num_bookings = random.randint(2, activity.activity_type.maximum_activity_capacity)
+    # num_bookings = random.randint(2, activity.session_type.maximum_activity_capacity)
+    num_bookings = random.randint(1, 3)
     activities_to_add = []
     for i in range(num_bookings):
         activities_to_add.append(activity)
     tdf.create_new_receipt(basket_activities=activities_to_add, user=customer_account,
                            basket_membership=None, membership_duration=None)
-
-
-def create_activity_facility_relation():
-    """
-    which activity types are available at which facilities (facility object, not type)?
-    """
-
-    relationships = [("swimming classes", ["main swimming pool"]),
-                     ("basketball classes", ["apex sports hall", "edge sports hall"]),
-                     ("football classes", ["apex sports hall", "edge sports hall", "outside playing field"]),
-                     ("badminton classes", ["apex sports hall", "edge sports hall"]),
-                     ("tennis sessions", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("tennis team events", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("squash sessions", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("squash team events", ["tennis court 1", "tennis court 2", "tennis court 3", "tennis court 4"]),
-                     ("general fitness", ["fitness Room"]),
-                     ("boxing classes", ["apex sports hall", "edge sports hall"]),
-                     ("climbing sessions", ["climbing wall"]),
-                     ("cricket classes", ["outside playing field"]),
-                     ("yoga classes", ["studio 1", "studio 2"]),
-                     ("aqua classes", ["main swimming pool"]),
-                     ("general swim", ["main swimming pool"]),
-                     ("dancing classes", ["studio 1", "studio 2"]),
-                     ("gymnastics classes", ["apex sports hall", "edge sports hall"]),
-                     ("rugby classes", ["outside playing field"])]
-
-    for relationship in relationships:
-        activity_type = ActivityType.query.filter_by(name=relationship[0].lower()).first()
-        for facility_name in relationship[1]:
-            facility_object = Facility.query.filter_by(name=facility_name.lower()).first()
-
-            # make this facility be available in this activity type
-            activity_type.available_facilities.append(facility_object)
-        # update database
-        add_to_database(activity_type)
-
-    return True
 
 
 # Executes all the functions for populating the database
@@ -541,9 +542,10 @@ def populate_db(create_timetable, populate_with_random_bookings):
         [create_roles, "failed to create_roles"],
         [create_membership_types, "failed to create create_membership_types"],
         [create_activity_types, "failed to create_activity_types"],
+        [create_session_types, "failed to create_session_types"],
         [create_activity_facility_relation, "failed to create_activity_facility_relation"],
         [create_base_account_types, "failed to create_base_account_types"],
-        [create_activity_type_and_role_validation, "failed to create_activity_type_and_role_validation"],
+        [create_session_type_and_role_validation, "failed to create_activity_type_and_role_validation"],
     ]
 
     for function_list in population_functions:
@@ -551,7 +553,7 @@ def populate_db(create_timetable, populate_with_random_bookings):
             raise Exception(function_list[1])
 
     if create_timetable:
-        create_pseudorandom_activity_instances(start_date=datetime.today(),
+        create_pseudorandom_activity_instances(start_date=datetime.today()-timedelta(weeks=2),
                                                end_date=timedelta(weeks=4),
                                                populate_with_random_bookings=populate_with_random_bookings)
     return True

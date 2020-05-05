@@ -132,7 +132,7 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
 
 
 def return_bookings_with_activity_id(activity_id):
-    return Booking.query.filter(Booking.activity_id == activity_id, Booking.deleted == False).all()
+    return Booking.query.filter(Booking.activity_id == activity_id, Booking.deleted is False).all()
 
 
 def create_new_receipt(basket_activities, basket_membership: MembershipType, user: User, membership_duration: int):
@@ -147,7 +147,7 @@ def create_new_receipt(basket_activities, basket_membership: MembershipType, use
     for i, activity in enumerate(basket_activities):
         new_booking = Booking(activity_id=activity.activity_id, receipt_id=new_receipt.receipt_id)
         duration: datetime.timedelta = activity.end_time - activity.start_time
-        current_price = (duration.seconds // 3600 * activity.activity_type.hourly_activity_price)
+        current_price = (duration.seconds // 3600 * activity.session_type.hourly_activity_price)
 
         total_price += current_price - (current_price * regular_discounts[i] / 100)
         add_to_database(new_booking)

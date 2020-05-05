@@ -33,7 +33,7 @@ Your Basket
                         </tr>
                         {% for activity, (session_price, num_bookings, regular_discount) in activity_and_price.items() %}
                             <tr>
-                                <td>{{ activity.activity_type.name.capitalize() }}</td>
+                                <td>{{ activity.session_type.session_type_name.capitalize() }}</td>
                                 <td>{{ activity.start_time }}</td>
                                 <td>{{ activity.end_time }}</td>
                                 <td>{{ activity.facility.name.capitalize() }}</td>
