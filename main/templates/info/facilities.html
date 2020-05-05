@@ -13,15 +13,21 @@ The Vertex - Facilities!
         {% for facility_type in facility_types %}
         <div class="col-12 col-md-6" id="{{ facility_type.facility_type_id }}">
             <div class="card">
-              <img src="/static/imgs/facility-img/facility{{ facility_type.facility_type_id }}.jpg" class="card-img-top" alt="Illustration of the facility &ldquo;{{ facility_type.facility_type_name }}&rdquo;">
-              <div class="card-body">
-                <h2 class="card-title">{{ facility_type.facility_type_name.title() }}</h2>
-                <p class="card-text">
-                    {{ facility_type.description }}
-                    <br>
-                    Capacity: {{ facility_type.max_capacity }}
-                </p>
-              </div>
+                <img src="/static/imgs/facility-img/facility{{ facility_type.facility_type_id }}.jpg" class="card-img-top" alt="Illustration of the facility &ldquo;{{ facility_type.facility_type_name }}&rdquo;">
+                <div class="card-body">
+                    <h2 class="card-title">{{ facility_type.facility_type_name.title() }}</h2>
+                    <p class="card-text">
+                        {{ facility_type.description }}
+                        <br>
+                        Capacity: {{ facility_type.max_capacity }}
+                    </p>
+
+                    <form action="{{ url_for('activities.view_booking') + '?filter_facility_type_id=' + (facility_type.facility_type_id | string) }}" method="post">
+                        <button type="submit" name="amount" class="btn btn-primary">
+                            See Timetable
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         {% endfor %}

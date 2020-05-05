@@ -44,6 +44,9 @@ def view_booking():
 
     # Get this from the url argument (?request_activity_type_id=...)
     request_activity_type_id = flask.request.args.get("request_activity_type_id")
+    filter_facility_type_id = flask.request.args.get("filter_facility_type_id")
+
+    facilities = adf.return_facilities_with_facility_type_id(filter_facility_type_id)
 
     activity_type = adf.return_activity_type_with_id(request_activity_type_id)
     # The supplied id can be invalid, or the url doesn't contain a supplied id - in this case, it indicates the "show all" page is requested
@@ -51,25 +54,11 @@ def view_booking():
 
     page_title = "Booking" if activity_type is None else "Book " + activity_type.name.title()
 
-    # is_valid, basket_activities, basket_membership, basket_membership_duration = \
-    #     tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
-    #
-    # for session in weekly_activities:
-    #     if basket_activities:
-    #         amount_in_basket = basket_activities.count(session)
-    #         if amount_in_basket >= 8:
-    #             continue
-    #     else:
-    #         amount_in_basket = 0
-    #
-    #     availability = activity_capacities[session.activity_type_id] - len(tdf.return_bookings_with_activity_id(session.activity_id)) - amount_in_basket
-    #     if availability <= 0:
-    #         continue
-
     return flask.render_template("/activities/booking.html",
                                  User=user,
                                  has_cookie=has_cookie,
                                  activity_type=activity_type,  # For query_sessions
+                                 facility_id_list=[facility.facility_id for facility in facilities],  # For predefined facility filtering
                                  session_types=session_types,
                                  facilities=adf.return_facilities("Any"),
                                  page_title=page_title)
