@@ -8,6 +8,11 @@
     margin-bottom: 0;
 }
 
+#summary {
+    background-color: var(--dark-color);
+    color: white;
+}
+
 #submit_btn{
     display: none;
     margin-top: 1vh;

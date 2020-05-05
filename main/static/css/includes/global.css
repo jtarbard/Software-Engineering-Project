@@ -2,6 +2,9 @@
 :root {
     --primary-color: #6505FF;
     --secondary-color: #1e1e1e;
+    --light-color: #ffff;
+    --medium-color: #8888;
+    --dark-color: #000000;
     --neutral-color: grey;
     --min-body-height: 86.5vh;
     --content-spacer: 5vh;

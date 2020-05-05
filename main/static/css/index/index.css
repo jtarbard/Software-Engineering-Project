@@ -118,12 +118,12 @@ img+.media-body {
     -webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);
     -moz-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);
     box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);
-    background-color: lightgray;
+    background-color: var(--medium-color);
 }
 
 .card-header {
     border: none;
-    background-color: lightgray;
+    background-color: var(--medium-color);
     text-align: center;
 }
 
