@@ -7,7 +7,7 @@
 }
 
 .carousel {
-    height: 75h;
+    height: 75vh;
     background: #6505ff;
     background: linear-gradient(90deg,#6505ff 0%, #6505ff 80%);
     background: -webkit-linear-gradient(90deg,#6505ff 0%, #6505ff 80%);

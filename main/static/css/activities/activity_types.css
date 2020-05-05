@@ -9,11 +9,19 @@
 
 .card-img-top {
     width: 100%;
-    height: 15vw;
+    height: 25vw;
     object-fit: cover;
+    transition: all 1s ease;
+    -webkit-filter: brightness(70%) blur(0px); /* Chrome, Safari, Opera */
+    filter: brightness(70%) blur(0px);
+    transform: scale(1);
+}
 
-    filter: brightness(75%);
-    transition: transform .5s ease;
+.card:hover > *:not(.card-img-overlay) {
+    transition: all 1s ease;
+    -webkit-filter: brightness(70%) blur(2px); /* Chrome, Safari, Opera */
+    filter: brightness(70%) blur(2px);
+    transform: scale(1.1);
 }
 
 @media (max-width: 990px) {
@@ -23,10 +31,10 @@
 }
 
 .card-text-overlay {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: unset;
+    /*font-family: 'Poppins', sans-serif;*/
+    /*font-weight: 600;*/
+    /*letter-spacing: 1px;*/
+    /*text-transform: unset;*/
     color: white;
 }
 
