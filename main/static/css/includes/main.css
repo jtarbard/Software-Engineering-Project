@@ -90,6 +90,10 @@
     #main-nav .dropdown-menu {
         margin-left: -1.8vw;
     }
+
+    #page_description {
+        text-align: center;
+    }
 }
 
 .bg-black {

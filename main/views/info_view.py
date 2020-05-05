@@ -12,7 +12,7 @@ blueprint = flask.Blueprint("info", __name__)
 @blueprint.route('/info/about', methods=["GET"])
 def about_func():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
-    return flask.render_template("/info/about.html", page_title="About", User=user, has_cookie=has_cookie)
+    return flask.render_template("/info/about.html", facility_types=FacilityType.query.all(), page_title="About", User=user, has_cookie=has_cookie)
 
 
 @blueprint.route('/info/facilities', methods=["GET"])

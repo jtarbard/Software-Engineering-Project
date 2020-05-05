@@ -1,7 +1,21 @@
+p {
+    margin-bottom: 0;
+}
+
+h2 {
+    margin-bottom: var(--half-content-spacer);
+}
+
 h3 {
     font-size: 1.2rem;
     padding: 0;
     margin: 0;
+    margin-bottom: var(--half-content-spacer);
+}
+
+.spacer {
+    margin-top: var(--content-spacer);
+    margin-bottom: var(--content-spacer);
 }
 
 #fixed-container {
@@ -9,38 +23,33 @@ h3 {
     top: 7vh;
 }
 
-#google-map {
-    margin-bottom: 3vh;
+#googleMap {
+    margin-bottom: var(--content-spacer);
 }
 
 #faq h3{
     margin: 1vh 0 1.8vh 0;
     padding: 0.5vh;
-    border-bottom: solid 2px black;
+    border-bottom: solid 0.1rem #ebebeb;
 }
 
 .faq-q {
-    margin-bottom: 0.3vw;
     font-weight: bold;
 }
 
 .faq-a {
-    padding-left: 2vw;
-    border-left: 1vw solid black;
+    margin-bottom: var(--half-content-spacer);
 }
 
 /*Medium devices (tablets, 768px and up)*/
 @media (min-width: 768px) {
-
-    .faq-q {
-        margin-left: 2vw;
-    }
-
     .faq-a {
-        margin-left: 3vw;
-        padding-left: 0.5vw;
-        border-left: 0.5vw solid black;
+        margin-left: var(--half-content-spacer);
     }
+}
+
+.table {
+    margin-top: var(--half-content-spacer);
 }
 
 #contact-container {
@@ -54,4 +63,20 @@ h3 {
 
 .contact-title {
     font-weight: bold;
+}
+
+.content-container .table th, .content-container .table tr  {
+    width: 30%;
+}
+
+.content-container .table th:first-of-type{
+    width: 50%;
+}
+
+.content-container .table td+td, .content-container .table th+th {
+    text-align: right;
+}
+
+#contact-us .col-12 {
+    padding: 0 !important;
 }

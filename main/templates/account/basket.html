@@ -12,64 +12,66 @@ Your Basket
 <div class="row">
     <div class="content-container col-12 col-lg-8">
         <h1>Basket Items</h1>
-        <table class="table">
-            <thead>
-                <th class="col-2">Item</th>
-                <th class="col">Quantity</th>
-                <th class="col-2">Discount</th>
-                <th class="col">Total</th>
-            </thead>
-            <tbody>
-                {% if basket_membership %}
-                <form action="/account/basket" method="post" id="booking_item_{{basket_membership.membership_id}}">
-                <tr>
-                    <td>
-                        <h6>{{ basket_membership.name.capitalize() }} Membership</h6>
-                        Duration: {{ basket_membership_duration }} Month<br>
-                        Start Date: {{ basket_membership.start_time }}<br>
-                        End Date: {{ basket_membership.end_time }}.<br>
-                        <input type="hidden" name="delete" id="delete" value="booking_item_{{basket_membership.membership_id}}">
-                        <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
-                    </td>
-                    <td>1</td>
-                    <td>None</td>
-                    <td>£{{ basket_membership_duration * basket_membership.monthly_price }}</td>
-                </tr>
-                {% endif %}
-                {% if basket_activities %}
-                    {% for activity, (session_price, num_bookings, regular_discount) in activity_and_price.items() %}
-                    <tr>
-                        <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
-                            <td>
-                                <h6>{{ activity.session_type.session_type_name.capitalize() }}</h6>
-                                Facility: {{ activity.facility.name.capitalize() }}<br>
-                                Date: {{ activity.start_time.strftime("%m/%y") }}<br>
-                                Time: {{ activity.start_time.strftime("%H:%M") }} - {{ activity.end_time.strftime("%H:%M") }}<br>
-                                <input type="hidden" name="delete" id="delete" value="booking_item_{{activity.activity_id}}">
-                                <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
-                                <input type="button" id="cancel_btn" onclick="edit()" value="Cancel" class="btn btn-secondary" required>
-                                <input type="submit" id="submit_btn" name="update" value="Update" class="btn btn-primary">
-                                <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
-                                <input type="button" id="edit_btn" onclick="edit()" value="Edit" class="btn btn-secondary" required>
-                            </td>
-                            <td>
-                                <input type="number" id="num_change" name="num_change" max="8" min="0" value="{{num_bookings}}" class="form-control-plaintext" readonly>
-                            </td>
-                            <td>{{ regular_discount }}%</td>
-                            <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * regular_discount / 100) }}</td>
-                        </form>
-                    </tr>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <th class="col-2">Item</th>
+                    <th class="col">Quantity</th>
+                    <th class="col-2">Discount</th>
+                    <th class="col">Total</th>
+                </thead>
+                <tbody>
+                    {% if basket_membership %}
+                    <form action="/account/basket" method="post" id="booking_item_{{basket_membership.membership_id}}">
                     <tr>
                         <td>
-                            <form method="post">
-                            <input type="submit" name="delete_basket" value="Delete all items" class="btn btn-secondary">
-                            </form>
+                            <h6>{{ basket_membership.name.capitalize() }} Membership</h6>
+                            Duration: {{ basket_membership_duration }} Month<br>
+                            Start Date: {{ basket_membership.start_time }}<br>
+                            End Date: {{ basket_membership.end_time }}.<br>
+                            <input type="hidden" name="delete" id="delete" value="booking_item_{{basket_membership.membership_id}}">
+                            <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
                         </td>
+                        <td>1</td>
+                        <td>None</td>
+                        <td>£{{ basket_membership_duration * basket_membership.monthly_price }}</td>
                     </tr>
-                    {% endfor %}
-                {% endif %}
-            </tbody>
-        </table>
+                    {% endif %}
+                    {% if basket_activities %}
+                        {% for activity, (session_price, num_bookings, regular_discount) in activity_and_price.items() %}
+                        <tr>
+                            <form action="/account/basket" method="post" id="booking_item_{{activity.activity_id}}">
+                                <td>
+                                    <h6>{{ activity.session_type.session_type_name.capitalize() }}</h6>
+                                    Facility: {{ activity.facility.name.capitalize() }}<br>
+                                    Date: {{ activity.start_time.strftime("%m/%y") }}<br>
+                                    Time: {{ activity.start_time.strftime("%H:%M") }} - {{ activity.end_time.strftime("%H:%M") }}<br>
+                                    <input type="hidden" name="delete" id="delete" value="booking_item_{{activity.activity_id}}">
+                                    <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
+                                    <input type="button" id="cancel_btn" onclick="edit()" value="Cancel" class="btn btn-secondary" required>
+                                    <input type="submit" id="submit_btn" name="update" value="Update" class="btn btn-primary">
+                                    <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
+                                    <input type="button" id="edit_btn" onclick="edit()" value="Edit" class="btn btn-secondary" required>
+                                </td>
+                                <td>
+                                    <input type="number" id="num_change" name="num_change" max="8" min="0" value="{{num_bookings}}" class="form-control-plaintext" readonly>
+                                </td>
+                                <td>{{ regular_discount }}%</td>
+                                <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * regular_discount / 100) }}</td>
+                            </form>
+                        </tr>
+                        <tr>
+                            <td>
+                                <form method="post">
+                                <input type="submit" name="delete_basket" value="Delete all items" class="btn btn-secondary">
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
     </div>
     <div id="summary" class="content-container col-12 col-lg-4">
         <h1>Order Summary</h1>

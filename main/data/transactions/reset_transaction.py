@@ -34,37 +34,47 @@ def create_facility_types():
     data = [
         dict(name="Swimming Pool",
              description="The competition standard 50m, eight lane swimming pool is the ideal space for swimmers of all ages and abilities to enjoy.",
-             max_capacity=70),
+             max_capacity=70,
+             base_facility_price=70.00),
         dict(name="Fitness Room",
              description="The contemporary 100-station fitness room features an extensive range of cardiovascular and resistance machines and dedicated free-weight areas.",
-             max_capacity=120),
+             max_capacity=120,
+             base_facility_price=0),
         dict(name="Apex Sports Hall",
              description="The new 120m Apex Sports Hall is home to an indoor football pitch, basketball courts, badminton courts, and our gymnastics and boxing classes.",
-             max_capacity=80),
+             max_capacity=800,
+             base_facility_price=40.00),
         dict(name="Edge Sports Hall",
              description="The 60m Edge Sports Hall is home to basketball courts, badminton courts, and our gymnastics and boxing classes.",
-             max_capacity=50),
+             max_capacity=500,
+             base_facility_price=25.00),
         dict(name="Climbing Wall",
              description="The 10m climbing wall features 10 belay lines, a bouldering cave and a separate teaching wall. It is designed for beginners and experts alike.",
-             max_capacity=18),
+             max_capacity=18,
+             base_facility_price=35.00),
         dict(name="Tennis Court",
              description="The outdoor modern hard surface tennis courts are fitted with state of the art floodlighting and is ready all year round.",
-             max_capacity=8),
+             max_capacity=8,
+             base_facility_price=15.00),
         dict(name="Squash Court",
              description="The glass backed competition standard squash courts are ideal for both leisure and competitive play.",
-             max_capacity=4),
+             max_capacity=4,
+             base_facility_price=15.00),
         dict(name="Outside Playing Field",
              description="The 4 acre floodlight-lit outside playing field is maintained all year round and host to cricket grounds, two football pitches, and a rugby pitch.",
-             max_capacity=150),
+             max_capacity=150,
+             base_facility_price=30.00),
         dict(name="Studio",
              description="The ultra-modern large studio is home to a wall of full height mirrors and state of the art adaptive lighting to suite any activity.",
-             max_capacity=30)
+             max_capacity=30,
+             base_facility_price=35.00)
     ]
 
     for item in data:
         facility_type = FacilityType(facility_type_name=item["name"],
                                      description=item["description"],
-                                     max_capacity=item["max_capacity"])
+                                     max_capacity=item["max_capacity"],
+                                     base_facility_price=item["base_facility_price"])
         if not add_to_database(facility_type):
             log_transaction(f"Failed to add facility type: {facility_type}")
             return False

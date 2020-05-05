@@ -94,6 +94,7 @@ class FacilityType(database.Model):
     facility_type_name = database.Column(database.String, nullable=False)
     description = database.Column(database.Text, nullable=False)
     max_capacity = database.Column(database.Integer, nullable=False)
+    base_facility_price = database.Column(database.Integer, nullable=False)
 
     facilities = database.relationship("Facility", back_populates="facility_type")
 
