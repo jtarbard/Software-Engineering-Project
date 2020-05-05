@@ -1,7 +1,7 @@
 /*The Vertex Global Styling*/
 :root {
     --primary-color: #6505FF;
-    --secondary-color: #f6f930;
+    --secondary-color: #b7b4c3;
     --light-color: #ffff;
     --medium-color: #b7b4c3;
     --dark-color: #272727;
@@ -55,6 +55,7 @@ h2, h3, h4, h5, h6, .navbar {
     border-color: white;
     padding: 18px 32px;
     margin-bottom: 3vh;
+    background-color: var(--light-color);
 }
 
 /*Bootstrap classes customisation*/

@@ -92,8 +92,8 @@ input {
     min-height: 30vh;
     margin-bottom: 3vh;
     padding: 5vh 0;
-    color: var(--secondary-color);
-    background-color: #EEEEEE;
+    color: black;
+    background-color: var(--medium-color);
 }
 
 #descriptionContainer img {

@@ -115,7 +115,7 @@ aside a, aside a:hover {
 
 th {
     color: #F2F2F2;
-    background-color: #1E1E1E;
+    background-color: var(--dark-color);
 }
 
 label {
@@ -139,7 +139,7 @@ table.dataTable thead .sorting_desc:after,
 table.dataTable thead .sorting_desc:before,
 table.dataTable thead .sorting_desc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:before {
-    color: #F2F2F2;
+    color: var(--medium-color);
     bottom: .5em;
 }
 
