@@ -4,6 +4,7 @@
 #main-nav {
     margin: 0;
     padding: 2vh 2vh;
+    background-color: var(--light-color);
 }
 
 .navbar-brand img {

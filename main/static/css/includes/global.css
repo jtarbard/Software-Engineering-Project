@@ -1,10 +1,10 @@
 /*The Vertex Global Styling*/
 :root {
     --primary-color: #6505FF;
-    --secondary-color: #1e1e1e;
+    --secondary-color: #f6f930;
     --light-color: #ffff;
-    --medium-color: #8888;
-    --dark-color: #000000;
+    --medium-color: #b7b4c3;
+    --dark-color: #272727;
     --neutral-color: grey;
     --min-body-height: 86.5vh;
     --content-spacer: 5vh;
@@ -22,6 +22,7 @@ body {
     min-width: 100%;
     font-family: 'Open Sans', sans-serif;
     font-weight: 400;
+    background-color: var(--light-color);
 }
 
 h1 {
@@ -38,6 +39,14 @@ h2, h3, h4, h5, h6, .navbar {
     text-transform: uppercase;
 }
 
+.spacer {
+    position: relative;
+    width: 90%;
+    height: 0.1rem;
+    margin: auto;
+    background-color: #ebebeb;
+}
+
 .content-container {
     background-color: white;
     -webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,1);
@@ -49,6 +58,10 @@ h2, h3, h4, h5, h6, .navbar {
 }
 
 /*Bootstrap classes customisation*/
+
+.navbar-light {
+    background-color: white !important;
+}
 
 .card {
     background-color: white;
