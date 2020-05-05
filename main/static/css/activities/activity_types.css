@@ -11,17 +11,24 @@
     width: 100%;
     height: 25vw;
     object-fit: cover;
-    transition: all 1s ease;
+    transition: all 0.5s ease;
     -webkit-filter: brightness(70%) blur(0px); /* Chrome, Safari, Opera */
     filter: brightness(70%) blur(0px);
     transform: scale(1);
 }
 
 .card:hover > *:not(.card-img-overlay) {
-    transition: all 1s ease;
+    transition: all 0.5s ease;
     -webkit-filter: brightness(70%) blur(2px); /* Chrome, Safari, Opera */
     filter: brightness(70%) blur(2px);
     transform: scale(1.1);
+}
+
+#view_all, #view_all:hover *:not(.card-img-overlay) {
+    transition: none;
+    -webkit-filter: none; /* Chrome, Safari, Opera */
+    filter: none;
+    transform: scale(1);
 }
 
 @media (max-width: 990px) {
