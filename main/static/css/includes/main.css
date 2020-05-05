@@ -19,7 +19,16 @@
 }
 
 #main-nav .dropdown-menu {
-    width: 12vw;
+    margin-left: -2vw;
+    width: 15vw;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    text-align: center;
+    border: none;
+}
+
+#nav-content-left, #nav-content-right {
+    width: 40%;
 }
 
 #nav-content-left .nav-link {
@@ -62,7 +71,7 @@
 
 
 /*// Medium devices (tablets, 768px and up)*/
-@media (min-width: 768px) {
+@media (max-width: 768px) {
     #main-nav .float-right {
         float: left !important;
     }

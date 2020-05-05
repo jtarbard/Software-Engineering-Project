@@ -33,7 +33,7 @@ The Vertex-Index!
         Vertex one of the best equipped sports centres in the north of England.
         </p>
         <a href="{{ url_for('info.about_func')}}">
-            <div id="more_about">
+            <div class="more_about">
                 <h2 class="self-align-center">More About The Vertex</h2>
             </div>
         </a>
@@ -48,6 +48,11 @@ The Vertex-Index!
                     The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
                     instructor and coach lead classes, private court renting sessions, to team events.
                     </p>
+                    <a href="{{ url_for('info.about_func')}}">
+                        <div class="more_about">
+                            <h2 class="self-align-center">More About Activities</h2>
+                        </div>
+                    </a>
                 </div>
                 <img class="align-self-center" src="../static/imgs/activities-img/basketball-description.jpg">
             </div>
@@ -59,6 +64,11 @@ The Vertex-Index!
                     The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
                     instructor and coach lead classes, private court renting sessions, to team events.
                     </p>
+                    <a href="{{ url_for('info.about_func')}}">
+                        <div class="more_about">
+                            <h2 class="self-align-center">More About Memberships</h2>
+                        </div>
+                    </a>
                 </div>
             </div>
             <div class="media">
@@ -68,6 +78,11 @@ The Vertex-Index!
                     The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
                     instructor and coach lead classes, private court renting sessions, to team events.
                     </p>
+                    <a href="{{ url_for('info.about_func')}}">
+                        <div class="more_about">
+                            <h2 class="self-align-center">More About Facilities</h2>
+                        </div>
+                    </a>
                 </div>
                 <img class="align-self-center" src="../static/imgs/activities-img/basketball-description.jpg">
             </div>
@@ -82,29 +97,57 @@ The Vertex-Index!
                             The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
                             instructor and coach lead classes, private court renting sessions, to team events.
                         </p>
+                        <a href="{{ url_for('info.about_func')}}">
+                            <div class="more_about">
+                                <h2 class="self-align-center">More About Activities</h2>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="card">
-                    <h2 class="card-header">Activities</h2>
+                    <h2 class="card-header">Memberships</h2>
                     <img class="card-img-top" src="../static/imgs/activities-img/basketball-description.jpg">
                     <div class="card-body">
                         <p>
                             The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
                             instructor and coach lead classes, private court renting sessions, to team events.
                         </p>
+                        <a href="{{ url_for('info.about_func')}}">
+                            <div class="more_about">
+                                <h2 class="self-align-center">More About Memberships</h2>
+                            </div>
+                        </a>
                     </div>
                 </div>
                 <div class="card">
-                    <h2 class="card-header">Activities</h2>
+                    <h2 class="card-header">Facilities</h2>
                     <img class="card-img-top" src="../static/imgs/activities-img/basketball-description.jpg">
                     <div class="card-body">
                         <p>
                             The Vertex Sports Center holds a wide variety activities all throughout the week; ranging from general sessions,
                             instructor and coach lead classes, private court renting sessions, to team events.
                         </p>
+                        <a href="{{ url_for('info.about_func')}}">
+                            <div class="more_about">
+                                <h2 class="self-align-center">More About Facilities</h2>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
+        </div>
+        <div id="more_visit">
+            {% if date_time > 06 and date_time < 20 %}
+            <h2>We're Open Until 10pm</h2>
+            {% else %}
+            <h2>We're Open Again at 6am</h2>
+            {% endif %}
+            <img src="../static/imgs/logo/vertex_logo.png">
+            <a href="{{ url_for('info.about_func')}}">
+                <div class="more_about">
+                    <h2 class="self-align-center">Visit The Vertex</h2>
+                </div>
+            </a>
         </div>
     </div>
 </div>

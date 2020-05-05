@@ -1,3 +1,11 @@
+#main-nav {
+    position: -webkit-sticky; /* Safari */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+}
+
 .carousel {
     height: 65vh;
     background: #6505ff;
@@ -31,7 +39,7 @@
 #introduction {
     position: relative;
     margin-top: -20vh;
-    z-index: 100;
+    z-index: 2;
     /*-webkit-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);*/
     /*-moz-box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);*/
     /*box-shadow: 0px 0px 20px 0px rgba(232,232,232,0);*/
@@ -51,7 +59,7 @@
     text-align: center;
 }
 
-#more_about {
+.more_about {
     width: 40%;
     margin: auto;
     margin-top: var(--content-spacer);
@@ -65,7 +73,7 @@ a:hover {
     text-decoration: none;
 }
 
-#more_about h2 {
+.more_about h2 {
     padding: 2vh;
     font-size: 1rem;
     color: white;
@@ -134,13 +142,31 @@ img+.media-body {
     margin: 0;
 }
 
+.media .more_about, .card .more_about {
+    width: 80%;
+    margin: 0;
+    margin-top: 1rem;
+}
+
+#more_visit {
+    width: 90%;
+    margin: auto;
+    margin-bottom: var(--content-spacer);
+    text-align: center;
+}
+
+#more_visit img {
+    width: 70%;
+    object-fit: cover;
+}
+
 /*// Medium devices (tablets, 768px and up)*/
 @media (max-width: 768px) {
     .intro-text {
         width: 100%;
     }
 
-    #more_about {
+    .more_about {
         width: 90%;
         margin: auto;
         margin-top: var(--content-spacer);
@@ -148,5 +174,16 @@ img+.media-body {
         background-color: var(--primary-color);
         text-align: center;
         text-decoration: none;
+    }
+
+    .card .more_about {
+        margin: auto;
+        margin-top: var(--half-content-spacer);
+    }
+
+    #more_visit img {
+        margin-top: 2vh;
+        width: 90%;
+        object-fit: cover;
     }
 }

@@ -5,6 +5,7 @@
     --neutral-color: grey;
     --min-body-height: 86.5vh;
     --content-spacer: 5vh;
+    --half-content-spacer: 2vh;
 }
 
 html {
