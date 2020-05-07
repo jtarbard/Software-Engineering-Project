@@ -9,8 +9,9 @@ The Vertex memberships!
 
 {% block page_description %}
 <p>
-    Membership description goes here. You should really buy a membership because this makes things so much easier for us so please.
-    Membership description goes here. You should really buy a membership because this makes things so much easier for us so please.
+    We offer a range of membership options for access to our fitness suite and our extensive range of activities.
+    Whether you're interested in taking a weekly dance class or achieving a new personal best you're
+    welcome at the Vertex.
 </p>
 {% endblock %}
 
@@ -31,7 +32,7 @@ The Vertex memberships!
                                     By creating an account with us you gain access to all of our advertised activities
                                     from swimming classes, climbing sessions to rugby team events.
                                 </p>
-                                <p class="price">Free</p>
+                                <h4 class="price">Free</h4>
                                 <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
                                      TODO: Change text to reflect as well? -->
                                 <a href="#" class="btn btn-secondary">Register</a>
@@ -51,7 +52,7 @@ The Vertex memberships!
                                     Premium members get access to our state of the art 100-station fitness suite and
                                     free unlimited access to all of our activities, any time, any day.
                                 </p>
-                                <p class="price">£30</p>
+                                <h4 class="price">£30</h4>
                                 <form method="post" action="/info/memberships/buy">
                                     <input type="submit" class="btn btn-primary" value="Purchase">
                                     <input type="hidden" name="buy_membership" value={{ premium_id }}>
@@ -79,7 +80,7 @@ The Vertex memberships!
                                         Standard members get access to our state of the art 100-station fitness suite and
                                         a 30% discount on all of our activities, any time, any day.
                                     </p>
-                                    <p class="price">£20</p>
+                                    <h4 class="price">£20</h4>
                                     <form method="post" action="/info/memberships/buy">
                                         <input type="submit" class="btn btn-secondary" value="Purchase">
                                         <input type="hidden" name="buy_membership" value={{ standard_id }}>
