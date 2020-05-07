@@ -3,11 +3,36 @@
 }
 
 .card {
+    height: 95%;
     padding-top: 5vh;
     padding-bottom: 5vh;
     margin-bottom: 3vh;
+    min-height: 40vh;
+}
+
+.card-title {
+    padding: var(--half-content-spacer) 0;
+    width: 80%;
+    margin: auto;
 }
 
 .card-body {
     padding: 0 3vw;
+}
+
+.card-text {
+    width: 80%;
+    min-height: 20vh;
+    margin: auto;
+    margin-bottom: var(--half-content-spacer);
+}
+
+.price {
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: var(--half-content-spacer);
+    padding: 1vh;
+    border-top: solid 0.1rem #ebebeb;
+    border-bottom: solid 0.1rem #ebebeb;
 }

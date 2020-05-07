@@ -27,11 +27,14 @@ The Vertex memberships!
                         <div class="card-body">
                             <h3 class="card-title">Free<br>Account</h3>
                             <div class="card-block">
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
-
+                                <p class="card-text">
+                                    By creating an account with us you gain access to all of our advertised activities
+                                    from swimming classes, climbing sessions to rugby team events.
+                                </p>
+                                <p class="price">Free</p>
                                 <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
                                      TODO: Change text to reflect as well? -->
-                                <a href="#" class="btn btn-secondary">Book a Class for free</a>
+                                <a href="#" class="btn btn-secondary">Register</a>
                             </div>
                         </div>
                     </div>
@@ -44,7 +47,11 @@ The Vertex memberships!
                         <div class="card-body">
                             <h3 class="card-title">Premium Membership</h3>
                             <div class="card-block">
-                                <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+                                <p class="card-text">
+                                    Premium members get access to our state of the art 100-station fitness suite and
+                                    free unlimited access to all of our activities, any time, any day.
+                                </p>
+                                <p class="price">£30</p>
                                 <form method="post" action="/info/memberships/buy">
                                     <input type="submit" class="btn btn-primary" value="Purchase">
                                     <input type="hidden" name="buy_membership" value={{ premium_id }}>
@@ -68,7 +75,11 @@ The Vertex memberships!
                             <div class="card-body">
                                 <h3 class="card-title">Standard Membership</h3>
                                 <div class="card-block">
-                                    <p class="card-text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla tincidunt augue sapien, vitae imperdiet ex luctus id. Maecenas ullamcorper nisl eu elit sagittis pulvinar. Proin condimentum nulla at dui pulvinar, semper suscipit sem rutrum.</p>
+                                    <p class="card-text">
+                                        Standard members get access to our state of the art 100-station fitness suite and
+                                        a 30% discount on all of our activities, any time, any day.
+                                    </p>
+                                    <p class="price">£20</p>
                                     <form method="post" action="/info/memberships/buy">
                                         <input type="submit" class="btn btn-secondary" value="Purchase">
                                         <input type="hidden" name="buy_membership" value={{ standard_id }}>
