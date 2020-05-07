@@ -82,6 +82,10 @@ h2, h3, h4, h5, h6, .navbar {
     border-color: white;
 }
 
+.btn {
+    border-radius: 0;
+}
+
 .btn-primary, .btn-primary:hover {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
@@ -97,15 +101,32 @@ h2, h3, h4, h5, h6, .navbar {
     border-color: var(--secondary-color);
 }
 
+.alert {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    z-index: 10;
+    border-radius: 0;
+    margin: 0 0 0 0;
+}
+
+.alert-success {
+    color: white;
+    background-color: var(--primary-color)
+}
+
+.alert .close {
+    color: white;
+}
+
 .list-group {
     padding: 0;
-
 }
 
 .list-group-item {
     border: 0;
     padding: 1.5rem 2.5rem;
-
 }
 
 .media {

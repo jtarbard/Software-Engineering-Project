@@ -1,7 +1,3 @@
-#view_all {
-    margin-bottom: var(--content-spacer);
-}
-
 .card, .c-body{
     margin-bottom: var(--content-spacer);
 }

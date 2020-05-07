@@ -1,14 +1,21 @@
 body {
+    background-image: url("/static/imgs/facility-img/facility2.jpg");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
 }
 
+#background-overlay {
+    min-height: var(--min-body-height);
+    background-color: rgba(101,5,255, 0.7);
+}
+
 #login-container {
-    background-color: rgba(256, 256, 256, 0.93);
-    margin-top: 18vh;
-    border-radius: 20px;
-    padding: 30px 30px 30px 30px;
+    position: absolute;
+    background-color: white;
+    margin-top: 15vh;
+    padding: var(--content-spacer);
+    height: 60vh;
 }
 
 #login-container h1 {

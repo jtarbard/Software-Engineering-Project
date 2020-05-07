@@ -1,43 +1,35 @@
 body {
+    background-image: url("/static/imgs/facility-img/facility2.jpg");
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-size: cover;
 }
 
+#background-overlay {
+    background-color: rgba(101,5,255, 0.7);
+}
+
 #register-container {
-    background-color: rgba(256, 256, 256, 0.93);
-    margin-top: 8vh;
-    border-radius: 20px;
-    padding: 2.5vw 2.5vw 2.5vw 2.5vw;
+    padding: var(--content-spacer);
+    margin: var(--content-spacer);
 }
 
-#register-container h5[id="title"]{
-    margin-top: 10px;
+h2 {
+    margin-bottom: var(--content-spacer);
 }
 
-#register-container select {
-    margin-bottom: 30px;
-    margin-top: 5px;
+.spacer {
+    margin: var(--content-spacer) 0;
 }
 
-#register-container input[type="text"],input[type="password"],input[type="email"],input[type="tel"],input[type="date"] {
+#register-container input:not(.btn) {
     background-color: transparent;
     border: none;
     border-bottom: 1px solid #5BBDC8;
     outline: none;
-    width: 175px;
-    margin-bottom: 30px;
+    margin-bottom: var(--half-content-spacer);
 }
 
-#register-container input[name="address"] {
-    width: 58vw;
-}
-
-#register-container input[type="submit"] {
-    border: none;
-    border-radius: 20px;
-    background: #5BBDC8;
-    margin-bottom: 10px;
-    font-size: 18px;
-    color: white;
+form .btn {
+    margin: auto;
 }

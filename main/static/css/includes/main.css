@@ -100,20 +100,6 @@
     }
 }
 
-.bg-black {
-    background-color: #1E1E1E;
-    color: #F2F2F2;
-}
-
-.alert {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 100%;
-    z-index: 10;
-    margin: 0 0 0 0;
-}
-
 #cookies{
 	text-align: center;
 	border: black 0.3em ridge;
