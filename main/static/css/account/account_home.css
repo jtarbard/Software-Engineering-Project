@@ -1,10 +1,6 @@
-.container {
-    margin-top: var(--content-spacer);
-    min-height: var(--min-body-height);
-}
 
 #title-bar {
-    margin-bottom: var(--content-spacer);
+    margin: var(--content-spacer) 0;
 }
 
 .card {
@@ -44,7 +40,7 @@ a {
 }
 
 .card, .media {
-    background-color: var(--primary-color);
+    background-color: var(--dark-color);
     color: white;
 }
 
