@@ -11,7 +11,8 @@ body {
 
 #register-container {
     padding: var(--content-spacer);
-    margin: var(--content-spacer);
+    margin-top: var(--content-spacer);
+    margin-bottom: var(--content-spacer);
 }
 
 h2 {
@@ -34,4 +35,10 @@ h2 {
 
 form .btn {
     margin: auto;
+}
+
+@media (min-width: 768px) {
+    #register-container {
+        margin: var(--content-spacer);
+    }
 }
