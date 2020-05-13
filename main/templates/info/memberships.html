@@ -33,9 +33,13 @@ The Vertex memberships!
                                     from swimming classes, climbing sessions to rugby team events.
                                 </p>
                                 <h4 class="price">Free</h4>
-                                <!-- TODO: Redirect to book classes for USER, redirect to create account for GUEST
-                                     TODO: Change text to reflect as well? -->
-                                <a href="#" class="btn btn-secondary">Register</a>
+                                {% if User is not defined or User is none %}
+                                <!-- User is not logged in. Prompt register page -->
+                                <a href="/account/register" class="btn btn-secondary">Register</a>
+                                {% elif User is defined and User is not none and User.__mapper_args__ ['polymorphic_identity'] == "Customer" %}
+                                <!-- Redirect to book classes for Customer -->
+                                <a href="/activities/types" class="btn btn-secondary">Book a session</a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
