@@ -65,7 +65,7 @@ input {
 
 #descriptionContainer {
     min-height: 30vh;
-    margin-bottom: 3vh;
+    margin-bottom: var(--content-spacer);
     padding: 5vh 0;
     color: black;
     background-color: var(--medium-color);
@@ -73,6 +73,9 @@ input {
 
 #descriptionContainer .media {
     background-color: var(--medium-color);
+    margin: 0;
+    width: 100%;
+    height: 100%;
 }
 
 #descriptionContainer img {
@@ -111,4 +114,27 @@ select.filter{
 .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
     color: white !important;
     padding-right: 0.3rem !important;
+}
+
+.media img {
+    width: 100%;
+    height: 35vh;
+    margin: 0;
+    object-fit: cover;
+}
+
+.media-body {
+    width: 100%;
+    height: inherit;
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    #descriptionTitle {
+        margin: var(--content-spacer) 0;
+    }
+
+    #description {
+        text-align: center;
+    }
 }
