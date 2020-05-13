@@ -71,6 +71,10 @@ input {
     background-color: var(--medium-color);
 }
 
+#descriptionContainer .media {
+    background-color: var(--medium-color);
+}
+
 #descriptionContainer img {
     margin-right: 5vw;
     object-fit: cover;

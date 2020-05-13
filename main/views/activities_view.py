@@ -60,8 +60,7 @@ def view_booking():
                                  activity_type=activity_type,  # For query_sessions
                                  facility_id_list=[facility.facility_id for facility in facilities],  # For predefined facility filtering
                                  session_types=session_types,
-                                 facilities=adf.return_facilities("Any"),
-                                 page_title=page_title)
+                                 facilities=adf.return_facilities("Any"))
 
 
 # -------------------------------------------------- Ajax routes -------------------------------------------------- #
