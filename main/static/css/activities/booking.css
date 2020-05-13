@@ -7,6 +7,11 @@
     text-align: center;
 }
 
+
+.content-container {
+    margin-top: var(--content-spacer);
+}
+
 input {
   border: 2px solid whitesmoke;
   border-radius: 20px;
@@ -70,7 +75,6 @@ input {
 
 #descriptionContainer {
     min-height: 30vh;
-    margin-bottom: var(--content-spacer);
     padding: 5vh 0;
     color: black;
     background-color: var(--medium-color);
@@ -136,10 +140,14 @@ select.filter{
 
 @media (max-width: 768px) {
     #descriptionTitle {
-        margin: var(--content-spacer) 0;
+        margin: var(--content-spacer);
     }
 
     #description {
         text-align: center;
+    }
+
+    .content-container {
+        margin-top: 0;
     }
 }
