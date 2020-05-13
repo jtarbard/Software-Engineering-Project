@@ -22,7 +22,7 @@
 {% for session_type in session_types %}
     <!-- activity info -->
     <div id="descriptionContainer" class="fluid-container">
-        <div class="container">
+        <div id="descriptionInfo" class="container">
             <div class="media row no-gutters">
                 <img class="col-12 col-md-5" src="/static/imgs/activities-img/{{ session_type.session_type_name | replace(" ", "-") }}-description.jpg" alt="Illustration of {{ session_type.name }}">
                 <div id="descriptionTextbox" class="align-self-center media-body col-12 col-md-7"> <!-- makes the content vertically aligned -->

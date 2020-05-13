@@ -26,7 +26,7 @@ The Vertex Receipt
                         </tr>
                         {% for booking in returned_receipt.bookings %}
                             <tr>
-                                <td>{{ booking.activity.activity_type.name }}</td>
+                                <td>{{ booking.activity.session_type.session_type_name }}</td>
                                 <td>{{ booking.activity.start_time }}</td>
                                 <td>{{ booking.activity.end_time }}</td>
                                 <td>{{ booking.activity.facility.name }}</td>

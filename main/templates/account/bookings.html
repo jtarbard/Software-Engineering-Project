@@ -22,7 +22,7 @@
                 <tbody>
                     {% for activity, receipt_and_amount in returned_bookings.items() %}
                         <tr>
-                            <td>{{ activity.activity_type.name.title() }}</td>
+                            <td>{{ activity.session_type.session_type_name.title() }}</td>
                             <td>{{ activity.start_time.strftime("%d/%m/%y") }}</td>
                             <td>{{ activity.start_time.strftime("%H:%M") }}</td>
                             <td>{{ activity.end_time.strftime("%H:%M") }}</td>

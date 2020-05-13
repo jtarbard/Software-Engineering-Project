@@ -24,7 +24,7 @@ def return_email_message(receipt: Receipt, new_user: User):
     for booking in receipt.bookings:
         message.html += f"""
                     <tr>
-                        <td>{booking.activity.activity_type.name}</td>
+                        <td>{booking.activity.session_type.session_type_name}</td>
                         <td>{booking.activity.start_time}</td>
                         <td>{booking.activity.end_time}</td>
                         <td>{booking.activity.facility.name}</td>
