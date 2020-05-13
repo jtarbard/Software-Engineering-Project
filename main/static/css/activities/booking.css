@@ -67,12 +67,12 @@ input {
 #descriptionContainer {
     min-height: 30vh;
     padding: 5vh 0;
-    color: black;
-    background-color: var(--medium-color);
+    color: white;
+    background-color: var(--primary-color);
 }
 
 #descriptionContainer .media {
-    background-color: var(--medium-color);
+    background-color: var(--primary-color);
     margin: 0;
     width: 100%;
     height: 100%;

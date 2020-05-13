@@ -64,7 +64,7 @@
 }
 
 .more_about {
-    width: 40%;
+    max-width: 40%;
     margin: auto;
     margin-top: var(--content-spacer);
     margin-bottom: var(--content-spacer);
