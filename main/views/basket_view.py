@@ -115,6 +115,13 @@ def basket_view():
     # total_discounted_price = 0  # can uncomment but this is not needed (why is python weird)
     if basket_membership:
         total_discounted_price = (total_activity_price - basket_membership.discount / 100 * total_activity_price)
+        start_date = datetime.date.today()
+        if start_date.month+basket_membership_duration > 12:
+            end_date = datetime.date(start_date.year+1, start_date.month+basket_membership_duration-12, start_date.day)
+        elif start_date.month+basket_membership_duration == 12:
+            end_date = datetime.date(start_date.year + 1, start_date.month, start_date.day)
+        else:
+            end_date = datetime.date(start_date.year, start_date.month+basket_membership_duration, start_date.day)
 
         current_membership_discount = basket_membership.discount
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
@@ -137,7 +144,8 @@ def basket_view():
                                  activity_and_price=activity_and_price, final_price=round(final_price, 2),
                                  basket_membership_duration=basket_membership_duration,
                                  total_discounted_price=round(total_discounted_price, 2),
-                                 current_membership_discount=current_membership_discount)
+                                 current_membership_discount=current_membership_discount,
+                                 start_date=start_date, end_date=end_date)
 
 
 @blueprint.route("/account/basket", methods=["POST"])

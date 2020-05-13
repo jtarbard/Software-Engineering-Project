@@ -27,8 +27,8 @@ Your Basket
                         <td>
                             <h6>{{ basket_membership.name.capitalize() }} Membership</h6>
                             Duration: {{ basket_membership_duration }} Month<br>
-                            Start Date: {{ basket_membership.start_time }}<br>
-                            End Date: {{ basket_membership.end_time }}.<br>
+                            Start Date: {{ start_date.strftime("%d/%m/%y") }}<br>
+                            End Date: {{ end_date.strftime("%d/%m/%y") }}<br>
                             <input type="hidden" name="delete" id="delete" value="booking_item_{{basket_membership.membership_id}}">
                             <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
                         </td>
@@ -60,25 +60,26 @@ Your Basket
                                 <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * regular_discount / 100) }}</td>
                             </form>
                         </tr>
-                        <tr>
-                            <td>
-                                <form method="post">
-                                <input type="submit" name="delete_basket" value="Delete all items" class="btn btn-secondary">
-                                </form>
-                            </td>
-                        </tr>
                         {% endfor %}
                     {% endif %}
+                    <tr>
+                        <td>
+                            <form method="post">
+                            <input type="submit" name="delete_basket" value="Delete All" class="btn btn-secondary">
+                            </form>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
     <div id="summary" class="content-container col-12 col-lg-4">
         <h1>Order Summary</h1>
+        <div class="spacer"></div>
         {% if current_membership_discount %}
-            <h6>Pre-discount Item Total:</h6>
+            <h6>Subtotal:</h6>
         {% else %}
-            <h6>Total Payable:</h6>
+            <h6>Total:</h6>
         {% endif %}
         {% if basket_membership and basket_activities %}
             <p>£{{(basket_membership_duration * basket_membership.monthly_price) + total_activity_price}}</p>
@@ -90,10 +91,10 @@ Your Basket
             <p>£0</p>
         {% endif %}
         {% if current_membership_discount and basket_activities %}
-            <h6>Member Discounts:</h6>
-            <p>{{current_membership_discount}}% on all Activities</p>
+            <h6>Membership Discount:</h6>
             <p>-£{{ (current_membership_discount/100) * total_activity_price }}</p>
-            <h6>Total Payable:</h6>
+            <div class="spacer"></div>
+            <h6>Total:</h6>
             <p>£{{final_price}}</p>
         {% endif %}
 

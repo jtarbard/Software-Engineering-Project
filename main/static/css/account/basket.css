@@ -30,3 +30,9 @@
 #delete_btn {
     margin-top: 1vh;
 }
+
+.spacer {
+    background-color: var(--medium-color);
+    height: 0.03rem;
+    margin-bottom: var(--half-content-spacer);
+}
