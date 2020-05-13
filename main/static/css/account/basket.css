@@ -13,21 +13,21 @@
     color: white;
 }
 
-#submit_btn{
+.submit_btn{
     display: none;
     margin-top: 1vh;
 }
 
-#cancel_btn  {
+.cancel_btn  {
     display: none;
     margin-top: 1vh;
 }
 
-#edit_btn {
+.edit_btn {
     margin-top: 1vh;
 }
 
-#delete_btn {
+.delete_btn {
     margin-top: 1vh;
 }
 

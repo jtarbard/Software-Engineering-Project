@@ -11,7 +11,10 @@ Your Basket
 
 <div class="row">
     <div class="content-container col-12 col-lg-8">
-        <h1>Basket Items</h1>
+        <h1>Your Basket</h1>
+
+        {% if basket_membership is defined or (basket_activities | count) > 0 %}
+        <!-- Show table if basket is not empty -->
         <div class="table-responsive">
             <table class="table">
                 <thead>
@@ -27,10 +30,10 @@ Your Basket
                         <td>
                             <h6>{{ basket_membership.name.capitalize() }} Membership</h6>
                             Duration: {{ basket_membership_duration }} Month<br>
-                            Start Date: {{ start_date.strftime("%d/%m/%y") }}<br>
-                            End Date: {{ end_date.strftime("%d/%m/%y") }}<br>
-                            <input type="hidden" name="delete" id="delete" value="booking_item_{{basket_membership.membership_id}}">
-                            <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
+                            Start Date: {{ membership_start_date.strftime("%d-%b-%y") }}<br>
+                            End Date: {{ membership_end_date.strftime("%d-%b-%y") }}<br>
+                            <input type="hidden" name="delete" value="booking_item_{{basket_membership.membership_id}}">
+                            <input type="submit" id="delete_btn_membership" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
                         </td>
                         <td>1</td>
                         <td>None</td>
@@ -44,17 +47,17 @@ Your Basket
                                 <td>
                                     <h6>{{ activity.session_type.session_type_name.capitalize() }}</h6>
                                     Facility: {{ activity.facility.name.capitalize() }}<br>
-                                    Date: {{ activity.start_time.strftime("%m/%y") }}<br>
+                                    Date: {{ activity.start_time.strftime("%d-%b-%y") }}<br>
                                     Time: {{ activity.start_time.strftime("%H:%M") }} - {{ activity.end_time.strftime("%H:%M") }}<br>
-                                    <input type="hidden" name="delete" id="delete" value="booking_item_{{activity.activity_id}}">
+                                    <input type="hidden" name="delete" value="booking_item_{{activity.activity_id}}">
                                     <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
-                                    <input type="button" id="cancel_btn" onclick="edit()" value="Cancel" class="btn btn-secondary" required>
-                                    <input type="submit" id="submit_btn" name="update" value="Update" class="btn btn-primary">
-                                    <input type="submit" id="delete_btn" onclick="delete_item()" value="Delete" class="btn btn-secondary" required>
-                                    <input type="button" id="edit_btn" onclick="edit()" value="Edit" class="btn btn-secondary" required>
+                                    <input type="button" id="cancel_btn_a{{activity.activity_id}}" onclick="edit({{activity.activity_id}})" value="Cancel" class="btn btn-secondary cancel_btn" required>
+                                    <input type="submit" id="submit_btn_a{{activity.activity_id}}" name="update" value="Update" class="btn btn-primary submit_btn">
+                                    <input type="submit" id="delete_btn_a{{activity.activity_id}}" onclick="delete_item({{activity.activity_id}})" value="Delete" class="btn btn-secondary delete_btn" required>
+                                    <input type="button" id="edit_btn_a{{activity.activity_id}}" onclick="edit({{activity.activity_id}})" value="Edit" class="btn btn-secondary edit_btn" required>
                                 </td>
                                 <td>
-                                    <input type="number" id="num_change" name="num_change" max="8" min="0" value="{{num_bookings}}" class="form-control-plaintext" readonly>
+                                    <input type="number" id="num_change_a{{activity.activity_id}}" name="num_change" max="8" min="0" value="{{num_bookings}}" class="form-control-plaintext" readonly>
                                 </td>
                                 <td>{{ regular_discount }}%</td>
                                 <td>£{{ (num_bookings * session_price) - (num_bookings * session_price * regular_discount / 100) }}</td>
@@ -62,6 +65,8 @@ Your Basket
                         </tr>
                         {% endfor %}
                     {% endif %}
+
+                    <!-- Delete all button -->
                     <tr>
                         <td>
                             <form method="post">
@@ -72,6 +77,14 @@ Your Basket
                 </tbody>
             </table>
         </div>
+
+        {% else %}
+        <!-- If basket is empty, indicate so -->
+        <div class="container text-center" id="empty-basket-box">
+            <h4>You have an empty basket.</h4>
+            <h4>Go book an activity now!</h4>
+        </div>
+        {% endif %}
     </div>
     <div id="summary" class="content-container col-12 col-lg-4">
         <h1>Order Summary</h1>
@@ -108,7 +121,7 @@ Your Basket
 
             {% if User.__mapper_args__ ['polymorphic_identity'] != "Customer" %}
             <form method="post" action="/transactions/pay-card">
-                <input type="submit" name="submit" value="Pay With Cash" class="btn btn-primary">
+                <input type="submit" name="submit" value="Pay for a customer with cash" class="btn btn-primary">
                 <input type="hidden" name="checkout" value="user_has_checkout">
                 <input type="hidden" name="total_price" value="{{final_price}}">
                 <input type="hidden" name="payment_type" value="cash">
@@ -125,18 +138,18 @@ Your Basket
 <script>
     let edit_state = false;
 
-    function delete_item(){
-        document.getElementById("num_change").setAttribute("value","0");
-        const id = document.getElementById("delete").getAttribute("value");
+    function delete_item(activity_id){
+        document.getElementById("num_change_a" + activity_id).setAttribute("value","0");
+        const id = document.getElementById("delete_a" + activity_id).getAttribute("value");
         document.getElementById("id").submit();
     }
 
-    function edit(){
-        const input = document.getElementById("num_change");
-        const submit = document.getElementById("submit_btn");
-        const cancel = document.getElementById("cancel_btn");
-        const del = document.getElementById("delete_btn");
-        const edit = document.getElementById("edit_btn");
+    function edit(activity_id){
+        const input = document.getElementById("num_change_a" + activity_id);
+        const submit = document.getElementById("submit_btn_a" + activity_id);
+        const cancel = document.getElementById("cancel_btn_a" + activity_id);
+        const del = document.getElementById("delete_btn_a" + activity_id);
+        const edit = document.getElementById("edit_btn_a" + activity_id);
 
         if(edit_state){ //switch editing off
             input.classList.remove("form-control");

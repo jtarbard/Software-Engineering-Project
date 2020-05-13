@@ -78,6 +78,8 @@ def basket_view():
         flask.flash("User is invalid. Please try to login again.", category="error")
         return cl.destroy_account_cookie(flask.redirect("/account/login"))
 
+    print(basket_membership, basket_activities)
+
     if not (basket_activities or basket_membership):
         return flask.render_template("/account/basket.html", User=user, has_cookie=has_cookie)
 
@@ -112,16 +114,17 @@ def basket_view():
         total_activity_price += current_price - (current_price * regular_discounts[i] / 100)  # TODO: Bad floating point for money
 
     current_membership_discount = 0
+    memb_start_date = datetime.date.today()
+    memb_end_date = None
     # total_discounted_price = 0  # can uncomment but this is not needed (why is python weird)
     if basket_membership:
         total_discounted_price = (total_activity_price - basket_membership.discount / 100 * total_activity_price)
-        start_date = datetime.date.today()
-        if start_date.month+basket_membership_duration > 12:
-            end_date = datetime.date(start_date.year+1, start_date.month+basket_membership_duration-12, start_date.day)
-        elif start_date.month+basket_membership_duration == 12:
-            end_date = datetime.date(start_date.year + 1, start_date.month, start_date.day)
+        if memb_start_date.month+basket_membership_duration > 12:
+            memb_end_date = datetime.date(memb_start_date.year+1, memb_start_date.month+basket_membership_duration-12, memb_start_date.day)
+        elif memb_start_date.month+basket_membership_duration == 12:
+            memb_end_date = datetime.date(memb_start_date.year + 1, memb_start_date.month, memb_start_date.day)
         else:
-            end_date = datetime.date(start_date.year, start_date.month+basket_membership_duration, start_date.day)
+            memb_end_date = datetime.date(memb_start_date.year, memb_start_date.month+basket_membership_duration, memb_start_date.day)
 
         current_membership_discount = basket_membership.discount
         final_price = total_discounted_price + (basket_membership_duration * basket_membership.monthly_price)
@@ -145,7 +148,7 @@ def basket_view():
                                  basket_membership_duration=basket_membership_duration,
                                  total_discounted_price=round(total_discounted_price, 2),
                                  current_membership_discount=current_membership_discount,
-                                 start_date=start_date, end_date=end_date)
+                                 membership_start_date=memb_start_date, membership_end_date=memb_end_date)
 
 
 @blueprint.route("/account/basket", methods=["POST"])
@@ -155,6 +158,9 @@ def basket_delete_activity():
         return response
 
     data_form = flask.request.form
+
+    import pprint
+    pprint.pprint(data_form)
 
     if data_form.get("delete_basket"):
         return cl.destroy_basket_cookie(flask.redirect("/account/basket"))
