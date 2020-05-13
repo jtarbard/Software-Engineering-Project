@@ -73,14 +73,14 @@
     text-decoration: none;
 }
 
-a:hover {
-    text-decoration: none;
-}
-
 .more_about h2 {
     padding: 2vh;
     font-size: 1rem;
     color: white;
+}
+
+a:hover {
+    text-decoration: none;
 }
 
 .card {
