@@ -3,11 +3,9 @@
 }
 
 .card {
-    height: 95%;
     padding-top: 5vh;
     padding-bottom: 5vh;
     margin-bottom: 3vh;
-    min-height: 40vh;
 }
 
 .card-title {
@@ -22,7 +20,6 @@
 
 .card-text {
     width: 80%;
-    min-height: 20vh;
     margin: auto;
     margin-bottom: var(--half-content-spacer);
 }
@@ -35,4 +32,15 @@
     padding: 1vh;
     border-top: solid 0.1rem #ebebeb;
     border-bottom: solid 0.1rem #ebebeb;
+}
+
+@media (min-width: 1200px) {
+    .card {
+        height: 95%;
+        min-height: 40vh;
+    }
+
+    .card-text {
+        min-height: 20vh;
+    }
 }
