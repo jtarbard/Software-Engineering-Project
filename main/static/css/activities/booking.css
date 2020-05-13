@@ -7,7 +7,6 @@
     text-align: center;
 }
 
-
 .content-container {
     margin-top: var(--content-spacer);
 }
@@ -30,14 +29,6 @@ input {
 .fc-right .fc-button-group {
     /*justify-content: flex-end;*/
     float: right;
-}
-
-@media (max-width: 768px){
-    .fc-left, .fc-center h2, .fc-right {
-        display: flex;
-        justify-content: center;
-        float: none;
-    }
 }
 
 .progress-bar {
@@ -99,12 +90,6 @@ input {
     text-transform: unset;
 }
 
-@media (max-width: 768px){
-    #descriptionTextbox {
-        text-align: center;  /* Description box aligns left on medium-up, aligns center below medium */
-    }
-}
-
 /*#page_title h1 {*/
 /*    padding: 3vh 0;*/
 /*    padding-bottom: 0;*/
@@ -150,5 +135,15 @@ select.filter{
     .content-container {
         margin-top: 0;
         padding: var(--half-content-spacer);
+    }
+
+    #descriptionTextbox {
+        text-align: center;  /* Description box aligns left on medium-up, aligns center below medium */
+    }
+
+    .fc-left, .fc-center h2, .fc-right {
+        display: flex;
+        justify-content: center;
+        float: none;
     }
 }
