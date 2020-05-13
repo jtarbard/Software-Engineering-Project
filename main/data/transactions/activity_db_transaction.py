@@ -10,6 +10,13 @@ import main.data.transactions.employee_data_transaction as edf
 TAGS_CSV = "main/data/transactions/valid_tags.csv"
 
 
+def return_facility_types():
+    """
+    Returns all facility types as a list
+    """
+    return FacilityType.query.all()
+
+
 def return_facility_type_with_name(name: str):
     """
     Returns the facility type with the same name as the parameter

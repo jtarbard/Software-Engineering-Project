@@ -146,12 +146,12 @@ About the Vertex
                                 <th class="col">Price</th>
                             </thead>
                             <tbody>
-                                {% for facility in facility_types %}
-                                {% if facility.base_facility_price > 0 %}
+                                {% for facility_type in facility_types %}
+                                {% if facility_type.base_facility_price > 0 %}
                                  <tr>
-                                    <td>{{ facility.facility_type_name.title() }}</td>
-                                    <td>{{ facility.max_capacity }}</td>
-                                    <td>£{{ facility.base_facility_price }}+</td>
+                                    <td>{{ facility_type.facility_type_name.title() }}</td>
+                                    <td>{{ facility_type.max_capacity }}</td>
+                                    <td>£{{ facility_type.base_facility_price }}+</td>
                                 </tr>
                                 {% endif %}
                                 {% endfor %}

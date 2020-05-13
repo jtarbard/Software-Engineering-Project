@@ -46,7 +46,7 @@ def view_booking():
     request_activity_type_id = flask.request.args.get("request_activity_type_id")
     filter_facility_type_id = flask.request.args.get("filter_facility_type_id")
 
-    facilities = adf.return_facilities_with_facility_type_id(filter_facility_type_id)
+    facilities = adf.return_facilities(filter_facility_type_id)
 
     activity_type = adf.return_activity_type_with_id(request_activity_type_id)
     # The supplied id can be invalid, or the url doesn't contain a supplied id - in this case, it indicates the "show all" page is requested

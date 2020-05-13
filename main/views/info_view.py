@@ -1,6 +1,7 @@
 import flask
 import main.view_lib.cookie_lib as cl
-import main.data.transactions.transaction_db_transaction as db_transaction
+import main.data.transactions.activity_db_transaction as adf
+import main.data.transactions.transaction_db_transaction as tdf
 from main.data.db_classes.activity_db_class import FacilityType
 from main.data.db_classes.user_db_class import Customer
 from main.data.db_classes.transaction_db_class import MembershipType
@@ -12,14 +13,15 @@ blueprint = flask.Blueprint("info", __name__)
 @blueprint.route('/info/about', methods=["GET"])
 def about_func():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
-    return flask.render_template("/info/about.html", facility_types=FacilityType.query.all(), page_title="About", User=user, has_cookie=has_cookie)
+    print(adf.return_facility_types())
+    return flask.render_template("/info/about.html", facility_types=adf.return_facility_types(), page_title="About", User=user, has_cookie=has_cookie)
 
 
 @blueprint.route('/info/facilities', methods=["GET"])
 def facilities_view():
     user, response, has_cookie = cl.return_user_response(flask.request, False)
     return flask.render_template("/info/facilities.html", has_cookie=has_cookie,
-                                 facility_types=FacilityType.query.all(), page_title="Facilities", User=user)
+                                 facility_types=adf.return_facility_types(), page_title="Facilities", User=user)
 
 
 @blueprint.route('/info/memberships', methods=["GET"])
@@ -47,13 +49,13 @@ def buy_membership():
         return flask.redirect("/info/memberships")
 
     is_valid, basket_activities, basket_membership, basket_membership_duration = \
-        db_transaction.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
+        tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
     if not is_valid:
         flask.flash("User is invalid. Please try to login again.", category="error")
         return cl.destroy_account_cookie(flask.redirect("/account/login"))
 
-    new_membership_type = db_transaction.return_membership_type_with_id(membership_id)
+    new_membership_type = tdf.return_membership_type_with_id(membership_id)
     response = cl.add_activity_or_membership_to_basket(
         new_membership_type, flask.request, duration=membership_duration)
 
