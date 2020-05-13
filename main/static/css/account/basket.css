@@ -36,3 +36,11 @@
     height: 0.03rem;
     margin-bottom: var(--half-content-spacer);
 }
+
+.form-control-plaintext {
+    padding: 0;
+}
+
+.form-control {
+    margin-top: -7px;
+}
