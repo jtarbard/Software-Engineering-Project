@@ -246,7 +246,7 @@ def refund_booking():
     if not tdf.set_deletion_for_receipt_bookings_with_activity(receipt, activity):
         return flask.abort(500)
 
-    activity_type = adf.return_session_type_name_with_activity_type_id(activity.activity_type_id).title()
-    flask.flash(activity_type+" booking refunded.", "success")
+    session_type = adf.return_session_type_with_id(activity.session_type_id)
+    flask.flash(session_type.title() + " booking refunded.", "success")
 
     return flask.redirect("/account/bookings")

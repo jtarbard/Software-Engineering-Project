@@ -32,18 +32,20 @@ def return_session_type_with_id(session_type_id: int):
     return SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
 
 
-# Attempts to return the name of an session type with a specific session type ID, this is to combat
+# Attempts to return the name of an session type with a specific activity ID, this is to combat
 # lazy loading errors
 # [Lewis S]
-def return_session_type_name_with_activity_type_id(session_type_id):
-    session_type: SessionType = SessionType.query.filter(SessionType.session_type_id == session_type_id).first()
+def return_session_type_name_with_activity_id(activity_id):
+    activity_obj = return_activity_with_id(activity_id)
+    if activity_obj is None:
+        return "MissingActivity"
 
     # if not activity_type:
     #     log_transaction(f"Failed to return activity type name with activity type ID: {activity_type_id} from DB")
     # else:
     #     log_transaction(f"Successfully returned activity type name with activity type ID: {activity_type_id} from DB")
 
-    return str(session_type.session_type_name)
+    return str(activity_obj.session_type.session_type_name)
 
 
 # Returns the session type with the same name as the parameter

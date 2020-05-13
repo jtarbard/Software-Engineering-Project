@@ -58,8 +58,8 @@ def add_booking_to_basket_post():
     if not response:
         return flask.abort(500)
 
-    session_type_name = adf.return_session_type_name_with_activity_type_id(activity.activity_type_id)
-    flask.flash(session_type_name.title()+" session has been added to your basket.", category="success")
+    session_type = adf.return_session_type_with_id(activity.session_type_id)
+    flask.flash(session_type.session_type_name.title()+" session has been added to your basket.", category="success")
 
     response.headers['Access-Control-Allow-Origin'] = '*'
     return response

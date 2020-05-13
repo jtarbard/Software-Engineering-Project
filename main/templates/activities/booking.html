@@ -181,7 +181,7 @@
                         modal.find("#sessionPrice").val(session.session_price);
                         modal.find("#subtotal").html("<p>Subtotal: £" + session.subtotal + "</p>");
 
-                        {% if User is defined and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
+                        {% if User is defined and User is not none and User.__mapper_args__ ['polymorphic_identity'] == "Manager" %}
                         sessionInfoList.append(
                             "<li><b>Manager Info:</b></li>",
                             "<li>Total bookings: " + session.total_bookings + "</li>",
