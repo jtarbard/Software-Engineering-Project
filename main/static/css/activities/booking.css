@@ -149,5 +149,6 @@ select.filter{
 
     .content-container {
         margin-top: 0;
+        padding: var(--half-content-spacer);
     }
 }
