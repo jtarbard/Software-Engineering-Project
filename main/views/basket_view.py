@@ -74,13 +74,15 @@ def basket_view():
     is_valid, basket_activities, basket_membership, basket_membership_duration \
         = tdf.return_activities_and_memberships_from_basket_cookie_if_exists(flask.request)
 
+    if basket_activities is None:
+        basket_activities = list()
+
     if not is_valid:
         flask.flash("User is invalid. Please try to login again.", category="error")
         return cl.destroy_account_cookie(flask.redirect("/account/login"))
 
-    print(basket_membership, basket_activities)
-
-    if not (basket_activities or basket_membership):
+    # do not return if basket is empty
+    if basket_activities is [] and (basket_membership is None or basket_membership_duration is None):
         return flask.render_template("/account/basket.html", User=user, has_cookie=has_cookie)
 
     new_activities_basket = ""
@@ -159,16 +161,15 @@ def basket_delete_activity():
 
     data_form = flask.request.form
 
-    import pprint
-    pprint.pprint(data_form)
-
+    # if delete_all, create an empty basket cookie
     if data_form.get("delete_basket"):
-        return cl.destroy_basket_cookie(flask.redirect("/account/basket"))
+        return cl.create_basket_cookie(flask.redirect("/account/basket"))
 
-    booking = data_form.get("update")
+    # booking = data_form.get("update")
     booking_data = data_form.get("booking_id")
     num_change = int(data_form.get("num_change"))
-    if not (booking and booking_data) or num_change > 8 or num_change < 0:
+    name = data_form.get("name")
+    if booking_data is None or num_change > 8 or num_change < 0:
         return flask.abort(500)
 
     item = booking_data.split(":")
@@ -189,4 +190,6 @@ def basket_delete_activity():
 
     if not response:
         flask.abort(500)
+
+    flask.flash(f"Deleted {name}.", category="success")
     return response

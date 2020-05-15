@@ -13,7 +13,7 @@ Your Basket
     <div class="content-container col-12 col-lg-8">
         <h1>Your Basket</h1>
 
-        {% if basket_membership is defined or (basket_activities | count) > 0 %}
+        {% if basket_membership is defined and basket_membership is not none or (basket_activities | count) > 0 %}
         <!-- Show table if basket is not empty -->
         <div class="table-responsive">
             <table class="table">
@@ -49,6 +49,7 @@ Your Basket
                                     Facility: {{ activity.facility.name.capitalize() }}<br>
                                     Date: {{ activity.start_time.strftime("%d-%b-%y") }}<br>
                                     Time: {{ activity.start_time.strftime("%H:%M") }} - {{ activity.end_time.strftime("%H:%M") }}<br>
+                                    <input type="hidden" name="name" value="{{activity.session_type.session_type_name}}">
                                     <input type="hidden" name="delete" value="booking_item_{{activity.activity_id}}">
                                     <input type="hidden" name="booking_id" value="A:{{activity.activity_id}}">
                                     <input type="button" id="cancel_btn_a{{activity.activity_id}}" onclick="edit({{activity.activity_id}})" value="Cancel" class="btn btn-secondary cancel_btn" required>
@@ -141,8 +142,8 @@ Your Basket
 
     function delete_item(activity_id){
         document.getElementById("num_change_a" + activity_id).setAttribute("value","0");
-        const id = document.getElementById("delete_a" + activity_id).getAttribute("value");
-        document.getElementById("id").submit();
+        // const del = document.getElementById("delete_btn_a" + activity_id).getAttribute("value");
+        // del.submit();
     }
 
     function edit(activity_id){

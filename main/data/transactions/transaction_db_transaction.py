@@ -88,8 +88,9 @@ def return_activities_and_memberships_from_basket_cookie_if_exists(request: flas
 
     basket = request.cookies["vertex_basket_cookie"]
 
+    # if basket doesn't exist, it's still valid. But return empty for activities and memberships
     if not basket:
-        return False, None, None, None
+        return True, [], None, None
 
     basket_instances = basket.split(";")
 

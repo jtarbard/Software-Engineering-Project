@@ -39,6 +39,9 @@ def return_regular_discounts(basket_activities=None):
     :param basket_activities: a list of activity objects
     """
 
+    if basket_activities is None:
+        basket_activities = list()
+
     def regular_discount(item_count):
         if item_count >= 10:
             return 50

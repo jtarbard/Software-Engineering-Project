@@ -53,6 +53,11 @@ def destroy_basket_cookie(response: Response) -> Response:
     return response
 
 
+def create_basket_cookie(response: flask):
+    response.set_cookie("vertex_basket_cookie", "", max_age=datetime.timedelta(days=1))
+    return response
+
+
 # Validates that the user has a valid cookie, if so, then the user can access their account
 def check_valid_account_cookie(request: flask.request):
     if "vertex_account_cookie" not in request.cookies:  # Cookie does not exist
@@ -120,12 +125,12 @@ def add_activity_or_membership_to_basket(booking_objects, request: flask.request
         else:
             return None
 
-        if b == 0 and "vertex_basket_cookie" not in request.cookies:
+        if b == 0 and (request.cookies.get("vertex_basket_cookie", "") is ""):  
             basket_buffer = add_instance
             for i in range(num_people - 1):
                 basket_buffer += ";" + add_instance
             continue  # don't add more
-        elif b == 0:  # has basket cookie
+        elif b == 0:  # has basket cookie with activities selected
             basket = request.cookies.get("vertex_basket_cookie", basket_buffer)
         else:
             basket = basket_buffer
@@ -165,8 +170,10 @@ def change_items_with_id_from_cookie(id: int, num_change: int, response: flask, 
 
     basket = request.cookies["vertex_basket_cookie"]
 
+    # if basket cookie does not exist, create an empty one
     if not basket:
-        return None
+        response.set_cookie("vertex_basket_cookie", "", max_age=datetime.timedelta(days=1))
+        return response
 
     basket_instances = basket.split(";")
 
